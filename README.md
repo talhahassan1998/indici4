@@ -131,4 +131,3 @@ The prototype was checked in headless Chromium:
 - **Interaction** — 11 end-to-end flows: arrival status, calendar drag,
   letter autosave and template insert, AI scribe, kanban drag, ACC fix-now
   revalidation, inbox approval, split invoicing, command palette routing
-# indici4

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en-NZ" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kora Health — Practice Management</title>
+<meta name="description" content="Kora Health — cloud practice management for New Zealand specialist clinics. Unified patient view, letters, ACC, and billing in one place.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2314635C'/%3E%3Cpath d='M10 8v16M10 16l7-8M10 16l7 8' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='23' cy='11' r='2.4' fill='%23E9B254'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+<a class="skip-link" href="#view">Skip to main content</a>
+
+<div class="app" id="app" data-rail="false">
+
+  <!-- ================= Sidebar ================= -->
+  <nav class="app-sidebar" aria-label="Main">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 4v16M7 12l7.5-8M7 12l7.5 8"/>
+        </svg>
+      </span>
+      <span class="brand-name">
+        <b>Kora Health</b>
+        <span>Newmarket</span>
+      </span>
+    </div>
+
+    <div class="nav" id="nav"></div>
+
+    <div class="sidebar-ft">
+      <button class="u-card" id="userBtn" aria-haspopup="menu">
+        <span class="avatar tone-1" id="userAvatar">AF</span>
+        <span class="u-meta grow">
+          <b id="userName">Dr Alice Fenwick</b>
+          <span id="userRole">Clinician</span>
+        </span>
+        <span class="u-meta" aria-hidden="true"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m6.4 9.4 5.6 5.6 5.6-5.6"/></svg></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= Main ================= -->
+  <div class="app-main">
+    <header class="app-topbar">
+      <button class="btn btn-ghost btn-icon tip" id="railToggle" data-tip="Collapse sidebar" aria-label="Collapse sidebar" aria-expanded="true"></button>
+
+      <div class="global-search" role="search">
+        <span class="ic-lead" id="searchIcon"></span>
+        <input class="input" id="globalSearch" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Search patients by name, NHI, DOB or phone…"
+               aria-label="Search patients" aria-expanded="false" aria-controls="searchResults" role="combobox">
+        <span class="kbd">/</span>
+        <div class="search-results" id="searchResults" role="listbox" hidden></div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" id="cmdkBtn">
+          <span id="cmdkIcon"></span><span>Actions</span><span class="kbd">Ctrl K</span>
+        </button>
+        <button class="role-switch tip" id="roleBtn" data-tip="Switch role view" aria-haspopup="menu">
+          <span class="role-dot"></span><span class="role-name" id="roleLabel">Clinician</span>
+          <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.4 9.4 5.6 5.6 5.6-5.6"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-icon tip" id="inboxBtn" data-tip="Inbox" aria-label="Inbox" style="position:relative"></button>
+        <button class="btn btn-ghost btn-icon tip" id="themeBtn" data-tip="Toggle dark mode" aria-label="Toggle dark mode"></button>
+      </div>
+    </header>
+
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div class="toast-host" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/views/dashboard.js"></script>
+<script src="assets/js/views/appointments.js"></script>
+<script src="assets/js/views/patients.js"></script>
+<script src="assets/js/views/patient.js"></script>
+<script src="assets/js/views/inbox.js"></script>
+<script src="assets/js/views/letters.js"></script>
+<script src="assets/js/views/tasks.js"></script>
+<script src="assets/js/views/billing.js"></script>
+<script src="assets/js/views/acc.js"></script>
+<script src="assets/js/views/reports.js"></script>
+<script src="assets/js/views/admin.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

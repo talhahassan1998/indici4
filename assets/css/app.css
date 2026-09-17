@@ -620,3 +620,114 @@
   .fn-item { white-space: nowrap; }
   .cb-alerts { align-items: flex-start; max-width: none; flex-direction: row; flex-wrap: wrap; }
 }
+
+/* ==========================================================================
+   Patient grid — full bleed, full height, built for thousands of rows
+   ========================================================================== */
+.ps-shell {
+  display: flex; flex-direction: column;
+  height: calc(100vh - var(--topbar-h));
+  min-width: 0;
+}
+.ps-head {
+  display: flex; align-items: flex-end; gap: var(--s-4); flex-wrap: wrap;
+  padding: var(--s-5) var(--s-5) var(--s-4); flex: none;
+}
+.ps-filters {
+  flex: none; padding: 0 var(--s-5) var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+.ps-filter-grid {
+  display: grid; gap: var(--s-3);
+  grid-template-columns: minmax(200px, 1.6fr) minmax(130px, .8fr) minmax(130px, .8fr) minmax(170px, 1.1fr) auto;
+  align-items: end;
+}
+.ps-legend {
+  display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap;
+  padding: 7px var(--s-5); flex: none;
+  background: var(--surface-2); border-bottom: 1px solid var(--line);
+}
+.ps-legend .lg { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-2xs); color: var(--text-muted); }
+.ps-legend .lg i { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+
+/* The grid itself owns the remaining height and scrolls in both directions. */
+.ps-grid { flex: 1 1 auto; overflow: auto; background: var(--surface); min-height: 0; }
+.ps-grid table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
+.ps-grid thead th {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--surface-2);
+  padding: 8px var(--s-3); white-space: nowrap;
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-subtle);
+  text-align: left; border-bottom: 1px solid var(--line-strong);
+}
+.ps-grid thead th.sortable { cursor: pointer; user-select: none; }
+.ps-grid thead th.sortable:hover { color: var(--text); background: var(--surface-3); }
+.ps-grid thead th .sort-ind { opacity: .35; margin-left: 3px; }
+.ps-grid thead th[aria-sort] .sort-ind { opacity: 1; color: var(--accent-text); }
+.ps-grid tbody td {
+  padding: 7px var(--s-3); white-space: nowrap;
+  border-bottom: 1px solid var(--line-faint); font-size: var(--fs-sm);
+  vertical-align: middle;
+}
+.ps-grid tbody tr { transition: background var(--dur-1) var(--ease); cursor: pointer; }
+.ps-grid tbody tr:hover { background: var(--surface-2); }
+.ps-grid tbody tr:focus-visible { background: var(--accent-soft); outline: 2px solid var(--focus); outline-offset: -2px; }
+.ps-grid td.wrap-cell { white-space: normal; min-width: 210px; max-width: 280px; }
+
+/* Name cell carries the enrolment colour, with a dot that repeats it as shape. */
+.pname { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
+.pname .p-dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.pname b { font-weight: var(--fw-semi); }
+.pname .p-pref { color: var(--text-subtle); font-weight: var(--fw-regular); }
+
+/* Action row: same affordances as before, drawn as one consistent icon set. */
+.p-actions { display: flex; align-items: center; gap: 1px; }
+.p-actions .pa {
+  width: 26px; height: 26px; border-radius: var(--r-xs);
+  display: grid; place-items: center; color: var(--text-subtle);
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.p-actions .pa:hover { background: var(--accent-soft); color: var(--accent-text); }
+.p-actions .pa.danger:hover { background: var(--bad-bg); color: var(--bad-fg); }
+.p-actions .pa-sep { width: 1px; height: 16px; background: var(--line); margin: 0 3px; flex: none; }
+tbody tr:hover .p-actions .pa { color: var(--text-muted); }
+
+.ps-foot {
+  display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; flex: none;
+  padding: 9px var(--s-5); border-top: 1px solid var(--line); background: var(--surface-2);
+}
+.pager { display: inline-flex; align-items: center; gap: 2px; }
+.pager button {
+  min-width: 30px; height: 30px; padding: 0 8px; border-radius: var(--r-xs);
+  font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.pager button:hover:not(:disabled) { background: var(--surface-3); color: var(--text); }
+.pager button[aria-current="true"] { background: var(--accent); color: var(--text-on-accent); }
+.pager button:disabled { opacity: .35; cursor: not-allowed; }
+
+@media (max-width: 1100px) {
+  .ps-filter-grid { grid-template-columns: 1fr 1fr; }
+  .ps-filter-grid > *:last-child { grid-column: 1 / -1; }
+}
+
+/* Name and Actions stay pinned while the middle columns scroll horizontally —
+   otherwise the most-used column is the one furthest off-screen. */
+.ps-grid thead th:first-child,
+.ps-grid tbody td:first-child { position: sticky; left: 0; z-index: 2; background: var(--surface); }
+.ps-grid thead th:last-child,
+.ps-grid tbody td:last-child  { position: sticky; right: 0; z-index: 2; background: var(--surface); }
+.ps-grid thead th:first-child,
+.ps-grid thead th:last-child  { z-index: 5; background: var(--surface-2); }
+
+.ps-grid tbody td:first-child { box-shadow: 1px 0 0 var(--line-faint); }
+.ps-grid tbody td:last-child  { box-shadow: -1px 0 0 var(--line-faint); }
+.ps-grid thead th:first-child { box-shadow: 1px 0 0 var(--line); }
+.ps-grid thead th:last-child  { box-shadow: -1px 0 0 var(--line); }
+
+/* Pinned cells paint their own background, so the row hover has to be repeated. */
+.ps-grid tbody tr:hover td:first-child,
+.ps-grid tbody tr:hover td:last-child { background: var(--surface-2); }
+.ps-grid tbody tr:focus-visible td:first-child,
+.ps-grid tbody tr:focus-visible td:last-child { background: var(--accent-soft); }

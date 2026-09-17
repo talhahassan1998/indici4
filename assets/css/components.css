@@ -112,7 +112,8 @@
   position: relative; display: inline-flex; align-items: center;
   width: 38px; height: 22px; flex: none; cursor: pointer;
 }
-.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.switch input { position: absolute; inset: 0; z-index: 1; opacity: 0; width: 100%; height: 100%;
+                margin: 0; cursor: pointer; }   /* sits above track and thumb so it is the click target */
 .switch .track {
   width: 100%; height: 100%; border-radius: var(--r-pill);
   background: var(--n-300); transition: background var(--dur-2) var(--ease);

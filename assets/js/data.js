@@ -121,6 +121,143 @@
 
   const consultTypes = ['Note only', 'Face to face', 'Telehealth', 'Phone', 'Home visit', 'Nurse consult', 'ACC review'];
 
+
+  /* ======================================================================
+     Bulk sample population.
+     A real practice grid is thousands of rows, so the design has to hold up
+     at volume: sticky header, pagination, and columns that stay readable.
+     Generated deterministically, and every NHI carries a valid check digit.
+     ====================================================================== */
+  const extraProviders = [
+    { id:'v1', name:'Dr Cathy Ferguson',  initials:'CF', role:'Provider', spec:'General Practitioner', tone:2 },
+    { id:'v2', name:'Dr Alan Phillips',   initials:'AP', role:'Provider', spec:'General Practitioner', tone:4 },
+    { id:'v3', name:'Dr Moana Reihana',   initials:'MR', role:'Provider', spec:'General Practitioner', tone:1 },
+    { id:'v4', name:'Dr Ian Whitcombe',   initials:'IW', role:'Provider', spec:'General Practitioner', tone:3 },
+    { id:'v5', name:'Nurse Aroha Pene',   initials:'AP', role:'Provider', spec:'Practice Nurse',       tone:5 },
+  ];
+  staff.push(...extraProviders);
+
+  (function generatePopulation() {
+    // Small deterministic PRNG so the set is identical on every load.
+    let seed = 20260917;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    const pick = a => a[Math.floor(rnd() * a.length)];
+    const int = (lo, hi) => lo + Math.floor(rnd() * (hi - lo + 1));
+
+    const SURNAMES = [
+      'NGATA','WAITITI','KAWITI','PARATA','MĀTAIRA','TAIT','SOLOMON','RĀWIRI','HEKE','TAMATI',
+      'HOHEPA','IHAKA','MANAIA','ROPATA','PŌTIKI','TE RANGI','WHAREPAPA','MARINO','KĒPA','NGAWATI',
+      'TUPOU','FIFITA','FALEOLO','TAUFA','LATU','VAKA','HALAPUA','TUILAGI','SAVEA','FONOTI',
+      'IOSEFA','LEOTA','MATAELE','PELE','TAUAFIAFI',
+      "O'CONNELL",'SUTHERLAND','BENNETT','LOCKHART','BECKETT','DOWNIE','PETERSEN','FENWICK','HARDING',
+      'ASHCROFT','PRENDERGAST','KIRKWOOD','BLACKWELL','THORNTON','WINSTANLEY','ALDERTON','CUSACK',
+      'MERRICK','WHITCOMBE','BRADY','TRAYLOR','JEWETT','BRITT','BETSON','BOOT',
+      'NAIDU','RAMCHAND','PRASAD','CHAUHAN','IYER','SEKHON','BHATIA','DHILLON','KAPADIA','MISTRY',
+      'CHEN','ZHANG','LIU','HUANG','WONG','LAM','NG','TSE','YEUNG','KWOK',
+      'DELA CRUZ','BAUTISTA','VILLANUEVA','AGUSTIN',
+    ];
+    const FIRST_F = ['Te Aroha','Anahera','Tui','Mereana','Marama','Aroha','Māia','Hine','Ngaire','Moana',
+      'Mele','Sina','Losa','Ana','Ofa','Litia','Priya','Anjali','Deepa','Kavita','Mei','Ling','Hui','Xiu',
+      'Margaret','Chloe','Lorraine','Kate','Alice','Sarah','Emma','Charlotte','Isla','Mia','Ruby','Ella',
+      'Ava','Zoe','Harriet','Jocelyn','Noeline','Bridget','Fiona','Rosemary'];
+    const FIRST_M = ['Hemi','Wiremu','Rangi','Kahu','Tama','Nikau','Ihaia','Manaaki','Rāwiri','Tane',
+      'Siosaia','Sione','Tevita','Filipe','Malakai','Ravi','Sunil','Rohan','Arjun','Vikram',
+      'Wei','Jian','Ming','Hao','James','Bruce','Josh','Peter','Liam','Oliver','Hunter','Jack','Leo',
+      'Max','Noah','Malcolm','Gordon','Trevor','Desmond','Clive','Angus','Duncan'];
+    const PREF = { 'Margaret':'Maggie','James':'Jim','Charlotte':'Lottie','Te Aroha':'Aroha',
+      'Wiremu':'Wiri','Rosemary':'Rose','Desmond':'Des','Malcolm':'Mal','Elizabeth':'Liz' };
+
+    const STREETS = ['Devon Street','Caroline Road','Maanihi Drive','Maple Street','Andrew Avenue',
+      'Hamilton Place','Brightside Road','Molesworth Street','Longfellow Avenue','Kōwhai Road',
+      'Rata Street','Puriri Drive','Rewi Street','Hurstmere Road','Jervois Road','Bassett Road',
+      'Tiverton Road','Favona Road','Lake Road','Broadway','Anzac Street','Balmoral Road',
+      'Sandringham Road','Wairau Road','Seabrook Avenue','Great North Road','Riccarton Road'];
+    const PLACES = [
+      ['Newmarket','Auckland','1023'], ['Takapuna','Auckland','0622'], ['Māngere','Auckland','2022'],
+      ['Henderson','Auckland','0612'], ['Onehunga','Auckland','1061'], ['Remuera','Auckland','1050'],
+      ['Mt Eden','Auckland','1024'], ['Devonport','Auckland','0624'], ['Glenfield','Auckland','0629'],
+      ['Avondale','Auckland','0600'], ['Papatoetoe','Auckland','2025'], ['Epsom','Auckland','1023'],
+      ['Rototuna','Hamilton','3210'], ['Chartwell','Hamilton','3210'], ['Glenholme','Rotorua','3010'],
+      ['Mayfair','Hastings','4122'], ['Roslyn','Palmerston North','4414'], ['Bunnythorpe','Palmerston North','4478'],
+      ['Napier South','Napier','4110'], ['Thorndon','Wellington','6011'], ['Riccarton','Christchurch','8041'],
+      ['Papanui','Christchurch','8052'], ['Mosgiel','Dunedin','9024'], ['Mount Maunganui','Tauranga','3116'],
+    ];
+
+    const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const usedNhi = new Set(patients.map(x => x.nhi));
+    function makeNhi() {
+      for (let attempt = 0; attempt < 400; attempt++) {
+        const stem = [0,1,2].map(() => ALPHA[int(0, ALPHA.length - 1)]).join('')
+                   + [0,1,2].map(() => int(0, 9)).join('');
+        let total = 0;
+        for (let i = 0; i < 6; i++) {
+          const ch = stem[i];
+          total += (/[A-Z]/.test(ch) ? ALPHA.indexOf(ch) + 1 : Number(ch)) * (7 - (i + 1));
+        }
+        const rem = total % 11;
+        if (rem === 0) continue;
+        const cd = (11 - rem) === 10 ? 0 : 11 - rem;
+        const nhi = stem + cd;
+        if (!usedNhi.has(nhi)) { usedNhi.add(nhi); return nhi; }
+      }
+      return null;
+    }
+
+    const STATUSES = ['enrolled','enrolled','enrolled','enrolled','enrolled','enrolled',
+                      'unenrolled','casual','transferred','notfunded','deceased'];
+    const PAYGRPS = ['P','P','P','P','CAS','absgp','BD','C3'];
+    const FUNDERS = ['ACC','Southern Cross','Private','Private','ACC'];
+    const providerIds = ['u1','u2','u3','u4','v1','v2','v3','v4','v5'];
+
+    const TOTAL = 480;
+    for (let i = 0; i < TOTAL; i++) {
+      const nhi = makeNhi();
+      if (!nhi) break;
+      const sex = rnd() < 0.52 ? 'F' : 'M';
+      const first = sex === 'F' ? pick(FIRST_F) : pick(FIRST_M);
+      const last = pick(SURNAMES);
+      const status = pick(STATUSES);
+      const [suburb, city, pc] = pick(PLACES);
+      const year = int(1932, 2024);
+      const month = int(1, 12), day = int(1, 28);
+      const enrolled = status === 'enrolled' || status === 'notfunded';
+      const hasBalance = rnd() < 0.18;
+
+      patients.push({
+        id: 'g' + (i + 1),
+        first, last,
+        preferred: PREF[first] && rnd() < 0.5 ? PREF[first] : null,
+        dob: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`,
+        sex, nhi,
+        phone: rnd() < 0.7 ? `+64 2${int(0,9)} ${int(100,999)} ${int(1000,9999)}` : '',
+        email: `${first.toLowerCase().replace(/[^a-z]/g,'')}.${last.toLowerCase().replace(/[^a-z]/g,'')}@example.co.nz`,
+        addr: `${int(1,220)} ${pick(STREETS)}, ${suburb}, ${city} ${pc}`,
+        gp: pick(gps).id,
+        funder: pick(FUNDERS),
+        alerts: rnd() < 0.14 ? [pick(['Penicillin allergy','NSAID sensitivity','Latex allergy','Sulfa drugs','Codeine — nausea'])] : [],
+        warn: rnd() < 0.08 ? [pick(['Falls risk','Interpreter required','Anticoagulated','Pacemaker in situ'])] : [],
+        nok: '', claim: null, injury: null,
+        tone: int(1, 5),
+        // registration fields
+        status,
+        enrol: enrolled ? 'NES' : 'U',
+        reg: enrolled ? 'R' : 'C',
+        payGrp: pick(PAYGRPS),
+        gms: pick(['A3','A3','A3','C3']),
+        fund: rnd() < 0.12 ? 'F' : 'N',
+        csc: rnd() < 0.22,
+        provider: pick(providerIds),
+        chart: 'KRA-' + (47500 + i),
+        ethnicity: pick(['NZ European','Māori','Samoan','Tongan','Cook Islands Māori','Indian','Chinese','Filipino','Other European']),
+        quintile: int(1, 5),
+        dhb: pick(['G00028-E','G00011-A','G00042-C']),
+        portal: rnd() < 0.55,
+        ahBalance: 0,
+        bal: hasBalance ? Math.round(rnd() * 84000) / 100 : 0,
+      });
+    }
+  })();
+
   const apptTypes = [
     { id:'t1', name:'New consultation',     type:'consult',    mins:45, price:395.00, code:'CON-NEW' },
     { id:'t2', name:'Follow-up',            type:'followup',   mins:20, price:195.00, code:'CON-FU' },
@@ -430,9 +567,13 @@
 
     NHI_ALPHA,
     /* Outstanding balance — what reception is asked about at the desk. */
-    balance: id => invoices
-      .filter(i => i.pt === id && (i.status === 'sent' || i.status === 'overdue'))
-      .reduce((sum, i) => sum + i.items.reduce((a, x) => a + x.q * x.p, 0) * (1 + GST), 0),
+    balance: id => {
+      const p = patients.find(x => x.id === id);
+      if (p && p.bal != null) return p.bal;
+      return invoices
+        .filter(i => i.pt === id && (i.status === 'sent' || i.status === 'overdue'))
+        .reduce((sum, i) => sum + i.items.reduce((a, x) => a + x.q * x.p, 0) * (1 + GST), 0);
+    },
     /* "BRADY, Thomas (Tom)" — surname first, preferred name in brackets. */
     displayName: p => `${p.last.toUpperCase()}, ${p.first}${p.preferred ? ` (${p.preferred})` : ''}`,
     /* NZ NHI validation — old AAANNNN format, modulus 11 check digit. */

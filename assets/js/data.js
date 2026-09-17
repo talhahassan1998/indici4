@@ -217,11 +217,123 @@
     { id:'n5', pt:'p10', by:'u2', at:'2026-09-16T09:15', title:'Abdominal pain — workup',        signed:false },
   ];
 
+
+  /* ---- Billing codes: mastered in Xero, synced into Kora ---- */
+  const XERO_SYNC = '2026-09-17T09:42';
+  const billingCodes = [
+    { code:'CON-NEW',  name:'New consultation',            price:395.00, acct:'200', tax:'GST on Income', acc:null,    active:true },
+    { code:'CON-FU',   name:'Follow-up consultation',      price:195.00, acct:'200', tax:'GST on Income', acc:null,    active:true },
+    { code:'TEL-FU',   name:'Telehealth follow-up',        price:145.00, acct:'200', tax:'GST on Income', acc:null,    active:true },
+    { code:'PROC-MIN', name:'Minor procedure',             price:860.00, acct:'201', tax:'GST on Income', acc:null,    active:true },
+    { code:'INJ-JT',   name:'Joint injection',             price:120.00, acct:'201', tax:'GST on Income', acc:null,    active:true },
+    { code:'USG',      name:'Ultrasound guidance',         price:180.00, acct:'201', tax:'GST on Income', acc:null,    active:true },
+    { code:'DRESS',    name:'Dressing / wound care',       price:85.00,  acct:'200', tax:'GST on Income', acc:null,    active:true },
+    { code:'ACC-SP01', name:'ACC specialist assessment',   price:395.00, acct:'210', tax:'GST on Income', acc:'SP01',  active:true },
+    { code:'ACC-SP08', name:'ACC specialist review',       price:195.00, acct:'210', tax:'GST on Income', acc:'SP08',  active:true },
+    { code:'ACC-SP12', name:'ACC nurse review',            price:85.00,  acct:'210', tax:'GST on Income', acc:'SP12',  active:true },
+    { code:'REPORT',   name:'Medico-legal report',         price:550.00, acct:'220', tax:'GST on Income', acc:null,    active:true },
+    { code:'DNA-FEE',  name:'Did not attend fee',          price:75.00,  acct:'230', tax:'GST on Income', acc:null,    active:false },
+  ];
+
+  /* ---- Clinic financial identity, shown on every invoice (from Xero) ---- */
+  const org = {
+    legal:'Kora Health Limited', trading:'Kora Specialists',
+    gst:'123-456-789', nzbn:'9429040000000',
+    bank:'12-3456-0078901-00', bankName:'Kora Health Ltd',
+    email:'accounts@korahealth.nz', phone:'09 523 8840',
+    terms:'Payment due within 14 days. Please quote the invoice number as reference.',
+    xeroOrg:'Kora Health Limited', xeroBrand:'Kora Specialists — standard',
+  };
+
+  /* ---- Doctor timetables: recurring weekly sessions per location ---- */
+  // day 0 = Monday … 4 = Friday
+  const timetables = [
+    { cl:'u1', day:0, start:8*60,     end:12*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u1', day:0, start:13*60,    end:17*60,    clinic:'c3', kind:'theatre' },
+    { cl:'u1', day:1, start:8*60,     end:17*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u1', day:2, start:8*60,     end:12*60,    clinic:'c2', kind:'clinic'  },
+    { cl:'u1', day:3, start:8*60+30,  end:17*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u1', day:4, start:8*60,     end:12*60,    clinic:'c1', kind:'clinic'  },
+
+    { cl:'u2', day:0, start:8*60,     end:16*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u2', day:2, start:8*60,     end:12*60,    clinic:'c3', kind:'theatre' },
+    { cl:'u2', day:3, start:8*60,     end:17*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u2', day:4, start:13*60,    end:17*60,    clinic:'c1', kind:'admin'   },
+
+    { cl:'u3', day:1, start:9*60,     end:16*60,    clinic:'c2', kind:'clinic'  },
+    { cl:'u3', day:3, start:9*60+30,  end:16*60,    clinic:'c2', kind:'clinic'  },
+
+    { cl:'u4', day:0, start:8*60+30,  end:16*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u4', day:2, start:8*60+30,  end:16*60,    clinic:'c1', kind:'clinic'  },
+    { cl:'u4', day:3, start:8*60+30,  end:10*60+30, clinic:'c1', kind:'clinic'  },
+  ];
+
+  /* ---- Prescribing ---- */
+  const pharmacies = [
+    { id:'ph1', name:'Unichem Newmarket',            addr:'250 Broadway, Newmarket',        edi:'UNINEW'  },
+    { id:'ph2', name:'Chemist Warehouse Sandringham',addr:'482 Sandringham Rd, Sandringham',edi:'CWSAND'  },
+    { id:'ph3', name:'Life Pharmacy Takapuna',       addr:'40 Hurstmere Rd, Takapuna',      edi:'LIFETAK' },
+    { id:'ph4', name:'Māngere Town Centre Pharmacy', addr:'93 Bader Dr, Māngere',           edi:'MANGTC'  },
+    { id:'ph5', name:'Bayview Pharmacy',             addr:'12 Glenfield Rd, Glenfield',     edi:'BAYGLN'  },
+  ];
+
+  // `classes` drives allergy checking against the patient's recorded alerts
+  const medicines = [
+    { id:'m1', name:'Naproxen',           form:'500 mg tablet', dose:'One tablet twice daily with food', classes:['NSAID'],      qty:30, repeats:1, funded:true  },
+    { id:'m2', name:'Paracetamol',        form:'500 mg tablet', dose:'Two tablets four times daily as needed', classes:[],       qty:100,repeats:2, funded:true  },
+    { id:'m3', name:'Codeine phosphate',  form:'30 mg tablet',  dose:'One tablet up to four times daily', classes:['Opioid','Codeine'], qty:20, repeats:0, funded:true },
+    { id:'m4', name:'Amoxicillin',        form:'500 mg capsule',dose:'One capsule three times daily for 7 days', classes:['Penicillin'], qty:21, repeats:0, funded:true },
+    { id:'m5', name:'Methotrexate',       form:'10 mg tablet',  dose:'Once weekly — Tuesdays. With folic acid.', classes:['DMARD'], qty:12, repeats:5, funded:true },
+    { id:'m6', name:'Omeprazole',         form:'20 mg capsule', dose:'One capsule daily before food', classes:[],                qty:30, repeats:5, funded:true  },
+    { id:'m7', name:'Prednisone',         form:'20 mg tablet',  dose:'Reducing course — see instructions', classes:['Steroid'],  qty:30, repeats:0, funded:true  },
+    { id:'m8', name:'Celecoxib',          form:'200 mg capsule',dose:'One capsule daily', classes:['NSAID'],                     qty:30, repeats:1, funded:false },
+    { id:'m9', name:'Cotrimoxazole',      form:'480 mg tablet', dose:'Two tablets twice daily', classes:['Sulfa'],               qty:20, repeats:0, funded:true  },
+  ];
+
+  const prescriptions = [
+    { id:'rx1', pt:'p1',  by:'u1', at:'2026-08-02T10:10', med:'m1', pharmacy:'ph2', status:'dispensed', qty:30, repeats:1 },
+    { id:'rx2', pt:'p14', by:'u3', at:'2026-09-10T11:30', med:'m5', pharmacy:'ph1', status:'sent',      qty:12, repeats:5 },
+    { id:'rx3', pt:'p3',  by:'u1', at:'2026-09-05T09:15', med:'m2', pharmacy:'ph3', status:'dispensed', qty:100,repeats:2 },
+  ];
+
+  /* ---- Test requesting ---- */
+  const testProviders = [
+    { id:'tp-rad1', name:'Auckland Radiology',  kind:'radiology', edi:'AKLRAD'  },
+    { id:'tp-rad2', name:'TRG Imaging',         kind:'radiology', edi:'TRGIMG'  },
+    { id:'tp-rad3', name:'Horizon Radiology',   kind:'radiology', edi:'HORIZON' },
+    { id:'tp-lab1', name:'Awanui Labs',         kind:'pathology', edi:'AWANUI'  },
+    { id:'tp-lab2', name:'Medlab Auckland',     kind:'pathology', edi:'MEDLAB'  },
+  ];
+
+  const testCatalogue = [
+    { id:'t-xr',   kind:'radiology', name:'X-ray',                  prep:'No preparation required', accFundable:true  },
+    { id:'t-usg',  kind:'radiology', name:'Ultrasound',             prep:'Fasting may be required for abdominal scans', accFundable:true },
+    { id:'t-ct',   kind:'radiology', name:'CT scan',                prep:'Check renal function before contrast', accFundable:true },
+    { id:'t-mri',  kind:'radiology', name:'MRI',                    prep:'Screen for implants and pacemaker', accFundable:true },
+    { id:'t-dexa', kind:'radiology', name:'DEXA bone density',      prep:'No preparation required', accFundable:false },
+    { id:'t-fbc',  kind:'pathology', name:'Full blood count',       prep:'No preparation required', accFundable:false },
+    { id:'t-crp',  kind:'pathology', name:'CRP and ESR',            prep:'No preparation required', accFundable:false },
+    { id:'t-lft',  kind:'pathology', name:'Liver function tests',   prep:'No preparation required', accFundable:false },
+    { id:'t-ue',   kind:'pathology', name:'Urea, creatinine and electrolytes', prep:'No preparation required', accFundable:false },
+    { id:'t-hba1c',kind:'pathology', name:'HbA1c',                  prep:'No fasting required', accFundable:false },
+    { id:'t-rf',   kind:'pathology', name:'Rheumatoid factor and anti-CCP', prep:'No preparation required', accFundable:false },
+    { id:'t-ana',  kind:'pathology', name:'ANA screen',             prep:'No preparation required', accFundable:false },
+  ];
+
+  const testRequests = [
+    { id:'tr1', pt:'p1',  by:'u1', at:'2026-09-17T08:45', test:'t-mri',  provider:'tp-rad1', urgency:'routine', status:'sent',     note:'Right knee — query medial meniscal tear' },
+    { id:'tr2', pt:'p12', by:'u3', at:'2026-09-16T10:20', test:'t-rf',   provider:'tp-lab1', urgency:'urgent',  status:'resulted', note:'Query inflammatory arthritis' },
+    { id:'tr3', pt:'p14', by:'u3', at:'2026-09-15T14:00', test:'t-lft',  provider:'tp-lab1', urgency:'routine', status:'resulted', note:'Methotrexate monitoring' },
+    { id:'tr4', pt:'p9',  by:'u1', at:'2026-09-14T09:05', test:'t-xr',   provider:'tp-rad2', urgency:'routine', status:'resulted', note:'Right wrist — union check' },
+  ];
+
   const GST = 0.15;
 
   window.KORA = {
     TODAY, GST, clinics, staff, clinicians, gps, patients, apptTypes, appts, blocks,
     letters, letterTemplates, inbox, invoices, accQueue, accHistory, tasks, timeline, notes,
+    billingCodes, XERO_SYNC, org, timetables, pharmacies, medicines, prescriptions,
+    testProviders, testCatalogue, testRequests,
 
     /* ---- lookups ---- */
     pt:  id => patients.find(p => p.id === id),
@@ -230,6 +342,22 @@
     at:  id => apptTypes.find(t => t.id === id),
     cln: id => clinics.find(c => c.id === id),
     ltr: id => letters.find(l => l.id === id),
+    med: id => medicines.find(m => m.id === id),
+    pharm: id => pharmacies.find(x => x.id === id),
+    test: id => testCatalogue.find(t => t.id === id),
+    prov: id => testProviders.find(t => t.id === id),
+    code: c => billingCodes.find(b => b.code === c),
+
+    /* Medicines whose class matches something in the patient's allergy list. */
+    allergyClash: (ptId, medId) => {
+      const p = patients.find(x => x.id === ptId), m = medicines.find(x => x.id === medId);
+      if (!p || !m) return null;
+      for (const alert of p.alerts) {
+        const hit = m.classes.find(c => alert.toLowerCase().includes(c.toLowerCase()));
+        if (hit) return { cls: hit, alert };
+      }
+      return null;
+    },
 
     ptName: id => { const p = patients.find(x => x.id === id); return p ? `${p.first} ${p.last}` : '—'; },
     ptInitials: id => { const p = patients.find(x => x.id === id); return p ? (p.first[0] + p.last[0]) : '?'; },

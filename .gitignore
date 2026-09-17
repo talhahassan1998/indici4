@@ -1,0 +1,4 @@
+# Local test/screenshot output — never part of the design deliverable
+undefined/
+shots/
+*.bundle

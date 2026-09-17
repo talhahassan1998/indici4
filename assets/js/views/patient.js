@@ -26,6 +26,8 @@
       invoices: K.invoices.filter(i => i.pt === p.id).length,
       notes: K.notes.filter(n => n.pt === p.id).length,
       timeline: (K.timeline[p.id] || []).length,
+      rx: K.prescriptions.filter(r => r.pt === p.id).length,
+      tests: K.testRequests.filter(r => r.pt === p.id).length,
     };
     return `<div class="pt-header">
       <div class="pt-id">
@@ -303,16 +305,241 @@
 
   function card(inner) { return `<section class="card">${inner}</section>`; }
 
+  /* --------------------------------------------------------- prescriptions */
+  const RX_STATUS = { sent: 'sent', dispensed: 'paid', cancelled: 'draft' };
+
+  function rxTab(p) {
+    const list = K.prescriptions.filter(r => r.pt === p.id)
+      .sort((a, b) => b.at.localeCompare(a.at));
+    return `<div class="col g-4">
+      ${p.alerts.length ? `<div class="banner bad"><span class="b-ic">${ic('alert', 16)}</span>
+        <span class="grow"><b>Recorded allergies — checked on every prescription</b><br>
+        <span class="t-sm">${p.alerts.map(esc).join(' · ')}</span></span></div>` : ''}
+      <section class="card">
+        <div class="card-hd"><h3>Prescriptions</h3><span class="chip">${list.length}</span>
+          <span class="spacer"></span>
+          <button class="btn btn-primary btn-sm" data-act="rx">${ic('plus', 14)} New prescription</button></div>
+        ${list.length ? `<div class="table-wrap"><table class="tbl">
+          <thead><tr><th>Medicine</th><th>Directions</th><th class="num-cell">Qty</th>
+            <th class="num-cell">Repeats</th><th>Pharmacy</th><th>Prescriber</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>${list.map(r => { const m = K.med(r.med), ph = K.pharm(r.pharmacy);
+            return `<tr>
+              <td><b>${esc(m.name)}</b><br><span class="t-xs subtle">${esc(m.form)}</span>
+                ${m.funded ? '' : '<span class="chip chip-warn">Unfunded</span>'}</td>
+              <td class="t-sm">${esc(m.dose)}</td>
+              <td class="num-cell">${r.qty}</td>
+              <td class="num-cell">${r.repeats}</td>
+              <td class="t-sm">${esc(ph.name)}<br><span class="t-xs subtle t-mono">${esc(ph.edi)}</span></td>
+              <td class="t-sm">${esc(K.st(r.by).name)}</td>
+              <td class="t-sm">${U.fmtDateShort(r.at.slice(0, 10))}</td>
+              <td>${chip(RX_STATUS[r.status], { label: r.status === 'dispensed' ? 'Dispensed' : r.status === 'sent' ? 'Sent to pharmacy' : 'Cancelled' })}</td>
+            </tr>`; }).join('')}</tbody></table></div>`
+          : U.empty('rx', 'No current prescriptions',
+              'Prescriptions are sent electronically to the patient’s chosen pharmacy. Allergies on the record are checked before anything is sent.',
+              `<button class="btn btn-primary btn-sm" data-act="rx">${ic('plus', 14)} New prescription</button>`)}
+      </section>
+    </div>`;
+  }
+
+  function newRx(p, root, pr) {
+    let medId = 'm1';
+    const clash = () => K.allergyClash(p.id, medId);
+
+    function detail() {
+      const m = K.med(medId), c = clash();
+      return `${c ? `<div class="banner bad"><span class="b-ic">${ic('alert', 16)}</span>
+          <span class="grow"><b>Allergy warning — ${esc(m.name)} is a ${esc(c.cls)}</b><br>
+          <span class="t-sm">This patient’s record says: <b>${esc(c.alert)}</b>. Choose another medicine, or record why you are overriding.</span></span>
+        </div>
+        <div class="field"><label class="label" for="rxOverride">Reason for overriding <span class="req">*</span></label>
+          <input class="input" id="rxOverride" placeholder="e.g. previous reaction was intolerance, not allergy"></div>` : ''}
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label class="label" for="rxQty">Quantity</label>
+          <input class="input input-money" id="rxQty" type="number" min="1" value="${m.qty}"></div>
+        <div class="field"><label class="label" for="rxRep">Repeats</label>
+          <input class="input input-money" id="rxRep" type="number" min="0" value="${m.repeats}"></div>
+      </div>
+      <div class="field"><label class="label" for="rxDose">Directions</label>
+        <textarea class="textarea" id="rxDose" rows="2">${esc(m.dose)}</textarea></div>
+      ${m.funded ? '' : `<div class="banner warn"><span class="b-ic">${ic('info', 15)}</span>
+        <span class="t-sm">Not funded by Pharmac — the patient pays the full cost. Tell them before sending.</span></div>`}`;
+    }
+
+    U.modal({
+      title: 'New prescription', sub: `${p.first} ${p.last} · ${p.nhi} · ${U.age(p.dob)}y`,
+      icon: 'rx', wide: true,
+      body: `<div class="col g-4">
+        <div class="field"><label class="label" for="rxMed">Medicine</label>
+          <select class="select" id="rxMed" data-autofocus>
+            ${K.medicines.map(m => `<option value="${m.id}">${esc(m.name)} ${esc(m.form)}${m.funded ? '' : ' — unfunded'}</option>`).join('')}
+          </select></div>
+        <div id="rxDetail" class="col g-4">${detail()}</div>
+        <div class="divider"></div>
+        <div class="field"><label class="label" for="rxPharm">Send electronically to</label>
+          <select class="select" id="rxPharm">
+            ${K.pharmacies.map(x => `<option value="${x.id}">${esc(x.name)} — ${esc(x.addr)}</option>`).join('')}
+          </select>
+          <span class="hint">The pharmacy receives it before the patient arrives. No paper script needed.</span></div>
+      </div>`,
+      footer: `<button class="btn btn-ghost" data-close>Cancel</button>
+        <span class="spacer"></span>
+        <button class="btn btn-secondary" data-print>${ic('print', 14)} Print instead</button>
+        <button class="btn btn-primary" data-send>${ic('send', 15)} Sign and send</button>`,
+      onMount(panel, close) {
+        const repaint = () => { qs('#rxDetail', panel).innerHTML = detail(); };
+        qs('#rxMed', panel).addEventListener('change', e => { medId = e.target.value; repaint(); });
+        const commit = (viaPrint) => {
+          const c = clash();
+          if (c) {
+            const reason = qs('#rxOverride', panel);
+            if (!reason || !reason.value.trim()) {
+              reason && reason.setAttribute('aria-invalid', 'true');
+              U.toast('Allergy override needs a reason', `${K.med(medId).name} clashes with “${c.alert}”.`, 'bad');
+              return;
+            }
+          }
+          const m = K.med(medId), ph = K.pharm(qs('#rxPharm', panel).value);
+          K.prescriptions.unshift({ id: 'rx' + Date.now(), pt: p.id, by: 'u1', at: '2026-09-17T10:22',
+            med: medId, pharmacy: ph.id, status: viaPrint ? 'dispensed' : 'sent',
+            qty: Number(qs('#rxQty', panel).value), repeats: Number(qs('#rxRep', panel).value) });
+          close();
+          U.mountView(window.Views.patient, pr);
+          U.toast(viaPrint ? 'Prescription printed' : 'Prescription sent',
+            viaPrint ? `${m.name} — signed and printed` : `${m.name} → ${ph.name}`, 'ok');
+        };
+        qs('[data-send]', panel).addEventListener('click', () => commit(false));
+        qs('[data-print]', panel).addEventListener('click', () => commit(true));
+      }
+    });
+  }
+
+  /* --------------------------------------------------------- test requests */
+  const TR_STATUS = { sent: 'sent', resulted: 'paid', cancelled: 'draft' };
+
+  function testsTab(p) {
+    const list = K.testRequests.filter(r => r.pt === p.id).sort((a, b) => b.at.localeCompare(a.at));
+    return `<section class="card">
+      <div class="card-hd"><h3>Test requests</h3><span class="chip">${list.length}</span>
+        <span class="spacer"></span>
+        <button class="btn btn-primary btn-sm" data-act="test">${ic('plus', 14)} New test request</button></div>
+      ${list.length ? `<div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Test</th><th>Clinical details</th><th>Provider</th>
+          <th>Requested by</th><th>Date</th><th>Urgency</th><th>Status</th></tr></thead>
+        <tbody>${list.map(r => { const t = K.test(r.test), pv = K.prov(r.provider);
+          return `<tr>
+            <td><span class="row g-2">${ic(t.kind === 'radiology' ? 'flask' : 'flask', 14)}
+              <span><b>${esc(t.name)}</b><br><span class="t-xs subtle">${t.kind === 'radiology' ? 'Radiology' : 'Pathology'}</span></span></span></td>
+            <td class="t-sm">${esc(r.note)}</td>
+            <td class="t-sm">${esc(pv.name)}<br><span class="t-xs subtle t-mono">${esc(pv.edi)}</span></td>
+            <td class="t-sm">${esc(K.st(r.by).name)}</td>
+            <td class="t-sm">${U.fmtDateShort(r.at.slice(0, 10))}</td>
+            <td>${r.urgency === 'urgent' ? chip('overdue', { label: 'Urgent' }) : chip('draft', { label: 'Routine' })}</td>
+            <td>${chip(TR_STATUS[r.status], { label: r.status === 'resulted' ? 'Result filed' : 'Sent' })}</td>
+          </tr>`; }).join('')}</tbody></table></div>`
+        : U.empty('flask', 'No test requests yet',
+            'Radiology and pathology requests are sent electronically, and results file straight back onto this patient’s timeline.',
+            `<button class="btn btn-primary btn-sm" data-act="test">${ic('plus', 14)} New test request</button>`)}
+    </section>`;
+  }
+
+  function newTest(p, root, pr) {
+    let testId = 't-xr';
+    function detail() {
+      const t = K.test(testId);
+      const providers = K.testProviders.filter(x => x.kind === t.kind);
+      return `<div class="banner"><span class="b-ic">${ic('info', 15)}</span>
+          <span class="t-sm"><b>Preparation:</b> ${esc(t.prep)}</span></div>
+        <div class="field"><label class="label" for="trProv">Send to</label>
+          <select class="select" id="trProv">
+            ${providers.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('')}
+          </select></div>
+        ${p.funder === 'ACC' && t.accFundable ? `<label class="row g-3">
+          <span class="switch"><input type="checkbox" id="trAcc" checked><span class="track"></span><span class="thumb"></span></span>
+          <span class="grow"><b class="t-sm">Bill to ACC claim ${esc(p.claim || '')}</b><br>
+            <span class="t-xs subtle">The claim number and injury date go with the request, so the provider bills ACC directly.</span></span>
+        </label>` : ''}`;
+    }
+
+    U.modal({
+      title: 'New test request', sub: `${p.first} ${p.last} · ${p.nhi}`,
+      icon: 'flask', wide: true,
+      body: `<div class="col g-4">
+        <div class="field"><label class="label" for="trTest">Test</label>
+          <select class="select" id="trTest" data-autofocus>
+            <optgroup label="Radiology">
+              ${K.testCatalogue.filter(t => t.kind === 'radiology').map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('')}
+            </optgroup>
+            <optgroup label="Pathology">
+              ${K.testCatalogue.filter(t => t.kind === 'pathology').map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('')}
+            </optgroup>
+          </select></div>
+        <div id="trDetail" class="col g-4">${detail()}</div>
+        <div class="field"><label class="label" for="trNote">Clinical details <span class="req">*</span></label>
+          <textarea class="textarea" id="trNote" rows="2" placeholder="What are you looking for? The reporting radiologist or pathologist reads this."></textarea></div>
+        <div class="field"><label class="label">Urgency</label>
+          <div class="segmented"><button aria-pressed="true" data-urg="routine">Routine</button>
+            <button aria-pressed="false" data-urg="urgent">Urgent</button></div></div>
+      </div>`,
+      footer: `<button class="btn btn-ghost" data-close>Cancel</button>
+        <span class="spacer"></span>
+        <button class="btn btn-primary" data-send>${ic('send', 15)} Sign and send</button>`,
+      onMount(panel, close) {
+        let urgency = 'routine';
+        qs('#trTest', panel).addEventListener('change', e => { testId = e.target.value; qs('#trDetail', panel).innerHTML = detail(); });
+        on(panel, 'click', '[data-urg]', (e, b) => {
+          qsa('[data-urg]', panel).forEach(x => x.setAttribute('aria-pressed', 'false'));
+          b.setAttribute('aria-pressed', 'true'); urgency = b.dataset.urg;
+        });
+        qs('[data-send]', panel).addEventListener('click', () => {
+          const note = qs('#trNote', panel);
+          if (!note.value.trim()) {
+            note.setAttribute('aria-invalid', 'true');
+            U.toast('Clinical details are required', 'The reporting provider needs to know what you are looking for.', 'warn');
+            return;
+          }
+          const t = K.test(testId), pv = K.prov(qs('#trProv', panel).value);
+          K.testRequests.unshift({ id: 'tr' + Date.now(), pt: p.id, by: 'u1', at: '2026-09-17T10:22',
+            test: testId, provider: pv.id, urgency, status: 'sent', note: note.value.trim() });
+          close();
+          U.mountView(window.Views.patient, pr);
+          U.toast('Test request sent', `${t.name} → ${pv.name}`, 'ok');
+        });
+      }
+    });
+  }
+
+  /* --------------------------------------------------------- notes */
+  function notesTab(p) {
+    const list = K.notes.filter(n => n.pt === p.id).sort((a, b) => b.at.localeCompare(a.at));
+    const feed = (K.timeline[p.id] || []).filter(e => e.kind === 'note');
+    if (!list.length && !feed.length) return card(U.empty('file', 'No notes yet',
+      'Consultation notes written here are signed, timestamped and locked to the author.',
+      `<button class="btn btn-primary btn-sm" data-act="note">${ic('plus', 14)} New note</button>`));
+    return `<section class="card">
+      <div class="card-hd"><h3>Consultation notes</h3>
+        <span class="chip ${list.some(n => !n.signed) ? 'chip-warn' : ''}">${list.filter(n => !n.signed).length} unsigned</span>
+        <span class="spacer"></span>
+        <button class="btn btn-primary btn-sm" data-act="note">${ic('plus', 14)} New note</button></div>
+      <div class="col g-4 card-bd">
+        ${feed.map(e => `<article class="card card-flat card-bd col g-3">
+          <div class="row between g-3">
+            <b class="t-sm">${esc(e.title)}</b>
+            <span class="row g-2">${e.signed ? chip('paid', { label: 'Signed' }) : chip('pending', { label: 'Unsigned' })}
+              <span class="t-xs subtle">${U.fmtDate(e.at.slice(0, 10))} ${U.fmtClock(e.at)}</span></span>
+          </div>
+          <p class="t-sm muted">${esc(e.body)}</p>
+          <div class="row g-2">
+            <span class="row g-2 t-xs subtle">${avatar(e.by, 'xs')} ${esc(K.st(e.by).name)}</span>
+            <span class="spacer"></span>
+            ${!e.signed ? `<button class="btn btn-soft btn-sm" data-sign>${ic('check', 13)} Sign note</button>` : ''}
+          </div>
+        </article>`).join('')}
+      </div>
+    </section>`;
+  }
+
+
   const PLACEHOLDERS = {
-    notes:    () => card(U.empty('file', 'Notes live here',
-      'Consultation notes, procedure records and clinical correspondence for this patient — filtered to notes only.',
-      `<button class="btn btn-primary btn-sm" data-act="note">${ic('plus', 14)} New note</button>`)),
-    rx:       () => card(U.empty('rx', 'No current prescriptions',
-      'Prescribed medicines appear here with dose, quantity and repeats. Nothing is active for this patient.',
-      `<button class="btn btn-primary btn-sm" data-act="rx">${ic('plus', 14)} New prescription</button>`)),
-    tests:    () => card(U.empty('flask', 'No outstanding test requests',
-      'Lab and imaging requests appear here, and results file back automatically from the provider.',
-      `<button class="btn btn-primary btn-sm" data-act="test">${ic('plus', 14)} New test request</button>`)),
     referrals:() => card(U.empty('referral', 'No referrals on file',
       'Referrals in and out — including the referrer, expiry, and session counts.',
       `<button class="btn btn-primary btn-sm" data-act="new-referral">${ic('plus', 14)} New referral</button>`)),
@@ -339,7 +566,10 @@
       const bodies = {
         summary: () => summary(p),
         timeline: () => timelineTab(p),
+        notes: () => notesTab(p),
         letters: () => lettersTab(p),
+        rx: () => rxTab(p),
+        tests: () => testsTab(p),
         invoices: () => invoicesTab(p),
       };
       const body = (bodies[tab] || PLACEHOLDERS[tab] || bodies.summary)(p);
@@ -368,6 +598,9 @@
       on(root, 'click', '[data-letter]', (e, t) => location.hash = `#/letter/${t.dataset.letter}`);
       on(root, 'click', '[data-act="fix-injury"]', () => fixInjury(p, root, pr, bump));
       on(root, 'click', '[data-act="letter"]', () => location.hash = `#/letter/new?pt=${p.id}`);
+      on(root, 'click', '[data-act="rx"]', () => newRx(p, root, pr));
+      on(root, 'click', '[data-act="test"]', () => newTest(p, root, pr));
+      on(root, 'click', '[data-act="note"]', () => U.toast('New note', 'The consultation note editor would open here.', 'info'));
       on(root, 'click', '[data-act="invoice"]', () => { location.hash = '#/billing'; setTimeout(() => window.Views.billing.openCreate(), 260); });
       on(root, 'click', '[data-act="book"]', () => { location.hash = '#/appointments'; setTimeout(() => window.Views.appointments.openBooking(p.id), 280); });
       on(root, 'click', '[data-act="print"]', () => U.toast('Print', 'A printable patient summary would open.', 'info'));
@@ -385,8 +618,8 @@
           { label: `New for ${p.first} ${p.last}` },
           { icon: 'file',    label: 'Note',         kbd: 'N', action: () => U.toast('New note', 'Note editor would open.', 'info') },
           { icon: 'letters', label: 'Letter',       kbd: 'L', action: () => location.hash = `#/letter/new?pt=${p.id}` },
-          { icon: 'rx',      label: 'Prescription', kbd: 'P', action: () => U.toast('New prescription', 'Prescribing screen would open.', 'info') },
-          { icon: 'flask',   label: 'Test request', kbd: 'T', action: () => U.toast('New test request', 'Lab/imaging form would open.', 'info') },
+          { icon: 'rx',      label: 'Prescription', kbd: 'P', action: () => newRx(p, root, pr) },
+          { icon: 'flask',   label: 'Test request', kbd: 'T', action: () => newTest(p, root, pr) },
           '-',
           { icon: 'send',    label: 'Email',        action: () => U.toast('Compose email', `To ${p.email}`, 'info') },
           { icon: 'tasks',   label: 'Task',         action: () => { location.hash = '#/tasks'; setTimeout(() => window.Views.tasks.openNew(p.id), 260); } },

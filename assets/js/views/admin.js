@@ -1,7 +1,7 @@
 /* Kora Health — Admin settings */
 (function () {
   const K = window.KORA, U = window.UI, ic = window.icon;
-  const { esc, chip, avatar, on, qs, qsa } = U;
+  const { esc, chip, avatar, on, qs, qsa, money } = U;
   window.Views = window.Views || {};
 
   const CARDS = [
@@ -11,6 +11,7 @@
     { id: 'rooms',    icon: 'clock',    title: 'Clinics & timetables',  sub: 'Sessions, rooms, leave and blocked time',    meta: '12 sessions/week' },
     { id: 'brand',    icon: 'letters',  title: 'Letter branding',       sub: 'Letterhead, logo, footer, signature blocks', meta: 'Kora default' },
     { id: 'tpl',      icon: 'template', title: 'Templates',             sub: 'Letter and note templates with merge fields',meta: `${K.letterTemplates.length} templates` },
+    { id: 'codes',    icon: 'billing',  title: 'Billing codes',         sub: 'Synced from Xero — prices, accounts, ACC codes', meta: `${K.billingCodes.length} codes` },
     { id: 'integ',    icon: 'link',     title: 'Integrations',          sub: 'Xero, ACC, Healthlink, AI scribe',           meta: '4 connected' },
     { id: 'audit',    icon: 'shield',   title: 'Security & audit',      sub: 'Access log, 2FA, data retention',            meta: 'AA compliant' },
   ];
@@ -38,13 +39,211 @@
     { n: 'NHI lookup', s: 'Not set up',d: 'Validate NHI numbers against the national index.',              ok: false, i: 'search' },
   ];
 
+
+  /* ============================================================ sub-screens */
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const KIND = { clinic: 'chip-accent', theatre: 'chip-warm', admin: '', leave: 'chip-bad' };
+
+  function crumb(title, sub) {
+    return `<div class="page-hd">
+      <div class="page-title">
+        <a class="t-xs accent-t" href="#/admin">${ic('chevronLeft', 12)} Admin</a>
+        <h1>${esc(title)}</h1><span class="page-sub">${esc(sub)}</span></div>
+      <div class="page-actions" id="crumbActions"></div>
+    </div>`;
+  }
+
+  /* ---- Appointment types ---- */
+  function apptTypesScreen() {
+    return `<div class="page">
+      ${crumb('Appointment types', 'Duration, colour and the billing code each type bills to')}
+      <div class="page-actions" style="margin:0 0 var(--s-4)">
+        <button class="btn btn-primary btn-sm" data-act="new-type">${ic('plus', 14)} New appointment type</button>
+      </div>
+      <section class="card"><div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Type</th><th>Colour</th><th class="num-cell">Duration</th>
+          <th>Billing code</th><th class="num-cell">Default fee</th><th>Bills to</th><th></th></tr></thead>
+        <tbody>${K.apptTypes.map(t => { const b = K.code(t.code);
+          return `<tr>
+            <td><b>${esc(t.name)}</b></td>
+            <td><span class="row g-2"><i style="width:12px;height:12px;border-radius:4px;background:var(--appt-${t.type})"></i>
+              <span class="t-xs subtle t-mono">${esc(t.type)}</span></span></td>
+            <td class="num-cell">${t.mins} min</td>
+            <td class="t-mono t-sm">${esc(t.code)}</td>
+            <td class="num-cell">${t.price ? money(t.price) : '<span class="subtle">No charge</span>'}</td>
+            <td>${b && b.acc ? `<span class="chip chip-warm">ACC ${esc(b.acc)}</span>` : '<span class="chip">Patient or insurer</span>'}</td>
+            <td><span class="row-actions"><button class="btn btn-ghost btn-icon btn-sm" data-edit-type="${t.id}" aria-label="Edit ${esc(t.name)}">${ic('edit', 14)}</button></span></td>
+          </tr>`; }).join('')}</tbody>
+      </table></div>
+      <div class="card-ft"><span class="t-xs subtle">Colours here drive the calendar. Fees come from the Xero billing code and can be overridden per invoice.</span></div>
+      </section>
+    </div>`;
+  }
+
+  /* ---- Billing codes (read-only mirror of Xero) ---- */
+  function codesScreen() {
+    return `<div class="page">
+      ${crumb('Billing codes', 'Mastered in Xero and synced into Kora')}
+      <div class="banner mb-4"><span class="b-ic">${ic('sync', 16)}</span>
+        <span class="grow"><b>Xero is the source of truth</b><br>
+        <span class="t-sm">Add or reprice a code in Xero and it appears here on the next sync. Editing is deliberately
+        disabled so the two systems cannot drift apart.</span></span>
+        <button class="btn btn-secondary btn-sm" data-act="sync-codes">${ic('refresh', 14)} Sync now</button></div>
+      <section class="card"><div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Code</th><th>Name</th><th class="num-cell">Price</th><th>Account</th>
+          <th>Tax</th><th>ACC code</th><th>Status</th></tr></thead>
+        <tbody>${K.billingCodes.map(b => `<tr>
+          <td class="t-mono t-sm"><b>${esc(b.code)}</b></td>
+          <td>${esc(b.name)}</td>
+          <td class="num-cell">${money(b.price)}</td>
+          <td class="t-mono t-sm">${esc(b.acct)}</td>
+          <td class="t-sm">${esc(b.tax)}</td>
+          <td class="t-mono t-sm">${b.acc ? esc(b.acc) : '<span class="subtle">—</span>'}</td>
+          <td>${b.active ? chip('paid', { label: 'Active' }) : chip('draft', { label: 'Archived' })}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div class="card-ft row"><span class="t-xs subtle">${K.billingCodes.length} codes · last synced ${U.fmtClock(K.XERO_SYNC)} today</span></div>
+      </section>
+    </div>`;
+  }
+
+  /* ---- Clinics and timetables ---- */
+  function clinicsScreen() {
+    const span = (t) => ((t.end - t.start) / 60).toFixed(1).replace('.0', '');
+    return `<div class="page">
+      ${crumb('Clinics & timetables', 'Locations, and the recurring sessions each clinician works')}
+
+      <h2 class="t-h3 mb-3">Locations</h2>
+      <div class="settings-grid mb-6">
+        ${K.clinics.map(c => `<div class="card setting-card">
+          <span class="sc-ic">${ic('building', 18)}</span>
+          <span><b class="t-h4" style="display:block">${esc(c.short)}</b>
+            <span class="t-sm muted">${esc(c.addr)}</span></span>
+          <div class="row g-2 mt-2"><span class="chip">${ic('phone', 11)} ${esc(c.phone)}</span>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost btn-sm" data-edit-clinic="${c.id}">${ic('edit', 13)} Edit</button></div>
+        </div>`).join('')}
+      </div>
+
+      <div class="row between mb-3">
+        <h2 class="t-h3">Weekly timetable</h2>
+        <button class="btn btn-primary btn-sm" data-act="new-session">${ic('plus', 14)} Add session</button>
+      </div>
+      <div class="row g-4 wrap mb-3">
+        ${Object.entries({ clinic: 'Clinic', theatre: 'Theatre', admin: 'Admin / MDT', leave: 'Leave' })
+          .map(([k, l]) => `<span class="chip ${KIND[k]}">${l}</span>`).join('')}
+      </div>
+      <section class="card"><div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Clinician</th>${DAYS.map(d => `<th>${d}</th>`).join('')}</tr></thead>
+        <tbody>${K.clinicians.map(c => `<tr>
+          <td style="min-width:190px"><span class="row g-2">${avatar(c.id, 'sm')}
+            <span><b class="t-sm">${esc(c.name)}</b><br><span class="t-xs subtle">${esc(c.spec)}</span></span></span></td>
+          ${DAYS.map((d, di) => {
+            const sess = K.timetables.filter(t => t.cl === c.id && t.day === di);
+            if (!sess.length) return `<td><span class="t-xs subtle">—</span></td>`;
+            return `<td style="min-width:150px"><div class="col g-2">${sess.map(t => `
+              <button class="card card-flat" style="padding:7px 9px;text-align:left;width:100%" data-edit-session="${c.id}-${di}-${t.start}">
+                <b class="t-xs">${U.fmtTime(t.start)}–${U.fmtTime(t.end)}</b>
+                <span class="t-xs subtle" style="display:block">${esc(K.cln(t.clinic).short)} · ${span(t)}h</span>
+                <span class="chip ${KIND[t.kind]} mt-2">${esc(t.kind)}</span>
+              </button>`).join('')}</div></td>`;
+          }).join('')}
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div class="card-ft"><span class="t-xs subtle">Sessions define bookable hours. Anything outside them shows as unavailable on the calendar,
+        and leave is drawn as hatched blocked time.</span></div>
+      </section>
+    </div>`;
+  }
+
+  /* ---- Templates ---- */
+  function templatesScreen() {
+    return `<div class="page">
+      ${crumb('Letter templates', 'Reusable letters that fill in patient details automatically')}
+      <div class="page-actions" style="margin:0 0 var(--s-4)">
+        <button class="btn btn-primary btn-sm" data-act="new-template">${ic('plus', 14)} New template</button>
+      </div>
+      <section class="card"><div class="table-wrap"><table class="tbl">
+        <thead><tr><th>Template</th><th>Group</th><th>Prompts for</th><th>Pinned</th><th></th></tr></thead>
+        <tbody>${K.letterTemplates.map(t => `<tr>
+          <td><b>${esc(t.name)}</b></td>
+          <td><span class="chip">${esc(t.group)}</span></td>
+          <td class="t-sm">${t.fields.length
+            ? t.fields.map(f => `<span class="chip">${esc(f.label)}</span>`).join(' ')
+            : '<span class="subtle">No prompts — inserts straight in</span>'}</td>
+          <td>${t.pinned ? `<span class="chip chip-accent">${ic('pin', 11)} Pinned</span>` : '<span class="subtle t-xs">—</span>'}</td>
+          <td><span class="row-actions"><button class="btn btn-ghost btn-icon btn-sm" aria-label="Edit ${esc(t.name)}">${ic('edit', 14)}</button></span></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div class="card-ft"><span class="t-xs subtle">Merge fields available: patient name, NHI, date of birth, ACC claim,
+        injury date, GP, referrer, clinician, today’s date.</span></div>
+      </section>
+    </div>`;
+  }
+
+  /* ---- Letter branding ---- */
+  function brandingScreen() {
+    const o = K.org;
+    return `<div class="page">
+      ${crumb('Letter & invoice branding', 'Applied to every letter and invoice that leaves the clinic')}
+      <div class="dash-grid">
+        <div class="col-6"><section class="card">
+          <div class="card-hd"><h3>Organisation</h3><span class="spacer"></span>
+            <span class="chip chip-accent">${ic('sync', 11)} From Xero</span></div>
+          <div class="card-bd col g-4">
+            <div class="grid" style="grid-template-columns:1fr 1fr">
+              <div class="field"><label class="label" for="bLegal">Legal name</label>
+                <input class="input" id="bLegal" value="${esc(o.legal)}"></div>
+              <div class="field"><label class="label" for="bTrade">Trading name</label>
+                <input class="input" id="bTrade" value="${esc(o.trading)}"></div>
+              <div class="field"><label class="label" for="bGst">GST number</label>
+                <input class="input t-mono" id="bGst" value="${esc(o.gst)}"></div>
+              <div class="field"><label class="label" for="bNzbn">NZBN</label>
+                <input class="input t-mono" id="bNzbn" value="${esc(o.nzbn)}"></div>
+              <div class="field"><label class="label" for="bBank">Bank account</label>
+                <input class="input t-mono" id="bBank" value="${esc(o.bank)}"></div>
+              <div class="field"><label class="label" for="bBrand">Xero branding theme</label>
+                <select class="select" id="bBrand"><option>${esc(o.xeroBrand)}</option><option>Kora Specialists — ACC</option></select></div>
+            </div>
+            <div class="field"><label class="label" for="bTerms">Payment terms</label>
+              <textarea class="textarea" id="bTerms" rows="2">${esc(o.terms)}</textarea></div>
+          </div>
+          <div class="card-ft row"><span class="saved">${ic('check', 13)} Saved automatically</span></div>
+        </section></div>
+
+        <div class="col-6"><section class="card">
+          <div class="card-hd"><h3>Preview</h3><span class="spacer"></span>
+            <span class="t-xs subtle">Letterhead and invoice footer</span></div>
+          <div class="card-bd" style="background:var(--bg-sunken)">
+            <div class="card" style="background:#fff;color:#1A1814;padding:26px 28px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #14635C;padding-bottom:12px">
+                <div><b style="color:#0F4E49;font-size:17px;letter-spacing:-.02em">Kora Health</b>
+                  <div style="font-size:9.5px;color:#5D584E;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Specialist Clinic</div></div>
+                <div style="font-size:9.5px;color:#5D584E;text-align:right;line-height:1.5">
+                  ${esc(K.clinics[0].addr)}<br>${esc(o.phone)} · ${esc(o.email)}<br>GST ${esc(o.gst)}</div>
+              </div>
+              <p style="font-size:11px;color:#5D584E;margin-top:34px;padding-top:10px;border-top:1px solid #DCD8D0;line-height:1.6">
+                <b>${esc(o.legal)}</b> · NZBN ${esc(o.nzbn)}<br>
+                Direct credit to <b>${esc(o.bank)}</b> (${esc(o.bankName)})<br>
+                ${esc(o.terms)}</p>
+            </div>
+          </div>
+        </section></div>
+      </div>
+    </div>`;
+  }
+
   window.Views.admin = {
     title: () => 'Admin',
     skeleton: () => `<div class="page"><div class="settings-grid">${Array.from({length:6}).map(() =>
       '<div class="sk sk-block" style="height:150px"></div>').join('')}</div></div>`,
 
     render(pr) {
-      if (pr.id === 'users') return usersScreen();
+      const SUB = {
+        users: usersScreen, types: apptTypesScreen, codes: codesScreen,
+        rooms: clinicsScreen, tpl: templatesScreen, brand: brandingScreen,
+      };
+      if (SUB[pr.id]) return SUB[pr.id]();
       return `<div class="page">
         <div class="page-hd">
           <div class="page-title"><h1>Admin</h1><span class="page-sub">Practice configuration for Kora Health, Newmarket</span></div>
@@ -75,11 +274,21 @@
     },
 
     mount(root, pr) {
+      const LIVE = ['users', 'types', 'codes', 'rooms', 'tpl', 'brand'];
       on(root, 'click', '[data-card]', (e, t) => {
-        if (t.dataset.card === 'users') { location.hash = '#/admin/users'; return; }
-        const c = CARDS.find(x => x.id === t.dataset.card);
+        const id = t.dataset.card;
+        if (LIVE.includes(id)) { location.hash = `#/admin/${id}`; return; }
+        const c = CARDS.find(x => x.id === id);
         U.toast(c.title, 'This settings area would open here.', 'info');
       });
+      on(root, 'click', '[data-act="sync-codes"]', (e, t) => {
+        t.innerHTML = `<span class="spinner"></span> Syncing…`;
+        setTimeout(() => { U.mountView(this, pr); U.toast('Billing codes synced', `${K.billingCodes.length} codes refreshed from Xero.`, 'ok'); }, 1000);
+      });
+      on(root, 'click', '[data-act="new-type"], [data-edit-type]', () => U.toast('Appointment type', 'Duration, colour and billing code would be edited here.', 'info'));
+      on(root, 'click', '[data-act="new-session"], [data-edit-session]', () => U.toast('Timetable session', 'Day, times, location and session kind would be edited here.', 'info'));
+      on(root, 'click', '[data-edit-clinic]', (e, t) => U.toast(K.cln(t.dataset.editClinic).short, 'Address, phone and opening hours would be edited here.', 'info'));
+      on(root, 'click', '[data-act="new-template"]', () => U.toast('New template', 'Template body and merge fields would be edited here.', 'info'));
       on(root, 'click', '[data-int]', (e, t) => U.toast(t.dataset.int, 'Integration settings would open here.', 'info'));
       on(root, 'click', '[data-perm]', (e, t) => {
         const on_ = t.getAttribute('aria-checked') === 'true';

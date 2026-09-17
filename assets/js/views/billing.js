@@ -51,6 +51,12 @@
             <span class="stat-value">${s.v}</span><span class="stat-sub">${s.s}</span></div></div>`).join('')}
         </div>
 
+        <div class="banner mb-4"><span class="b-ic">${ic('sync', 16)}</span>
+          <span class="grow"><b>Reconcile in Xero only</b><br>
+          <span class="t-sm">Billing codes and prices are mastered in Xero and synced into Kora. When a payment lands in the
+          bank and is matched in Xero, the invoice is marked paid here automatically — nobody re-keys it.</span></span>
+          <span class="t-xs subtle">Last sync ${U.fmtClock(K.XERO_SYNC)}</span></div>
+
         <div class="toolbar">
           <div class="input-group" style="max-width:250px">
             <span class="ic-lead">${ic('search', 15)}</span>
@@ -62,7 +68,7 @@
           </select>
           <select class="select" id="bPayer" style="max-width:180px" aria-label="Payer">
             <option value="all">All payers</option>
-            ${['ACC', 'Southern Cross', 'Private'].map(s => `<option value="${s}" ${f.payer === s ? 'selected' : ''}>${s}</option>`).join('')}
+            ${['ACC', 'Southern Cross', 'Private', 'Hospital'].map(s => `<option value="${s}" ${f.payer === s ? 'selected' : ''}>${s}</option>`).join('')}
           </select>
           <select class="select" id="bCl" style="max-width:200px" aria-label="Clinician">
             <option value="all">All clinicians</option>
@@ -92,7 +98,7 @@
                 <td class="num-cell">${money(tt.excl)}</td>
                 <td class="num-cell subtle">${money(tt.gst)}</td>
                 <td class="num-cell"><b>${money(tt.incl)}</b></td>
-                <td>${chip(i.status)}</td>
+                <td>${chip(i.status)}${i.reconciled ? `<br><span class="t-xs subtle row g-1" style="margin-top:3px">${ic('sync', 10)} matched in Xero</span>` : ''}</td>
                 <td><span class="row-actions">
                   ${i.status !== 'paid' ? `<button class="btn btn-ghost btn-icon btn-sm tip" data-tip="Record payment" data-pay="${i.id}">${ic('card', 14)}</button>` : ''}
                   <button class="btn btn-ghost btn-icon btn-sm tip" data-tip="Send" data-send="${i.id}">${ic('send', 14)}</button>
@@ -125,7 +131,18 @@
       on(root, 'click', '[data-act="create"]', () => createDrawer());
       on(root, 'click', '[data-act="sync"]', (e, t) => {
         t.innerHTML = `<span class="spinner"></span> Syncing…`;
-        setTimeout(() => { re(); U.toast('Xero sync complete', '5 invoices and 2 payments synced.', 'ok'); }, 1200);
+        setTimeout(() => {
+          // Xero has matched these against the bank feed, so Kora marks them paid.
+          // Staff reconcile in Xero only — nothing to re-key here.
+          const reconciled = K.invoices.filter(i => i.status === 'sent' || i.status === 'overdue').slice(0, 2);
+          reconciled.forEach(i => { i.status = 'paid'; i.paid = U.invoiceTotals(i).incl; i.reconciled = true; });
+          const drafts = K.invoices.filter(i => i.status === 'draft').length;
+          re();
+          U.toast('Xero sync complete',
+            reconciled.length
+              ? `${reconciled.length} invoices matched in the bank feed and marked paid · ${drafts} drafts pushed · ${K.billingCodes.length} billing codes refreshed`
+              : `${drafts} drafts pushed · ${K.billingCodes.length} billing codes refreshed`, 'ok');
+        }, 1200);
       });
       on(root, 'click', '[data-pay]', (e, t) => { e.stopPropagation(); payDrawer(K.invoices.find(i => i.id === t.dataset.pay), re); });
       on(root, 'click', '[data-send]', (e, t) => {
@@ -157,8 +174,9 @@
     const pt = existing ? K.pt(existing.pt) : (appt ? K.pt(appt.pt) : K.pt('p1'));
     const type = appt ? K.at(appt.type) : K.apptTypes[0];
 
+    const seedCode = K.code(type.code) || K.billingCodes[0];
     const items = existing ? existing.items.map(x => ({ ...x }))
-      : [{ d: type.name, q: 1, p: type.price || 395 }];
+      : [{ code: seedCode.code, d: seedCode.name, q: 1, p: seedCode.price }];
     const state = { items, split: !!splitOpen, pct: 30, payer: existing ? existing.payer : pt.funder };
 
     const calc = () => {
@@ -168,16 +186,24 @@
     };
 
     function lines() {
+      const active = K.billingCodes.filter(b => b.active);
       return `<table class="inv-lines">
-        <thead><tr><th style="width:46%">Description</th><th class="num-cell">Qty</th>
+        <thead><tr><th style="width:38%">Billable item</th><th style="width:14%">Code</th><th class="num-cell">Qty</th>
           <th class="num-cell">Unit price</th><th class="num-cell">Amount</th><th></th></tr></thead>
         <tbody>${state.items.map((it, n) => `<tr>
-          <td><input class="input" data-li="${n}" data-k="d" value="${esc(it.d)}" aria-label="Description"></td>
-          <td class="num-cell" style="width:72px"><input class="input input-money" data-li="${n}" data-k="q" type="number" min="1" value="${it.q}" aria-label="Quantity"></td>
-          <td class="num-cell" style="width:112px"><input class="input input-money" data-li="${n}" data-k="p" type="number" step="0.01" value="${it.p.toFixed(2)}" aria-label="Unit price"></td>
+          <td><select class="select" data-li="${n}" data-k="code" aria-label="Billable item">
+            ${active.map(b => `<option value="${b.code}" ${it.code === b.code ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}
+            <option value="__custom" ${it.code ? '' : 'selected'}>Other — describe below</option>
+          </select>
+          ${it.code ? '' : `<input class="input mt-2" data-li="${n}" data-k="d" value="${esc(it.d)}" aria-label="Description" placeholder="Description">`}</td>
+          <td><span class="t-mono t-xs">${it.code ? esc(it.code) : '—'}</span></td>
+          <td class="num-cell" style="width:68px"><input class="input input-money" data-li="${n}" data-k="q" type="number" min="1" value="${it.q}" aria-label="Quantity"></td>
+          <td class="num-cell" style="width:106px"><input class="input input-money" data-li="${n}" data-k="p" type="number" step="0.01" value="${it.p.toFixed(2)}" aria-label="Unit price"></td>
           <td class="num-cell"><b>${money(it.q * it.p)}</b></td>
           <td><button class="btn btn-ghost btn-icon btn-sm" data-rm="${n}" aria-label="Remove line">${ic('trash', 14)}</button></td>
-        </tr>`).join('')}</tbody></table>`;
+        </tr>`).join('')}</tbody></table>
+        <p class="hint mt-2">${ic('sync', 12)} Codes and prices are mastered in Xero and synced into Kora — last sync ${U.fmtClock(K.XERO_SYNC)} today.
+        Unit price stays editable for one-off variations.</p>`;
     }
 
     function splitBlock() {
@@ -223,7 +249,7 @@
       const t = calc();
       return `<div class="col g-2">
         <div class="row between t-sm"><span class="muted">Subtotal (excl GST)</span><span class="num">${money(t.excl)}</span></div>
-        <div class="row between t-sm"><span class="muted">GST 15%</span><span class="num">${money(t.gst)}</span></div>
+        <div class="row between t-sm"><span class="muted">GST 15% <span class="subtle">· GST on Income</span></span><span class="num">${money(t.gst)}</span></div>
         <div class="divider"></div>
         <div class="row between"><span class="t-h4">Total</span><span class="t-h3 num">${money(t.incl)}</span></div>
       </div>`;
@@ -247,7 +273,7 @@
         <div class="grid" style="grid-template-columns:1fr 1fr">
           <div class="field"><label class="label" for="invPayer">Payer</label>
             <select class="select" id="invPayer">
-              ${['ACC', 'Southern Cross', 'Private'].map(x => `<option ${state.payer === x ? 'selected' : ''}>${x}</option>`).join('')}
+              ${['ACC', 'Southern Cross', 'Private', 'Hospital'].map(x => `<option ${state.payer === x ? 'selected' : ''}>${x}</option>`).join('')}
             </select></div>
           <div class="field"><label class="label" for="invDue">Payment due</label>
             <input class="input" id="invDue" type="date" value="2026-10-01"></div>
@@ -260,6 +286,14 @@
         </div>
 
         <div id="invTotals">${totalsBlock()}</div>
+
+        <div class="card card-flat card-bd col g-2" style="background:var(--surface-2)">
+          <div class="row g-2"><span class="t-eyebrow">Invoice branding</span>
+            <span class="spacer"></span><span class="chip chip-accent">${ic('sync', 11)} ${esc(K.org.xeroBrand)}</span></div>
+          <div class="t-xs muted">${esc(K.org.legal)} · GST ${esc(K.org.gst)}<br>
+            Payments to <span class="t-mono">${esc(K.org.bank)}</span> (${esc(K.org.bankName)})<br>
+            ${esc(K.org.terms)}</div>
+        </div>
 
         <div class="divider"></div>
         <label class="row g-3">
@@ -281,7 +315,13 @@
           qs('#splitArea', panel).innerHTML = state.split ? splitBlock() : '';
           qs('[data-issue]', panel).innerHTML = `${ic('send', 15)} Create ${state.split ? '2 invoices' : 'invoice'}`;
         };
-        on(panel, 'input', '[data-li]', (e, t) => {
+        on(panel, 'change', 'select[data-li]', (e, t) => {
+          const n = Number(t.dataset.li);
+          if (t.value === '__custom') { state.items[n] = { code: null, d: 'Other item', q: state.items[n].q, p: state.items[n].p }; }
+          else { const b = K.code(t.value); state.items[n] = { code: b.code, d: b.name, q: state.items[n].q, p: b.price }; }
+          refresh();
+        });
+        on(panel, 'input', 'input[data-li]', (e, t) => {
           const n = Number(t.dataset.li), k = t.dataset.k;
           state.items[n][k] = k === 'd' ? t.value : Number(t.value) || 0;
           qs('#invTotals', panel).innerHTML = totalsBlock();
@@ -289,7 +329,10 @@
           const row = t.closest('tr'); if (row) row.querySelector('td:nth-child(4) b').textContent = money(state.items[n].q * state.items[n].p);
         });
         on(panel, 'click', '[data-rm]', (e, t) => { state.items.splice(Number(t.dataset.rm), 1); refresh(); });
-        qs('[data-add]', panel).addEventListener('click', () => { state.items.push({ d: 'Additional item', q: 1, p: 0 }); refresh(); });
+        qs('[data-add]', panel).addEventListener('click', () => {
+          const b = K.billingCodes.find(x => x.active);
+          state.items.push({ code: b.code, d: b.name, q: 1, p: b.price }); refresh();
+        });
         qs('#invPayer', panel).addEventListener('change', e => { state.payer = e.target.value; refresh(); });
         qs('#splitToggle', panel).addEventListener('change', e => { state.split = e.target.checked; refresh(); });
 

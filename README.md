@@ -90,6 +90,14 @@ Verified rather than asserted (see *Verification* below):
 - **Not colour alone** — every status chip pairs its colour with a label
 - **Motion** — 110–280ms, and all of it stops under `prefers-reduced-motion`
 
+## Icons
+
+The icon set is [Lucide](https://lucide.dev) (ISC licence), bundled into
+`assets/js/icons.js` as inline SVG rather than loaded from a CDN — so the app
+works offline and every icon shares one 24px grid, 2px stroke and rounded
+terminals. `icon(name, size)` returns the markup; unknown names warn in the
+console rather than rendering an invisible gap.
+
 ## Structure
 
 ```

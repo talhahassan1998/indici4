@@ -90,7 +90,7 @@
         <span>Arrived and waiting <b>${waiting} minutes</b>. Room 2 is free.</span></div>` : ''}
       <p class="t-sm muted">${esc(a.note)}</p>
       <div class="row g-2">
-        <a class="btn btn-primary grow" href="#/patient/${p.id}">${ic('stethoscope', 15)} Start consultation</a>
+        <a class="btn btn-primary grow" href="#/consult/${p.id}">${ic('stethoscope', 15)} Start consultation</a>
         <button class="btn btn-secondary" data-act="notes" data-id="${p.id}">${ic('file', 15)} Notes</button>
       </div>
     </div>`;

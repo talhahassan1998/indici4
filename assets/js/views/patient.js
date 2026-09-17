@@ -53,6 +53,7 @@
         </div>
         <div class="col g-2" style="align-items:flex-end">
           <div class="row g-2">
+            <a class="btn btn-primary btn-sm" href="#/consult/${p.id}">${ic('stethoscope', 14)} Start consult</a>
             <button class="btn btn-secondary btn-sm" data-act="email">${ic('send', 14)} Email</button>
             <button class="btn btn-secondary btn-sm" data-act="print">${ic('print', 14)} Print</button>
             <button class="btn btn-secondary btn-icon btn-sm" data-act="more" aria-label="More actions">${ic('dots', 15)}</button>
@@ -577,6 +578,10 @@
         <div style="padding:var(--s-5) var(--s-6) var(--s-10)">${body}</div>
         <button class="fab" id="ptFab" aria-haspopup="menu">${ic('plus', 18)} New</button>`;
     },
+
+    // Reused by the consult screen so there is one prescribing path, not two.
+    openRx: (p, pr) => newRx(p, null, pr),
+    openTest: (p, pr) => newTest(p, null, pr),
 
     mount(root, pr) {
       const p = K.pt(pr.id) || K.patients[0];

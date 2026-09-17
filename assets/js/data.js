@@ -29,21 +29,97 @@
   ];
 
   const patients = [
-    { id:'p1',  first:'Te Aroha',  last:'Ngata',      dob:'1974-03-12', sex:'F', nhi:'JKL8472', phone:'021 442 907',  email:'tearoha.ngata@xtra.co.nz',  addr:'18 Kōwhai Road, Sandringham, Auckland 1025', gp:'g1', funder:'ACC',           alerts:['Penicillin allergy'], warn:['Interpreter — te reo Māori preferred'], nok:'Hemi Ngata (husband) · 021 550 118', claim:'ACC-2026-44817', injury:'2026-07-28', tone:1 },
-    { id:'p2',  first:'Hemi',      last:'Waititi',    dob:'1959-11-02', sex:'M', nhi:'PQR2210', phone:'027 819 4402', email:'hemi.waititi@gmail.com',    addr:'7A Seabrook Ave, New Lynn, Auckland 0600',   gp:'g4', funder:'Southern Cross', alerts:[],                     warn:['Anticoagulated — dabigatran'], nok:'Marama Waititi (daughter) · 027 300 991', claim:null, injury:null, tone:2 },
-    { id:'p3',  first:'Margaret',  last:"O'Connell",  dob:'1948-06-24', sex:'F', nhi:'BCD9134', phone:'09 445 2218',  email:'m.oconnell48@outlook.co.nz',addr:'22 Lake Road, Devonport, Auckland 0624',     gp:'g5', funder:'Private',       alerts:['Latex allergy'],      warn:['Falls risk'],                  nok:'Peter O\'Connell (son) · 021 774 209', claim:null, injury:null, tone:3 },
-    { id:'p4',  first:'Siosaia',   last:'Tupou',      dob:'1991-01-19', sex:'M', nhi:'MNO5563', phone:'022 634 7781', email:'s.tupou91@gmail.com',       addr:'44 Rata Street, Māngere, Auckland 2022',     gp:'g1', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Ana Tupou (partner) · 022 118 640', claim:'ACC-2026-45102', injury:'2026-08-30', tone:4 },
-    { id:'p5',  first:'Priya',     last:'Naidu',      dob:'1986-09-08', sex:'F', nhi:'STU7719', phone:'021 077 3312', email:'priya.naidu@kiwilink.nz',   addr:'3/58 Balmoral Road, Mt Eden, Auckland 1024', gp:'g4', funder:'Southern Cross', alerts:['NSAID sensitivity'],  warn:[],                              nok:'Ravi Naidu (husband) · 021 448 205', claim:null, injury:null, tone:5 },
-    { id:'p6',  first:'Wiremu',    last:'Kawiti',     dob:'2003-04-30', sex:'M', nhi:'DEF3388', phone:'020 411 8890', email:'w.kawiti@studentmail.ac.nz',addr:'11 Puriri Drive, Henderson, Auckland 0612',  gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Rangi Kawiti (mother) · 021 660 774', claim:'ACC-2026-45330', injury:null, tone:1 },
-    { id:'p7',  first:'Ngaire',    last:'Solomon',    dob:'1966-12-15', sex:'F', nhi:'GHI6027', phone:'027 220 5518', email:'ngaire.solomon@ihug.co.nz', addr:'9 Rewi Street, Onehunga, Auckland 1061',     gp:'g2', funder:'Private',       alerts:[],                     warn:[],                              nok:'Dean Solomon (husband) · 027 884 110', claim:null, injury:null, tone:2 },
-    { id:'p8',  first:'James',     last:'Sutherland', dob:'1981-07-07', sex:'M', nhi:'VWX4451', phone:'021 938 0064', email:'jsutherland@workmail.nz',   addr:'160 Hurstmere Road, Takapuna, Auckland 0622',gp:'g5', funder:'Southern Cross', alerts:[],                     warn:[],                              nok:'Emma Sutherland (wife) · 021 300 447', claim:null, injury:null, tone:3 },
-    { id:'p9',  first:'Mele',      last:'Fifita',     dob:'1995-02-21', sex:'F', nhi:'YZA1178', phone:'022 500 9913', email:'mele.fifita@gmail.com',     addr:'5 Favona Road, Māngere, Auckland 2024',      gp:'g1', funder:'ACC',           alerts:['Codeine — nausea'],   warn:[],                              nok:'Sione Fifita (brother) · 022 774 300', claim:'ACC-2026-44290', injury:'2026-06-11', tone:4 },
-    { id:'p10', first:'Bruce',     last:'Lockhart',   dob:'1953-10-05', sex:'M', nhi:'JKM8802', phone:'09 418 6673',  email:'brucel53@xtra.co.nz',       addr:'31 Wairau Road, Glenfield, Auckland 0629',   gp:'g2', funder:'Private',       alerts:[],                     warn:['Pacemaker in situ'],           nok:'Judith Lockhart (wife) · 021 552 908', claim:null, injury:null, tone:5 },
-    { id:'p11', first:'Anahera',   last:'Tait',       dob:'1989-05-27', sex:'F', nhi:'NOP3345', phone:'021 664 1129', email:'anahera.tait@korohealth.nz',addr:'77 Hillsborough Rd, Hillsborough, Akld 1042',gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Tama Tait (partner) · 021 883 447', claim:'ACC-2026-45611', injury:'2026-09-02', tone:1 },
-    { id:'p12', first:'Rangi',     last:'Mātaira',    dob:'1972-08-14', sex:'M', nhi:'QRS9960', phone:'027 445 2207', email:'r.mataira@nzpost.co.nz',    addr:'14 Tiverton Road, Avondale, Auckland 0600',  gp:'g4', funder:'Southern Cross', alerts:['Sulfa drugs'],        warn:[],                              nok:'Hine Mātaira (wife) · 027 119 662', claim:null, injury:null, tone:2 },
-    { id:'p13', first:'Chloe',     last:'Bennett',    dob:'1998-11-30', sex:'F', nhi:'TUV2284', phone:'020 882 4419', email:'chloe.bennett98@gmail.com', addr:'2/19 Jervois Road, Herne Bay, Auckland 1011',gp:'g5', funder:'Private',       alerts:[],                     warn:[],                              nok:'Sarah Bennett (mother) · 021 447 998', claim:null, injury:null, tone:3 },
-    { id:'p14', first:'Tui',       last:'Parata',     dob:'1962-01-09', sex:'F', nhi:'WXY5507', phone:'021 338 7740', email:'tui.parata@ngatiwhatua.nz', addr:'40 Bassett Road, Remuera, Auckland 1050',    gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Kahu Parata (son) · 027 660 118', claim:'ACC-2026-43980', injury:'2026-05-19', tone:4 },
+    { id:'p1',  first:'Te Aroha',  last:'Ngata',      dob:'1974-03-12', sex:'F', nhi:'JKL8407', phone:'021 442 907',  email:'tearoha.ngata@xtra.co.nz',  addr:'18 Kōwhai Road, Sandringham, Auckland 1025', gp:'g1', funder:'ACC',           alerts:['Penicillin allergy'], warn:['Interpreter — te reo Māori preferred'], nok:'Hemi Ngata (husband) · 021 550 118', claim:'ACC-2026-44817', injury:'2026-07-28', tone:1 },
+    { id:'p2',  first:'Hemi',      last:'Waititi',    dob:'1959-11-02', sex:'M', nhi:'PQR2218', phone:'027 819 4402', email:'hemi.waititi@gmail.com',    addr:'7A Seabrook Ave, New Lynn, Auckland 0600',   gp:'g4', funder:'Southern Cross', alerts:[],                     warn:['Anticoagulated — dabigatran'], nok:'Marama Waititi (daughter) · 027 300 991', claim:null, injury:null, tone:2 },
+    { id:'p3',  first:'Margaret',  last:"O'Connell",  dob:'1948-06-24', sex:'F', nhi:'BCD9132', phone:'09 445 2218',  email:'m.oconnell48@outlook.co.nz',addr:'22 Lake Road, Devonport, Auckland 0624',     gp:'g5', funder:'Private',       alerts:['Latex allergy'],      warn:['Falls risk'],                  nok:'Peter O\'Connell (son) · 021 774 209', claim:null, injury:null, tone:3 },
+    { id:'p4',  first:'Siosaia',   last:'Tupou',      dob:'1991-01-19', sex:'M', nhi:'MNP5567', phone:'022 634 7781', email:'s.tupou91@gmail.com',       addr:'44 Rata Street, Māngere, Auckland 2022',     gp:'g1', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Ana Tupou (partner) · 022 118 640', claim:'ACC-2026-45102', injury:'2026-08-30', tone:4 },
+    { id:'p5',  first:'Priya',     last:'Naidu',      dob:'1986-09-08', sex:'F', nhi:'STU7714', phone:'021 077 3312', email:'priya.naidu@kiwilink.nz',   addr:'3/58 Balmoral Road, Mt Eden, Auckland 1024', gp:'g4', funder:'Southern Cross', alerts:['NSAID sensitivity'],  warn:[],                              nok:'Ravi Naidu (husband) · 021 448 205', claim:null, injury:null, tone:5 },
+    { id:'p6',  first:'Wiremu',    last:'Kawiti',     dob:'2003-04-30', sex:'M', nhi:'DEF3383', phone:'020 411 8890', email:'w.kawiti@studentmail.ac.nz',addr:'11 Puriri Drive, Henderson, Auckland 0612',  gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Rangi Kawiti (mother) · 021 660 774', claim:'ACC-2026-45330', injury:null, tone:1 },
+    { id:'p7',  first:'Ngaire',    last:'Solomon',    dob:'1966-12-15', sex:'F', nhi:'GHJ6025', phone:'027 220 5518', email:'ngaire.solomon@ihug.co.nz', addr:'9 Rewi Street, Onehunga, Auckland 1061',     gp:'g2', funder:'Private',       alerts:[],                     warn:[],                              nok:'Dean Solomon (husband) · 027 884 110', claim:null, injury:null, tone:2 },
+    { id:'p8',  first:'James',     last:'Sutherland', dob:'1981-07-07', sex:'M', nhi:'VWX4453', phone:'021 938 0064', email:'jsutherland@workmail.nz',   addr:'160 Hurstmere Road, Takapuna, Auckland 0622',gp:'g5', funder:'Southern Cross', alerts:[],                     warn:[],                              nok:'Emma Sutherland (wife) · 021 300 447', claim:null, injury:null, tone:3 },
+    { id:'p9',  first:'Mele',      last:'Fifita',     dob:'1995-02-21', sex:'F', nhi:'YZA1171', phone:'022 500 9913', email:'mele.fifita@gmail.com',     addr:'5 Favona Road, Māngere, Auckland 2024',      gp:'g1', funder:'ACC',           alerts:['Codeine — nausea'],   warn:[],                              nok:'Sione Fifita (brother) · 022 774 300', claim:'ACC-2026-44290', injury:'2026-06-11', tone:4 },
+    { id:'p10', first:'Bruce',     last:'Lockhart',   dob:'1953-10-05', sex:'M', nhi:'JKM8806', phone:'09 418 6673',  email:'brucel53@xtra.co.nz',       addr:'31 Wairau Road, Glenfield, Auckland 0629',   gp:'g2', funder:'Private',       alerts:[],                     warn:['Pacemaker in situ'],           nok:'Judith Lockhart (wife) · 021 552 908', claim:null, injury:null, tone:5 },
+    { id:'p11', first:'Anahera',   last:'Tait',       dob:'1989-05-27', sex:'F', nhi:'NPP3348', phone:'021 664 1129', email:'anahera.tait@korohealth.nz',addr:'77 Hillsborough Rd, Hillsborough, Akld 1042',gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Tama Tait (partner) · 021 883 447', claim:'ACC-2026-45611', injury:'2026-09-02', tone:1 },
+    { id:'p12', first:'Rangi',     last:'Mātaira',    dob:'1972-08-14', sex:'M', nhi:'QRS9968', phone:'027 445 2207', email:'r.mataira@nzpost.co.nz',    addr:'14 Tiverton Road, Avondale, Auckland 0600',  gp:'g4', funder:'Southern Cross', alerts:['Sulfa drugs'],        warn:[],                              nok:'Hine Mātaira (wife) · 027 119 662', claim:null, injury:null, tone:2 },
+    { id:'p13', first:'Chloe',     last:'Bennett',    dob:'1998-11-30', sex:'F', nhi:'TUV2287', phone:'020 882 4419', email:'chloe.bennett98@gmail.com', addr:'2/19 Jervois Road, Herne Bay, Auckland 1011',gp:'g5', funder:'Private',       alerts:[],                     warn:[],                              nok:'Sarah Bennett (mother) · 021 447 998', claim:null, injury:null, tone:3 },
+    { id:'p14', first:'Tui',       last:'Parata',     dob:'1962-01-09', sex:'F', nhi:'WXY5500', phone:'021 338 7740', email:'tui.parata@ngatiwhatua.nz', addr:'40 Bassett Road, Remuera, Auckland 1050',    gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Kahu Parata (son) · 027 660 118', claim:'ACC-2026-43980', injury:'2026-05-19', tone:4 },
   ];
+
+
+  /* ---- PMS registration fields, as a NZ practice actually files them ----
+     Enrolment status drives the colour a patient's name is shown in, but the
+     list also labels it — colour alone would fail WCAG and is hard to learn. */
+  const ENROL_STATUS = {
+    enrolled:    { label: 'Enrolled',        tone: 'var(--text)',        chip: 'chip-ok'    },
+    unenrolled:  { label: 'Un-enrolled',     tone: 'var(--accent-text)', chip: 'chip-accent'},
+    casual:      { label: 'Casual / visitor',tone: 'var(--ok-fg)',       chip: 'chip-ok'    },
+    transferred: { label: 'Transferred',     tone: 'var(--warn-fg)',     chip: 'chip-warn'  },
+    notfunded:   { label: 'Registered, not funded', tone: 'var(--appt-procedure)', chip: '' },
+    deceased:    { label: 'Deceased',        tone: 'var(--text-subtle)', chip: ''           },
+  };
+
+  // Deterministic so the sample set is stable between reloads.
+  const REG = [
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'N', false, 'u1'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'N', true,  'u2'],
+    ['transferred','NES', 'R', 'P',     'A3', 'N', true,  'u1'],
+    ['casual',     'U',   'C', 'CAS',   'A3', 'N', false, 'u1'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'F', false, 'u2'],
+    ['unenrolled', 'U',   'C', 'absgp', 'C3', 'N', false, 'u4'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'N', false, 'u2'],
+    ['notfunded',  'NES', 'C', 'BD',    'C3', 'N', false, 'u1'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'N', true,  'u1'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'N', true,  'u2'],
+    ['unenrolled', 'U',   'C', 'P',     'A3', 'N', false, 'u4'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'N', false, 'u3'],
+    ['casual',     'U',   'C', 'CAS',   'A3', 'N', false, 'u1'],
+    ['enrolled',   'NES', 'R', 'P',     'A3', 'F', true,  'u3'],
+  ];
+  const PREFERRED = { p1: 'Aroha', p3: 'Maggie', p8: 'Jim', p13: 'Chlo' };
+
+  patients.forEach((p, i) => {
+    const [status, enrol, reg, pay, gms, fund, csc, prov] = REG[i % REG.length];
+    p.status = status;
+    p.enrol = enrol;      // NES = enrolled national scheme, U = un-enrolled
+    p.reg = reg;          // C = casual, R = registered
+    p.payGrp = pay;
+    p.gms = gms;          // General Medical Services subsidy level
+    p.fund = fund;        // F = funded, N = not
+    p.csc = csc;          // Community Services Card held
+    p.provider = prov;    // usual provider
+    p.chart = 'KRA-' + (47400 + i * 7);
+    p.preferred = PREFERRED[p.id] || null;
+  });
+
+
+  /* ---- Demographic fields the consult banner carries ---- */
+  const ETHNIC = ['NZ European', 'Māori', 'Samoan', 'Tongan', 'Indian', 'Chinese', 'NZ European'];
+  patients.forEach((p, i) => {
+    p.ethnicity = ETHNIC[i % ETHNIC.length];
+    p.quintile = (i % 5) + 1;                 // NZDep quintile, 5 = most deprived
+    p.dhb = ['G00028-E', 'G00011-A', 'G00042-C'][i % 3];
+    p.portal = i % 3 !== 0;                   // patient portal registered
+    p.ahBalance = 0;
+  });
+
+  /* ---- Recalls and prompts: what the consult screen nags about ---- */
+  const recalls = [
+    { pt:'p1',  kind:'Vaccine schedule', text:'Influenza — annual',              due:'2027-04-01', status:'due' },
+    { pt:'p1',  kind:'Vaccine schedule', text:'Zoster 65Y',                      due:'2039-03-12', status:'future' },
+    { pt:'p1',  kind:'Screening',        text:'Cervical screening — 5 yearly',   due:'2026-10-02', status:'overdue' },
+    { pt:'p1',  kind:'Review',           text:'ACC45 review — right knee',       due:'2026-10-15', status:'due' },
+    { pt:'p3',  kind:'Screening',        text:'Bowel screening kit',             due:'2026-09-30', status:'due' },
+    { pt:'p12', kind:'Monitoring',       text:'Methotrexate bloods — 3 monthly', due:'2026-09-20', status:'due' },
+  ];
+
+  const problems = [
+    { pt:'p1',  text:'Medial meniscal tear, right knee', onset:'2026-07-28', status:'active',   acc:true  },
+    { pt:'p1',  text:'Osteoarthritis, medial compartment', onset:'2024-02-10', status:'active', acc:false },
+    { pt:'p1',  text:'Iron deficiency anaemia',          onset:'2021-06-04', status:'resolved', acc:false },
+    { pt:'p12', text:'Seropositive rheumatoid arthritis', onset:'2026-08-30', status:'active',  acc:false },
+  ];
+
+  const consultTypes = ['Note only', 'Face to face', 'Telehealth', 'Phone', 'Home visit', 'Nurse consult', 'ACC review'];
 
   const apptTypes = [
     { id:'t1', name:'New consultation',     type:'consult',    mins:45, price:395.00, code:'CON-NEW' },
@@ -327,12 +403,16 @@
     { id:'tr4', pt:'p9',  by:'u1', at:'2026-09-14T09:05', test:'t-xr',   provider:'tp-rad2', urgency:'routine', status:'resulted', note:'Right wrist — union check' },
   ];
 
+  // The NHI alphabet omits I and O so they cannot be misread as 1 and 0.
+  const NHI_ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+
   const GST = 0.15;
 
   window.KORA = {
     TODAY, GST, clinics, staff, clinicians, gps, patients, apptTypes, appts, blocks,
     letters, letterTemplates, inbox, invoices, accQueue, accHistory, tasks, timeline, notes,
-    billingCodes, XERO_SYNC, org, timetables, pharmacies, medicines, prescriptions,
+    billingCodes, XERO_SYNC, org, timetables, pharmacies, medicines, prescriptions, ENROL_STATUS,
+    recalls, problems, consultTypes,
     testProviders, testCatalogue, testRequests,
 
     /* ---- lookups ---- */
@@ -347,6 +427,39 @@
     test: id => testCatalogue.find(t => t.id === id),
     prov: id => testProviders.find(t => t.id === id),
     code: c => billingCodes.find(b => b.code === c),
+
+    NHI_ALPHA,
+    /* Outstanding balance — what reception is asked about at the desk. */
+    balance: id => invoices
+      .filter(i => i.pt === id && (i.status === 'sent' || i.status === 'overdue'))
+      .reduce((sum, i) => sum + i.items.reduce((a, x) => a + x.q * x.p, 0) * (1 + GST), 0),
+    /* "BRADY, Thomas (Tom)" — surname first, preferred name in brackets. */
+    displayName: p => `${p.last.toUpperCase()}, ${p.first}${p.preferred ? ` (${p.preferred})` : ''}`,
+    /* NZ NHI validation — old AAANNNN format, modulus 11 check digit. */
+    nhiCheck(raw) {
+      const v = String(raw || '').toUpperCase().trim();
+      if (!v) return { state: 'empty' };
+      if (/[IO]/.test(v)) return { state: 'bad', why: 'NHI numbers never contain the letters I or O.' };
+      if (!/^[A-Z]{3}\d{4}$/.test(v)) return { state: 'partial', why: 'Three letters, then four digits.' };
+      let total = 0;
+      for (let i = 0; i < 6; i++) {
+        const ch = v[i];
+        let val;
+        if (/[A-Z]/.test(ch)) {
+          val = NHI_ALPHA.indexOf(ch) + 1;
+          if (val <= 0) return { state: 'bad', why: 'That letter is not used in NHI numbers.' };
+        } else {
+          val = Number(ch);          // a digit may legitimately be 0
+        }
+        total += val * (7 - (i + 1));
+      }
+      const rem = total % 11;
+      if (rem === 0) return { state: 'bad', why: 'Check digit does not match — re-read the NHI.' };
+      const cd = (11 - rem) === 10 ? 0 : 11 - rem;
+      return cd === Number(v[6])
+        ? { state: 'ok', nhi: v }
+        : { state: 'bad', why: `Check digit does not match — did you mean ${v.slice(0, 6)}${cd}?` };
+    },
 
     /* Medicines whose class matches something in the patient's allergy list. */
     allergyClash: (ptId, medId) => {

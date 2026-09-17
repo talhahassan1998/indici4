@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en-NZ" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in — Kora Health</title>
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2314635C'/%3E%3Cpath d='M10 8v16M10 16l7-8M10 16l7 8' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Ccircle cx='23' cy='11' r='2.4' fill='%23E9B254'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+<main class="auth">
+
+  <!-- ============================ brand side ============================ -->
+  <section class="auth-brand" aria-labelledby="brandHead">
+    <div class="auth-wordmark">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 4v16M7 12l7.5-8M7 12l7.5 8"/></svg>
+      </span>
+      <span>
+        <b>Kora Health</b>
+        <span>Practice Management</span>
+      </span>
+    </div>
+
+    <div class="auth-pitch">
+      <h1 id="brandHead">The clinic day, in one place.</h1>
+    </div>
+
+    <div class="notice-stack" aria-label="Notices">
+      <article class="notice is-alert">
+        <div class="n-head">
+          <b>Authenticator app required from 29 April</b>
+        </div>
+        <p>A username and password alone will no longer be enough. Set up your
+           authenticator now so you are not locked out on the day.</p>
+        <div class="n-links"><a href="#">Set up two-factor</a><a href="#">What changes</a></div>
+      </article>
+
+      <article class="notice">
+        <div class="n-head">
+          <span class="n-new">New</span>
+          <b>Cervical Screening History Summary</b>
+        </div>
+        <p>View screening summaries from the National Cervical Screening Register in
+           real time, inside the patient record. Your authorised signatory needs to
+           sign the Terms of Use first.</p>
+        <div class="n-links"><a href="#">Register your organisation</a><a href="#">Watch the walkthrough</a></div>
+      </article>
+    </div>
+
+    <div class="auth-foot">
+      <span>© 2026 Kora Health Ltd</span>
+      <a href="#">Privacy</a>
+      <a href="#">Security</a>
+      <a href="#">Status</a>
+      <span class="t-mono">Version 3.0.114</span>
+    </div>
+  </section>
+
+  <!-- ============================ form side ============================= -->
+  <section class="auth-form-col">
+    <div class="auth-card">
+
+      <!-- step 1: credentials -->
+      <form id="stepCreds" novalidate>
+        <div class="auth-step" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+        <h2>Login</h2>
+        <p class="auth-sub">Use the account your practice administrator set up for you.</p>
+
+        <div class="col g-4 mt-5">
+          <div class="field">
+            <label class="label" for="username">Username</label>
+            <div class="input-group">
+              <span class="ic-lead" id="userIcon"></span>
+              <input class="input" id="username" name="username" type="text" autocomplete="username"
+                     spellcheck="false" placeholder="mmadmin" autofocus>
+            </div>
+            <span class="err" id="userErr" hidden></span>
+          </div>
+
+          <div class="field">
+            <div class="row between">
+              <label class="label" for="password">Password</label>
+              <a class="t-xs" href="#" id="forgot">Forgot password?</a>
+            </div>
+            <div class="pw-wrap">
+              <input class="input" id="password" name="password" type="password" autocomplete="current-password"
+                     placeholder="••••••••••••">
+              <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password" aria-pressed="false"></button>
+            </div>
+            <span class="err" id="pwErr" hidden></span>
+          </div>
+
+          <label class="row g-3" for="remember">
+            <span class="switch">
+              <input type="checkbox" id="remember" checked><span class="track"></span><span class="thumb"></span>
+            </span>
+            <span class="grow">
+              <b class="t-sm">Remember this device for 30 days</b><br>
+              <span class="t-xs subtle">Only on a clinic machine, never a shared or public one.</span>
+            </span>
+          </label>
+
+          <button class="btn btn-primary btn-lg btn-block" id="btnSignIn" type="submit">Login</button>
+
+          <div class="or-rule"><span>or</span></div>
+
+          <button class="btn btn-secondary btn-sso btn-block" type="button" data-sso="work">
+            <span class="ms-tile" aria-hidden="true">
+              <i style="background:#F25022"></i><i style="background:#7FBA00"></i>
+              <i style="background:#00A4EF"></i><i style="background:#FFB900"></i>
+            </span>
+            <span>Continue with Microsoft</span>
+          </button>
+          <button class="btn btn-ghost btn-sm btn-block" type="button" data-sso="spa">
+            Open Microsoft single sign-on in a new window
+          </button>
+        </div>
+      </form>
+
+      <!-- step 2: verification -->
+      <form id="stepMfa" novalidate hidden>
+        <div class="auth-step" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="backToCreds" style="margin-left:-10px">
+          <span id="backIcon"></span> Back
+        </button>
+        <h2 class="mt-2">Verification</h2>
+        <p class="auth-sub">Enter the 6-digit code from your authenticator app for
+          <b id="mfaAccount">a.fenwick@korahealth.nz</b>.</p>
+
+        <div class="col g-4 mt-5">
+          <div class="field">
+            <label class="label" for="code1">Verification code</label>
+            <div class="code-row" id="codeRow">
+              <input id="code1" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1">
+              <input id="code2" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+              <input id="code3" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+              <input id="code4" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+              <input id="code5" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+              <input id="code6" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+            </div>
+            <span class="err" id="codeErr" hidden></span>
+            <span class="hint" id="codeHint">Codes refresh every 30 seconds.</span>
+          </div>
+
+          <button class="btn btn-primary btn-lg btn-block" id="btnVerify" type="submit">Verify and sign in</button>
+          <button class="btn btn-ghost btn-sm btn-block" type="button" id="useBackup">Use a backup code instead</button>
+        </div>
+      </form>
+
+      <!-- step 3: practice and location -->
+      <form id="stepPractice" novalidate hidden>
+        <div class="auth-step" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+        <h2>Select practice</h2>
+        <p class="auth-sub">You have access to more than one. This sets which records
+           and calendars you see.</p>
+
+        <div class="col g-5 mt-5">
+          <div class="field">
+            <span class="label">Practice</span>
+            <div class="col g-2" id="practiceList" role="radiogroup" aria-label="Practice"></div>
+          </div>
+
+          <div class="field">
+            <span class="label">Location</span>
+            <div class="col g-2" id="locationList" role="radiogroup" aria-label="Location"></div>
+          </div>
+
+          <button class="btn btn-primary btn-lg btn-block" id="btnContinue" type="submit">Continue</button>
+          <button class="btn btn-ghost btn-sm btn-block" type="button" id="backToMfa">Cancel</button>
+        </div>
+      </form>
+
+      <!-- legal / support -->
+      <div class="auth-legal">
+        <p>This system holds patient health information. Access is logged against your
+           name under the Health Information Privacy Code.</p>
+        <div class="row mt-3">
+          <a href="#">Contact IT support</a>
+          <a href="#">Accessibility</a>
+          <span class="spacer"></span>
+          <button class="btn btn-ghost btn-sm" id="themeBtn" aria-label="Toggle dark mode"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast-host" id="toasts" aria-live="polite"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/login.js"></script>
+</body>
+</html>

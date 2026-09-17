@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Kora Health — authentication
+   Split canvas: a quiet brand panel that carries real product substance,
+   and a form column sized for a keyboard, not a marketing page.
+   ========================================================================== */
+
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(430px, 0.95fr);
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ---------------------------------------------------------- brand panel */
+.auth-brand {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: var(--s-8) var(--s-9);
+  color: #fff;
+  background:
+    radial-gradient(760px 420px at 88% -12%, rgba(233,178,84,.20), transparent 62%),
+    linear-gradient(152deg, var(--kauri-700) 0%, var(--kauri-800) 58%, var(--kauri-900) 100%);
+}
+/* Concentric arcs — the same motif as the dashboard greeting, rotated. */
+.auth-brand::before,
+.auth-brand::after {
+  content: ""; position: absolute; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.09); pointer-events: none;
+}
+.auth-brand::before { width: 620px; height: 620px; right: -230px; bottom: -280px;
+  box-shadow: inset 0 0 0 64px rgba(255,255,255,.028); }
+.auth-brand::after  { width: 340px; height: 340px; right: -60px;  bottom: -140px;
+  box-shadow: inset 0 0 0 36px rgba(255,255,255,.035); }
+
+.auth-wordmark { display: flex; align-items: center; gap: 11px; position: relative; }
+.auth-wordmark .brand-mark { width: 36px; height: 36px; border-radius: 11px; background: rgba(255,255,255,.14);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.auth-wordmark .brand-mark svg { width: 21px; height: 21px; }
+.auth-wordmark b { font-size: var(--fs-lg); font-weight: var(--fw-x); letter-spacing: -0.02em; }
+.auth-wordmark span { font-size: var(--fs-2xs); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: rgba(255,255,255,.62); font-weight: var(--fw-bold); display: block; line-height: 1.2; }
+
+.auth-pitch { position: relative; max-width: 30ch; }
+.auth-pitch h1 { font-size: var(--fs-4xl); line-height: 1.12; font-weight: var(--fw-x); letter-spacing: -0.035em; }
+.auth-pitch p { margin-top: var(--s-4); font-size: var(--fs-md); line-height: var(--lh-base); color: rgba(255,255,255,.74); max-width: 42ch; }
+
+/* Operational notices — the login screen is where a practice actually reads them. */
+.notice-stack { position: relative; display: flex; flex-direction: column; gap: var(--s-3); max-width: 480px; }
+.notice {
+  border-radius: var(--r-md); padding: 14px 16px;
+  background: rgba(255,255,255,.07);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.13);
+  backdrop-filter: blur(2px);
+}
+.notice.is-alert { background: rgba(233,178,84,.13); box-shadow: inset 0 0 0 1px rgba(233,178,84,.34); }
+.notice .n-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.notice .n-head b { font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+.notice p { font-size: var(--fs-xs); line-height: var(--lh-base); color: rgba(255,255,255,.76); }
+.notice p b { color: #fff; }
+.notice .n-new {
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; padding: 2px 7px; border-radius: var(--r-pill);
+  background: var(--kowhai-300); color: #2B2823;
+}
+.notice .n-links { display: flex; gap: var(--s-4); margin-top: 9px; }
+.notice .n-links a { font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--kowhai-200); }
+
+/* A strip of real numbers, not decoration — this is what the practice sees. */
+.auth-strip { position: relative; display: flex; gap: var(--s-7); flex-wrap: wrap;
+  padding-top: var(--s-5); border-top: 1px solid rgba(255,255,255,.14); }
+.auth-strip .as { display: flex; flex-direction: column; gap: 2px; }
+.auth-strip .as b { font-size: var(--fs-2xl); font-weight: var(--fw-x); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.auth-strip .as span { font-size: var(--fs-xs); color: rgba(255,255,255,.66); }
+
+.auth-foot { position: relative; display: flex; gap: var(--s-4); flex-wrap: wrap;
+  font-size: var(--fs-xs); color: rgba(255,255,255,.52); }
+.auth-foot a { color: rgba(255,255,255,.72); }
+
+/* ---------------------------------------------------------- form column */
+.auth-form-col {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--s-8) var(--s-9);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+}
+.auth-card { width: 100%; max-width: 384px; margin: 0 auto; }
+.auth-card h2 { font-size: var(--fs-2xl); font-weight: var(--fw-x); letter-spacing: -0.025em; }
+.auth-card .auth-sub { margin-top: 5px; font-size: var(--fs-sm); color: var(--text-muted); }
+
+.auth-step { display: flex; align-items: center; gap: 7px; margin-bottom: var(--s-5); }
+.auth-step i { width: 22px; height: 3px; border-radius: 2px; background: var(--line-strong); display: block; }
+.auth-step i.on { background: var(--accent); }
+
+/* Practice picker reads as a control, not a dropdown afterthought */
+.practice-pick {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  padding: 10px 12px; border-radius: var(--r-sm); text-align: left;
+  background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-field);
+  transition: background var(--dur-1) var(--ease);
+}
+.practice-pick:hover { background: var(--surface-3); }
+.practice-pick .pp-main { min-width: 0; flex: 1; }
+.practice-pick b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.practice-pick span { display: block; font-size: var(--fs-xs); color: var(--text-subtle); }
+
+/* "or" rule between password and single sign-on */
+.or-rule { display: flex; align-items: center; gap: var(--s-3); color: var(--text-subtle); }
+.or-rule::before, .or-rule::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+.or-rule span { font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps); text-transform: uppercase; }
+
+.btn-sso { justify-content: flex-start; gap: 11px; height: 42px; }
+.btn-sso .ms-tile { display: grid; grid-template-columns: 9px 9px; grid-gap: 2px; flex: none; }
+.btn-sso .ms-tile i { width: 9px; height: 9px; display: block; }
+
+/* Practice and location, chosen after authentication */
+.ctx-option {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  padding: 11px 12px; border-radius: var(--r-sm);
+  background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-field);
+  transition: background var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.ctx-option:hover { background: var(--surface-2); }
+.ctx-option[aria-checked="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.ctx-option .co-main { flex: 1; min-width: 0; }
+.ctx-option b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.ctx-option span { display: block; font-size: var(--fs-xs); color: var(--text-subtle); }
+.ctx-option .co-tick { color: var(--accent); opacity: 0; flex: none; }
+.ctx-option[aria-checked="true"] .co-tick { opacity: 1; }
+
+/* Six-box verification code */
+.code-row { display: flex; gap: 8px; }
+.code-row input {
+  width: 100%; height: 52px; text-align: center;
+  font-size: var(--fs-xl); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums;
+  border: 1px solid var(--line-field); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--text);
+  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.code-row input:focus { outline: none; border-color: var(--focus); box-shadow: var(--sh-focus); }
+.code-row input.filled { border-color: var(--accent); background: var(--accent-soft); }
+
+.auth-legal {
+  margin-top: var(--s-7); padding-top: var(--s-5); border-top: 1px solid var(--line-faint);
+  font-size: var(--fs-xs); color: var(--text-subtle); line-height: var(--lh-base);
+}
+.auth-legal .row { gap: var(--s-4); flex-wrap: wrap; }
+
+.pw-wrap { position: relative; }
+.pw-wrap .pw-toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: var(--r-xs); color: var(--text-subtle);
+}
+.pw-wrap .pw-toggle:hover { background: var(--surface-3); color: var(--text); }
+.pw-wrap .input { padding-right: 38px; }
+
+@media (max-width: 980px) {
+  .auth { grid-template-columns: 1fr; }
+  .auth-brand { padding: var(--s-6); gap: var(--s-6); min-height: auto; }
+  .auth-pitch h1 { font-size: var(--fs-2xl); }
+  .auth-pitch p, .auth-foot { display: none; }
+  .auth-form-col { border-left: 0; border-top: 1px solid var(--line); padding: var(--s-7) var(--s-5); }
+}
+@media (max-width: 520px) {
+  .auth-strip { gap: var(--s-5); }
+  .code-row input { height: 46px; font-size: var(--fs-lg); }
+}

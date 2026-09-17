@@ -47,7 +47,9 @@
         <div class="nav-group-label">${g.group}</div>
         ${g.items.map(it => {
           const n = it.badge ? it.badge() : 0;
-          const active = current === it.id || (current === 'patient' && it.id === 'patients') || (current === 'letter' && it.id === 'letters');
+          const active = current === it.id
+            || ((current === 'patient' || current === 'consult') && it.id === 'patients')
+            || (current === 'letter' && it.id === 'letters');
           return `<a class="nav-item" href="#/${it.id}" ${active ? 'aria-current="page"' : ''}>
             ${ic(it.icon, 18)}
             <span class="nav-label">${it.label}</span>
@@ -86,6 +88,7 @@
     appointments: () => window.Views.appointments,
     patients:     () => window.Views.patients,
     patient:      () => window.Views.patient,
+    consult:      () => window.Views.consult,
     inbox:        () => window.Views.inbox,
     letters:      () => window.Views.letters,
     letter:       () => window.Views.letter,
@@ -190,6 +193,7 @@
       { g: 'Go to',  id: 'g-acc',       label: 'ACC submissions',  sub: 'Validate and submit',  icon: 'acc',          run: () => location.hash = '#/acc' },
       { g: 'Go to',  id: 'g-admin',     label: 'Admin settings',   sub: 'Clinic, users, templates', icon: 'admin',    run: () => location.hash = '#/admin' },
       { g: 'Go to',  id: 'g-style',     label: 'Design system',    sub: 'Palette, type, components', icon: 'sparkle', run: () => location.href = 'styleguide.html' },
+      { g: 'Go to',  id: 'g-login',     label: 'Sign-in screen',   sub: 'View the authentication design', icon: 'lock', run: () => location.href = 'login.html' },
       { g: 'Actions',id: 'a-theme',     label: state.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', sub: 'Toggle appearance', icon: state.theme === 'dark' ? 'sun' : 'moon', run: toggleTheme },
       { g: 'Actions',id: 'a-sync',      label: 'Sync items to Xero',sub: 'Push today’s invoices', icon: 'sync',       run: () => U.toast('Xero sync started', '5 invoices queued for sync.', 'info') },
       { g: 'Actions',id: 'a-acc',       label: 'Submit ACC batch',  sub: '3 invoices ready',      icon: 'send',       run: () => location.hash = '#/acc' },

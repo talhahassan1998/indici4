@@ -19,11 +19,25 @@ The design system lives at `styleguide.html`.
 
 | | |
 |---|---|
-| **Accent** | Kauri Teal `#14635C` — carries every primary action |
-| **Secondary** | Kōwhai Gold `#D6932A` — highlights, ACC surfaces, "worth noticing" |
-| **Neutrals** | Warm greys on a `#F7F5F2` ground — deliberately not blue-and-white hospital |
-| **Type** | Plus Jakarta Sans, 14px base, tabular figures for every number a clinic reads at a glance |
-| **Shape** | 12–16px card radius, hairline borders, shadow only where something floats |
+| **Accent** | Pounamu `#2A6044` — a deep, desaturated pine; carries every primary action |
+| **Secondary** | Clay `#B87848` — the warm earth tone green needs opposite it |
+| **Neutrals** | Greys tinted a few degrees toward the brand, on a `#F3F6F4` ground |
+| **Type** | IBM Plex superfamily — Serif for headings, Sans for the interface, Mono for every identifier and figure |
+| **Shape** | 3px chips, 5px controls, 7px cards, 10px overlays — radius scales with density |
+| **Elevation** | Flat. A hairline separates; a shadow means the thing genuinely floats, so only overlays get one |
+
+Success reuses the brand green rather than introducing a second one — two
+competing greens is what makes green systems unreadable. Every other status
+is deliberately far from green in hue.
+
+### Avoiding the generic-AI look
+
+The [reliable tells](https://www.925studios.co/blog/ai-slop-design-tells) are a
+single typeface throughout, one radius and one soft shadow on everything, an
+unmotivated gradient hero, and a row of identical evenly-spaced cards. This
+design answers each: a serif/sans/mono superfamily, four radius steps tied to
+density, borders instead of shadows, a typographic masthead in place of the
+gradient panel, and a divided stat strip instead of matching tiles.
 
 Status colour means the same thing in every screen:
 **green** = arrived / paid / done · **amber** = waiting / pending ·
@@ -92,6 +106,9 @@ Verified rather than asserted (see *Verification* below):
 
 ## Icons
 
+Typefaces are IBM Plex (OFL), bundled as woff2 in `assets/fonts` — no CDN, so
+the app renders identically offline.
+
 The icon set is [Lucide](https://lucide.dev) (ISC licence), bundled into
 `assets/js/icons.js` as inline SVG rather than loaded from a CDN — so the app
 works offline and every icon shares one 24px grid, 2px stroke and rounded
@@ -104,6 +121,7 @@ console rather than rendering an invisible gap.
 index.html              app shell (sidebar, top bar, search, command palette)
 styleguide.html         design system reference
 assets/css/
+  fonts.css             @font-face for the bundled IBM Plex superfamily
   tokens.css            colour, type, spacing, radius, elevation, motion + dark theme
   base.css              reset, typography, a11y utilities
   components.css        buttons, inputs, chips, cards, tables, modals, toasts, skeletons

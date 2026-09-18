@@ -5,80 +5,87 @@
    ========================================================================== */
 
 :root {
-  /* ---- Brand ramp: Kauri Teal ---- */
-  --kauri-50:  #E9F4F2;
-  --kauri-100: #CCE6E2;
-  --kauri-200: #9FCFC8;
-  --kauri-300: #6EB4AB;
-  --kauri-400: #3F958B;
-  --kauri-500: #1E7A70;
-  --kauri-600: #14635C;
-  --kauri-700: #0F4E49;
-  --kauri-800: #0B3A36;
-  --kauri-900: #072724;
+  /* ---- Brand ramp: Pounamu — a deep, desaturated pine.
+         Institutional rather than "eco startup"; holds white text at every
+         step from 600 down. ---- */
+  --pou-50:  #EFF4F0;
+  --pou-100: #DBE7DE;
+  --pou-200: #B7CFBE;
+  --pou-300: #8CB198;
+  --pou-400: #5E9071;
+  --pou-500: #3D7455;
+  --pou-600: #2A6044;
+  --pou-700: #1E4A34;
+  --pou-800: #163628;
+  --pou-900: #0D231A;
 
-  /* ---- Secondary ramp: Kowhai Gold (warm highlight) ---- */
-  --kowhai-50:  #FDF4E4;
-  --kowhai-100: #F9E5C2;
-  --kowhai-200: #F2CC88;
-  --kowhai-300: #E9B254;
-  --kowhai-400: #D6932A;
-  --kowhai-500: #B0741A;
-  --kowhai-600: #875814;
+  /* ---- Secondary: clay. Green needs a warm earth tone opposite it, not
+         another cool hue, or the whole interface goes cold. ---- */
+  --clay-50:  #FBF1EA;
+  --clay-100: #F4E1D3;
+  --clay-200: #E6C0A4;
+  --clay-300: #D29C74;
+  --clay-400: #B87848;
+  --clay-500: #9A5C31;
+  --clay-600: #7C4826;
 
-  /* ---- Tertiary accent: Pounamu-adjacent clay, used sparingly ---- */
-  --clay-100: #F7E6DF;
-  --clay-300: #DB9C82;
-  --clay-500: #B4603F;
+  /* ---- Ochre, for caution and ACC surfaces ---- */
+  --ochre-100: #F8EBD2;
+  --ochre-300: #DFAE55;
+  --ochre-500: #8A5A12;
 
-  /* ---- Warm neutral ramp ---- */
+  /* ---- Neutrals, tinted a few degrees toward the brand so greys sit with
+         the green instead of fighting it ---- */
   --n-0:   #FFFFFF;
-  --n-25:  #FCFBF9;
-  --n-50:  #F7F5F2;
-  --n-100: #EFEDE8;
-  --n-150: #E6E3DC;
-  --n-200: #DCD8D0;
-  --n-300: #C5BFB4;
-  --n-400: #A39C90;
-  --n-500: #6E6860;
-  --n-600: #5D584E;
-  --n-700: #443F38;
-  --n-800: #2B2823;
-  --n-900: #1A1814;
+  --n-25:  #FAFBFA;
+  --n-50:  #F3F6F4;
+  --n-100: #E8EDEA;
+  --n-150: #DCE3DE;
+  --n-200: #CBD4CE;
+  --n-300: #AFBAB3;
+  --n-400: #8B978F;
+  --n-500: #5E6862;
+  --n-600: #4E5852;
+  --n-700: #39423C;
+  --n-800: #262D29;
+  --n-900: #151B18;
 
-  /* ---- Dark-mode ink ramp (slightly green-cast charcoal) ---- */
-  --ink-900: #0D1211;
-  --ink-850: #111716;
-  --ink-800: #161D1C;
-  --ink-750: #1C2422;
-  --ink-700: #232C2A;
-  --ink-600: #2E3936;
-  --ink-500: #3D4946;
+  /* ---- Dark-mode ink: near-black with a green cast ---- */
+  --ink-900: #0B100D;
+  --ink-850: #0F1512;
+  --ink-800: #131A16;
+  --ink-750: #18211C;
+  --ink-700: #1F2923;
+  --ink-600: #2A3630;
+  --ink-500: #39473F;
 
   /* ---- Semantic status ---- */
-  --ok-fg:      #1C6E47;   /* arrived / paid / done */
-  --ok-bg:      #E2F2E9;
-  --ok-line:    #A9D8BF;
-  --warn-fg:    #96600D;   /* waiting / pending */
-  --warn-bg:    #FBEEDA;
-  --warn-line:  #EFCE97;
-  --bad-fg:     #A8352A;   /* DNA / overdue / error */
-  --bad-bg:     #FBE6E3;
-  --bad-line:   #EDB3AA;
-  --draft-fg:   #5D584E;   /* draft / inactive */
-  --draft-bg:   #EFEDE8;
-  --draft-line: #DCD8D0;
-  --info-fg:    #3B4E9B;   /* informational / in consult */
-  --info-bg:    #E8EBF7;
-  --info-line:  #B8C2E6;
+  /* Success reuses the brand green rather than introducing a second one —
+     two competing greens is the thing that makes green systems unreadable.
+     Everything else is deliberately far from green in hue. */
+  --ok-fg:      #24573D;   /* arrived / paid / done */
+  --ok-bg:      #E2EEE7;
+  --ok-line:    #B2CFBD;
+  --warn-fg:    #8A5A12;   /* waiting / pending */
+  --warn-bg:    #F8EDD8;
+  --warn-line:  #E4C793;
+  --bad-fg:     #A33528;   /* DNA / overdue / error */
+  --bad-bg:     #FAE6E2;
+  --bad-line:   #EBB2A8;
+  --draft-fg:   #4E5852;   /* draft / inactive */
+  --draft-bg:   #E8EDEA;
+  --draft-line: #CBD4CE;
+  --info-fg:    #2C5B79;   /* informational / in consult */
+  --info-bg:    #E3EDF4;
+  --info-line:  #AECCE0;
 
   /* ---- Appointment type hues (calendar) ---- */
-  --appt-consult:  #14635C;
-  --appt-followup: #3F958B;
-  --appt-procedure:#8C4F86;
-  --appt-acc:      #B0741A;
-  --appt-telehealth:#3B4E9B;
-  --appt-admin:    #7D766B;
+  --appt-consult:  #2A6044;
+  --appt-followup: #5E9071;
+  --appt-procedure:#7A4E7E;
+  --appt-acc:      #9A5C31;
+  --appt-telehealth:#2C5B79;
+  --appt-admin:    #66716A;
 
   /* ---- Applied surface tokens (light theme is the default) ---- */
   --bg:            var(--n-50);
@@ -86,8 +93,8 @@
   --surface:       var(--n-0);
   --surface-2:     var(--n-25);
   --surface-3:     var(--n-50);
-  --surface-inv:   var(--kauri-800);
-  --overlay:       rgba(26, 24, 20, 0.44);
+  --surface-inv:   var(--pou-800);
+  --overlay:       rgba(13, 35, 26, 0.42);
 
   --text:          var(--n-900);
   --text-muted:    var(--n-600);
@@ -100,41 +107,44 @@
   --line-faint:    var(--n-100);
   --line-field:    #8E887D;        /* control boundary — meets 3:1 on every surface */
 
-  --accent:        var(--kauri-600);
-  --accent-hover:  var(--kauri-700);
-  --accent-press:  var(--kauri-800);
-  --accent-soft:   var(--kauri-50);
-  --accent-soft-2: var(--kauri-100);
-  --accent-text:   var(--kauri-700);
+  --accent:        var(--pou-600);
+  --accent-hover:  var(--pou-700);
+  --accent-press:  var(--pou-800);
+  --accent-soft:   var(--pou-50);
+  --accent-soft-2: var(--pou-100);
+  --accent-text:   var(--pou-700);
 
-  --warm:          var(--kowhai-400);
-  --warm-soft:     var(--kowhai-50);
-  --warm-text:     var(--kowhai-600);
+  --warm:          var(--clay-400);
+  --warm-soft:     var(--clay-50);
+  --warm-text:     var(--clay-600);
 
-  --focus:         var(--kauri-500);
-  --focus-halo:    rgba(30, 122, 112, 0.22);
+  --focus:         var(--pou-500);
+  --focus-halo:    rgba(61, 116, 85, 0.24);
 
-  /* ---- Radii ---- */
-  --r-xs: 6px;
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 22px;
-  --r-pill: 999px;
+  /* ---- Radii. Scaled to the density of the thing: dense controls stay
+         nearly square, only true overlays get a soft corner. ---- */
+  --r-xs: 3px;   /* chips, tags, swatches */
+  --r-sm: 5px;   /* buttons, inputs, menu items */
+  --r-md: 7px;   /* cards, panels */
+  --r-lg: 10px;  /* modals, drawers */
+  --r-xl: 14px;
+  --r-pill: 999px;  /* avatars and genuinely circular things only */
 
   /* ---- Elevation: soft, warm-tinted, never harsh ---- */
+  /* Flat by default. A hairline separates; a shadow means the thing is
+     genuinely above the page. Only overlays get one. */
   --sh-0: none;
-  --sh-1: 0 1px 2px rgba(26,24,20,.05), 0 1px 1px rgba(26,24,20,.04);
-  --sh-2: 0 2px 4px rgba(26,24,20,.05), 0 4px 12px rgba(26,24,20,.05);
-  --sh-3: 0 4px 8px rgba(26,24,20,.06), 0 12px 28px rgba(26,24,20,.08);
-  --sh-4: 0 8px 16px rgba(26,24,20,.08), 0 24px 56px rgba(26,24,20,.12);
+  --sh-1: none;
+  --sh-2: 0 1px 2px rgba(13,35,26,.06), 0 4px 10px rgba(13,35,26,.05);
+  --sh-3: 0 2px 6px rgba(13,35,26,.07), 0 10px 24px rgba(13,35,26,.09);
+  --sh-4: 0 6px 14px rgba(13,35,26,.10), 0 22px 48px rgba(13,35,26,.14);
   --sh-focus: 0 0 0 3px var(--focus-halo);
 
   /* ---- Type scale (1.200 minor third, 14px base for density) ---- */
-  --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont,
-               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
-               Consolas, monospace;
+  --font-sans:    "Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                  Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Plex Serif", Georgia, "Times New Roman", serif;
+  --font-mono:    "Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --fs-2xs: 10.5px;
   --fs-xs:  11.5px;
@@ -191,7 +201,7 @@
   --surface-2:     var(--ink-750);
   --surface-3:     var(--ink-700);
   --surface-inv:   var(--n-50);
-  --overlay:       rgba(5, 8, 8, 0.66);
+  --overlay:       rgba(4, 8, 6, 0.68);
 
   --text:          #EDEFEE;
   --text-muted:    #A8B3B0;
@@ -204,87 +214,87 @@
   --line-faint:    var(--ink-700);
   --line-field:    #6B7B78;
 
-  --accent:        #309690;
-  --accent-hover:  #3FA79C;
-  --accent-press:  #55BBB0;
-  --accent-soft:   rgba(46,145,135,.14);
-  --accent-soft-2: rgba(46,145,135,.24);
-  --accent-text:   #6FC7BC;
-  --text-on-accent:#04211F;
+  --accent:        #4E9A6B;
+  --accent-hover:  #5FAC7B;
+  --accent-press:  #74BE8E;
+  --accent-soft:   rgba(78,154,107,.15);
+  --accent-soft-2: rgba(78,154,107,.26);
+  --accent-text:   #86C79C;
+  --text-on-accent:#061A10;
 
-  --warm:          var(--kowhai-300);
-  --warm-soft:     rgba(233,178,84,.14);
-  --warm-text:     var(--kowhai-200);
+  --warm:          var(--clay-300);
+  --warm-soft:     rgba(210,156,116,.14);
+  --warm-text:     var(--clay-200);
 
-  --focus:         #56C0B4;
-  --focus-halo:    rgba(86, 192, 180, 0.28);
+  --focus:         #6FBA8A;
+  --focus-halo:    rgba(111, 186, 138, 0.28);
 
-  --ok-fg:      #6FD3A0;  --ok-bg:   rgba(111,211,160,.14);  --ok-line:  rgba(111,211,160,.32);
-  --warn-fg:    #EDB75F;  --warn-bg: rgba(237,183,95,.14);   --warn-line:rgba(237,183,95,.32);
-  --bad-fg:     #F0907F;  --bad-bg:  rgba(240,144,127,.14);  --bad-line: rgba(240,144,127,.32);
-  --draft-fg:   #A8B3B0;  --draft-bg:rgba(168,179,176,.12);  --draft-line:rgba(168,179,176,.26);
-  --info-fg:    #9DAEF2;  --info-bg: rgba(157,174,242,.14);  --info-line:rgba(157,174,242,.32);
+  --ok-fg:      #7FC79A;  --ok-bg:   rgba(127,199,154,.14);  --ok-line:  rgba(127,199,154,.30);
+  --warn-fg:    #E0B063;  --warn-bg: rgba(224,176,99,.14);    --warn-line:rgba(224,176,99,.30);
+  --bad-fg:     #EE8E7C;  --bad-bg:  rgba(238,142,124,.14);   --bad-line: rgba(238,142,124,.30);
+  --draft-fg:   #9FACA4;  --draft-bg:rgba(159,172,164,.12);   --draft-line:rgba(159,172,164,.26);
+  --info-fg:    #8FBEDD;  --info-bg: rgba(143,190,221,.14);   --info-line:rgba(143,190,221,.30);
 
-  --appt-consult:  #2E9187;
-  --appt-followup: #6EB4AB;
-  --appt-procedure:#C08ABA;
-  --appt-acc:      #E9B254;
-  --appt-telehealth:#9DAEF2;
-  --appt-admin:    #A8B3B0;
+  --appt-consult:  #4E9A6B;
+  --appt-followup: #86C79C;
+  --appt-procedure:#B78CBB;
+  --appt-acc:      #DFAE7E;
+  --appt-telehealth:#8FBEDD;
+  --appt-admin:    #9FACA4;
 
-  --sh-1: 0 1px 2px rgba(0,0,0,.4);
-  --sh-2: 0 2px 6px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.28);
-  --sh-3: 0 6px 14px rgba(0,0,0,.44), 0 16px 36px rgba(0,0,0,.34);
-  --sh-4: 0 10px 22px rgba(0,0,0,.5), 0 30px 68px rgba(0,0,0,.46);
+  --sh-1: none;
+  --sh-2: 0 1px 3px rgba(0,0,0,.42), 0 4px 12px rgba(0,0,0,.26);
+  --sh-3: 0 4px 10px rgba(0,0,0,.46), 0 14px 32px rgba(0,0,0,.32);
+  --sh-4: 0 8px 18px rgba(0,0,0,.52), 0 28px 60px rgba(0,0,0,.44);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:            #0D1211;
-    --bg-sunken:     #090D0C;
-    --surface:       #161D1C;
-    --surface-2:     #1C2422;
-    --surface-3:     #232C2A;
-    --surface-inv:   #F7F5F2;
-    --overlay:       rgba(5, 8, 8, 0.66);
+    --bg:            #0B100D;
+    --bg-sunken:     #070B09;
+    --surface:       #131A16;
+    --surface-2:     #18211C;
+    --surface-3:     #1F2923;
+    --surface-inv:   #F3F6F4;
+    --overlay:       rgba(4, 8, 6, 0.68);
 
-    --text:          #EDEFEE;
-    --text-muted:    #A8B3B0;
-    --text-subtle:   #8A9592;
-    --text-inv:      #0D1211;
+    --text:          #E9EEEA;
+    --text-muted:    #A3AFA7;
+    --text-subtle:   #879389;
+    --text-inv:      #0B100D;
 
-    --line:          #2E3936;
-    --line-strong:   #3D4946;
-    --line-faint:    #232C2A;
-    --line-field:    #6B7B78;
+    --line:          #2A3630;
+    --line-strong:   #39473F;
+    --line-faint:    #1F2923;
+    --line-field:    #6A7C71;
 
-    --accent:        #309690;
-    --accent-hover:  #3FA79C;
-    --accent-press:  #55BBB0;
-    --accent-soft:   rgba(46,145,135,.14);
-    --accent-soft-2: rgba(46,145,135,.24);
-    --accent-text:   #6FC7BC;
-    --text-on-accent:#04211F;
+    --accent:        #4E9A6B;
+    --accent-hover:  #5FAC7B;
+    --accent-press:  #74BE8E;
+    --accent-soft:   rgba(78,154,107,.15);
+    --accent-soft-2: rgba(78,154,107,.26);
+    --accent-text:   #86C79C;
+    --text-on-accent:#061A10;
 
-    --warm:          #E9B254;
-    --warm-soft:     rgba(233,178,84,.14);
-    --warm-text:     #F2CC88;
+    --warm:          #D29C74;
+    --warm-soft:     rgba(210,156,116,.14);
+    --warm-text:     #E6C0A4;
 
-    --focus:         #56C0B4;
-    --focus-halo:    rgba(86, 192, 180, 0.28);
+    --focus:         #6FBA8A;
+    --focus-halo:    rgba(111, 186, 138, 0.28);
 
-    --ok-fg:   #6FD3A0; --ok-bg:   rgba(111,211,160,.14); --ok-line:  rgba(111,211,160,.32);
-    --warn-fg: #EDB75F; --warn-bg: rgba(237,183,95,.14);  --warn-line:rgba(237,183,95,.32);
-    --bad-fg:  #F0907F; --bad-bg:  rgba(240,144,127,.14); --bad-line: rgba(240,144,127,.32);
-    --draft-fg:#A8B3B0; --draft-bg:rgba(168,179,176,.12); --draft-line:rgba(168,179,176,.26);
-    --info-fg: #9DAEF2; --info-bg: rgba(157,174,242,.14); --info-line:rgba(157,174,242,.32);
+    --ok-fg:   #7FC79A; --ok-bg:   rgba(127,199,154,.14); --ok-line:  rgba(127,199,154,.30);
+    --warn-fg: #E0B063; --warn-bg: rgba(224,176,99,.14);   --warn-line:rgba(224,176,99,.30);
+    --bad-fg:  #EE8E7C; --bad-bg:  rgba(238,142,124,.14);  --bad-line: rgba(238,142,124,.30);
+    --draft-fg:#9FACA4; --draft-bg:rgba(159,172,164,.12);  --draft-line:rgba(159,172,164,.26);
+    --info-fg: #8FBEDD; --info-bg: rgba(143,190,221,.14);  --info-line:rgba(143,190,221,.30);
 
-    --appt-consult:#2E9187; --appt-followup:#6EB4AB; --appt-procedure:#C08ABA;
-    --appt-acc:#E9B254; --appt-telehealth:#9DAEF2; --appt-admin:#A8B3B0;
+    --appt-consult:#4E9A6B; --appt-followup:#86C79C; --appt-procedure:#B78CBB;
+    --appt-acc:#DFAE7E; --appt-telehealth:#8FBEDD; --appt-admin:#9FACA4;
 
-    --sh-1: 0 1px 2px rgba(0,0,0,.4);
-    --sh-2: 0 2px 6px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.28);
-    --sh-3: 0 6px 14px rgba(0,0,0,.44), 0 16px 36px rgba(0,0,0,.34);
-    --sh-4: 0 10px 22px rgba(0,0,0,.5), 0 30px 68px rgba(0,0,0,.46);
+    --sh-1: none;
+    --sh-2: 0 1px 3px rgba(0,0,0,.42), 0 4px 12px rgba(0,0,0,.26);
+    --sh-3: 0 4px 10px rgba(0,0,0,.46), 0 14px 32px rgba(0,0,0,.32);
+    --sh-4: 0 8px 18px rgba(0,0,0,.52), 0 28px 60px rgba(0,0,0,.44);
   }
 }

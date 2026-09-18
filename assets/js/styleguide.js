@@ -26,8 +26,8 @@
       return `<div style="background:${v};color:${i >= dark ? '#fff' : 'var(--n-900)'}" title="--${name}-${s}">${s}</div>`;
     }).join('');
   };
-  ramp('#rampTeal', 'kauri',  [50, 100, 200, 300, 400, 500, 600, 700, 800, 900], 5);
-  ramp('#rampGold', 'kowhai', [50, 100, 200, 300, 400, 500, 600], 5);
+  ramp('#rampTeal', 'pou',  [50, 100, 200, 300, 400, 500, 600, 700, 800, 900], 4);
+  ramp('#rampGold', 'clay', [50, 100, 200, 300, 400, 500, 600], 4);
   ramp('#rampN',    'n',      [0, 25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900], 8);
 
   /* semantic swatches */

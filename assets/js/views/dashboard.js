@@ -45,15 +45,12 @@
   function greeting(user, s, extra) {
     const hour = Math.floor(NOW / 60);
     const part = hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
-    const short = user.name.replace(/^Dr /, 'Dr ').split(' ').slice(0, 2).join(' ');
-    // Direct children so the card's space-between pins the heading top and the stats bottom.
-    return `<div class="greeting-card">
-      <div class="greeting-head">
-        <p class="g-date">${U.fmtLongDate(K.TODAY)} · ${U.fmtTime(NOW)}</p>
-        <h1>${part}, ${esc(short)}.</h1>
-      </div>
-      <div class="greeting-stats">${extra.map(x => `
-        <div class="gs"><b>${x.v}</b><span>${esc(x.l)}</span></div>`).join('')}
+    const short = user.name.split(' ').slice(0, 2).join(' ');
+    return `<div class="masthead">
+      <p class="mh-date">${U.fmtLongDate(K.TODAY)} · ${U.fmtTime(NOW)} · ${esc(K.cln('c1').short)}</p>
+      <h1>${part}, <em>${esc(short)}</em>.</h1>
+      <div class="stat-strip">${extra.map(x => `
+        <div class="ss ${x.flag ? 'is-flag' : ''}"><b>${x.v}</b><span>${esc(x.l)}</span></div>`).join('')}
       </div>
     </div>`;
   }
@@ -195,16 +192,15 @@
     const seen = mine.filter(a => a.status === 'done').length;
     return `
       <div class="dash-grid">
-        <div class="col-8 stretch">${greeting(user, s, [
+        <div class="col-12">${greeting(user, s, [
           { v: mine.length, l: 'Patients booked' },
           { v: seen, l: 'Seen so far' },
-          { v: s.unsigned, l: 'Notes to sign' },
-          { v: s.pending, l: 'Letters to approve' },
+          { v: s.unsigned, l: 'Notes to sign', flag: s.unsigned > 0 },
+          { v: s.pending, l: 'Letters to approve', flag: s.pending > 0 },
         ])}</div>
-        <div class="col-4 stretch">${nextPatientCard(nextPatient(user.id))}</div>
-
         <div class="col-7">${timelineCard(mine, { title: 'My clinic today' })}</div>
         <div class="col-5 col g-4">
+          ${nextPatientCard(nextPatient(user.id))}
           ${workCard([
             { icon: 'file',    label: 'Unsigned notes',       sub: 'Waiting for your signature',    n: s.unsigned,   href: '#/patients', bg: 'var(--warn-bg)',   fg: 'var(--warn-fg)', urgent: true },
             { icon: 'letters', label: 'Letters to approve',   sub: 'Typed and ready to send',       n: s.pending,    href: '#/inbox',    bg: 'var(--accent-soft)', fg: 'var(--accent-text)' },
@@ -221,14 +217,14 @@
     const waiting = list.filter(a => a.status === 'arrived');
     return `
       <div class="dash-grid">
-        <div class="col-8 stretch">${greeting(user, s, [
+        <div class="col-12">${greeting(user, s, [
           { v: list.length, l: 'Appointments today' },
           { v: s.arrived, l: 'In the waiting room' },
-          { v: s.dna, l: 'Did not attend' },
+          { v: s.dna, l: 'Did not attend', flag: s.dna > 0 },
           { v: s.todayInv.length, l: 'Invoices raised' },
         ])}</div>
-        <div class="col-4 stretch">
-          <section class="card" style="height:100%">
+        <div class="col-4">
+          <section class="card">
             <div class="card-hd"><h3>Waiting room</h3><span class="chip chip-ok"><i class="dot"></i>${waiting.length} here</span></div>
             <div class="list-rows">
               ${waiting.length ? waiting.map(a => {
@@ -319,7 +315,7 @@
         <div class="col-12">${greeting(user, s, [
           { v: money0(s.todayTotal), l: 'Invoiced today' },
           { v: money0(s.unpaid), l: 'Outstanding' },
-          { v: s.accErr, l: 'ACC errors' },
+          { v: s.accErr, l: 'ACC errors', flag: s.accErr > 0 },
           { v: `${s.dna}`, l: 'DNAs today' },
         ])}</div>
 

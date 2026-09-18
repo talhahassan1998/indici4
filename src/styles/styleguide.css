@@ -1,0 +1,51 @@
+/* Design-system page. Only used by /styleguide, so it stays out of the app bundle's critical CSS. */
+.sg-wrap { max-width: 1080px; }
+.sg-lede { color: var(--text-muted); max-width: 64ch; }
+
+.sg-jump { position: sticky; top: 0; z-index: 5; margin: 0 calc(var(--s-6) * -1) var(--s-5);
+  padding: 9px var(--s-6); background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  display: flex; gap: 2px; flex-wrap: wrap; }
+.sg-jump a { font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted);
+  text-decoration: none; padding: 5px 9px; border-radius: var(--r-pill); white-space: nowrap; }
+.sg-jump a:hover { background: var(--surface-3); color: var(--text); }
+
+.sg-sec { margin-top: var(--s-9); scroll-margin-top: 64px; }
+.sg-sec > h2 { font-size: var(--fs-2xl); font-weight: var(--fw-x); letter-spacing: -.025em; margin-bottom: 5px; }
+.sg-sec > .lede { color: var(--text-muted); font-size: var(--fs-sm); max-width: 64ch; margin-bottom: var(--s-4); }
+
+.sg-block { background: var(--surface); border-radius: var(--r-lg);
+  box-shadow: inset 0 0 0 1px var(--line); padding: var(--s-5); }
+.sg-block + .sg-block { margin-top: var(--s-4); }
+.sg-cols { display: grid; gap: var(--s-3); grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.sg-auto { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+
+.ramp { display: flex; border-radius: var(--r-md); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.ramp > div { flex: 1; height: 56px; display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 5px; font-size: var(--fs-2xs); font-weight: var(--fw-bold); font-family: var(--font-mono); }
+
+.sw { border-radius: var(--r-md); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.sw .swatch { height: 64px; display: grid; place-items: center; }
+.sw .meta { padding: 9px 11px; background: var(--surface); }
+.sw b { display: block; font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+.sw span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); font-family: var(--font-mono); }
+
+.specimen { display: flex; align-items: baseline; gap: var(--s-4); padding: 12px 0;
+  border-bottom: 1px solid var(--line-faint); }
+.specimen:last-child { border-bottom: 0; }
+.specimen .tag { width: 124px; flex: none; font-size: var(--fs-2xs);
+  font-family: var(--font-mono); color: var(--text-subtle); }
+
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(94px, 1fr)); gap: var(--s-2); }
+.icon-cell { display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 6px; border-radius: var(--r-sm); background: none; border: 0; cursor: pointer; color: var(--text); }
+.icon-cell:hover { background: var(--surface-3); }
+.icon-cell span { font-size: 9.5px; color: var(--text-subtle); font-family: var(--font-mono);
+  text-align: center; word-break: break-all; }
+
+.do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+.do-dont > div { padding: var(--s-4); border-radius: var(--r-md); }
+.do-dont .do { background: var(--ok-bg); box-shadow: inset 0 0 0 1px var(--ok-line); }
+.do-dont .dont { background: var(--bad-bg); box-shadow: inset 0 0 0 1px var(--bad-line); }
+.do-dont ul { list-style: none; }
+@media (max-width: 780px) { .do-dont { grid-template-columns: 1fr; } }

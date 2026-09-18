@@ -6,8 +6,18 @@ workflow of a letters/referrals/ACC/Xero product with an all-in-one,
 dashboard-driven approach: one unified patient view, one inbox, clinical and
 admin tools in the same place.
 
-Open `index.html` in a browser — no build step, no dependencies.
-The design system lives at `styleguide.html`.
+Built with **React 18 + Vite**. Motion is [Motion](https://motion.dev)
+(framer-motion) for the interface and **three.js** for the sign-in brand scene.
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # static output in dist/
+npm run preview    # serve the build on :8181
+```
+
+Two entry points: `index.html` (the app) and `login.html` (sign-in).
+The design system is a route inside the app — `#/styleguide`.
 
 > Kora Health is fictional. Every patient, NHI number, ACC claim, invoice and
 > clinician in here is invented. The visual identity is original and is not
@@ -60,7 +70,10 @@ Both light and dark themes are full designs, not an inverted filter.
 | `#/billing` | Invoices, create drawer, split invoicing, payment recording, Xero sync |
 | `#/acc` | ACC submission queue with per-row validation and bulk submit |
 | `#/reports` | Revenue, utilisation, debtor ageing |
+| `#/consult/:id` | Consultation — SOAP notes, measurements, coding, prompts, sign and file |
 | `#/admin` | Settings cards, users, permissions, consultant profile |
+| `#/styleguide` | The design system, rendered from the product's own components |
+| `login.html` | Sign-in: credentials → authenticator code → practice and location |
 
 ### Role-based dashboards
 
@@ -88,9 +101,10 @@ re-ordered one:
 
 ## Design system
 
-`styleguide.html` documents the colour ramps, type scale, buttons, inputs,
-status chips, cards, tables, overlays, feedback states, the icon set, and the
-accessibility rules — live, in both themes.
+`#/styleguide` documents the colour ramps, type scale, buttons, inputs, status
+chips, cards, tables, overlays, feedback states, the icon set and the
+accessibility rules — live, in both themes. It renders the same components the
+product does, so it cannot drift from the app the way a static spec does.
 
 ## Accessibility
 
@@ -104,34 +118,50 @@ Verified rather than asserted (see *Verification* below):
 - **Not colour alone** — every status chip pairs its colour with a label
 - **Motion** — 110–280ms, and all of it stops under `prefers-reduced-motion`
 
-## Icons
+## Type, icons and 3D
 
-Typefaces are IBM Plex (OFL), bundled as woff2 in `assets/fonts` — no CDN, so
-the app renders identically offline.
+Typefaces are IBM Plex (OFL), bundled as woff2 in `src/fonts` and imported
+through CSS — no CDN, so the app renders identically offline.
 
-The icon set is [Lucide](https://lucide.dev) (ISC licence), bundled into
-`assets/js/icons.js` as inline SVG rather than loaded from a CDN — so the app
-works offline and every icon shares one 24px grid, 2px stroke and rounded
-terminals. `icon(name, size)` returns the markup; unknown names warn in the
-console rather than rendering an invisible gap.
+Icons are [Lucide](https://lucide.dev) (ISC licence) via `lucide-react`: real
+vectors on one 24px grid with a 1.75 stroke and rounded terminals, tree-shaken
+so only the 63 icons actually used ship. Every icon sits beside a label or an
+`aria-label` — none carries meaning on its own.
+
+**three.js is used in exactly one place**: the sign-in brand panel, which is a
+marketing surface rather than a clinical one. Nine concentric rings on separate
+z-planes drift behind a dust field. It is dynamically imported so the ~690 KB
+chunk never loads for the app itself, skipped entirely under
+`prefers-reduced-motion`, paused when the tab is hidden, fully disposed on
+unmount, and wrapped so a WebGL failure can never block someone signing in.
+Interface animation is Motion, which respects reduced-motion and leaves the
+accessibility tree alone — a PMS is used for eight hours a day on shared,
+often old clinic machines, and a WebGL canvas is the wrong tool for that.
 
 ## Structure
 
 ```
-index.html              app shell (sidebar, top bar, search, command palette)
-styleguide.html         design system reference
-assets/css/
-  fonts.css             @font-face for the bundled IBM Plex superfamily
-  tokens.css            colour, type, spacing, radius, elevation, motion + dark theme
-  base.css              reset, typography, a11y utilities
-  components.css        buttons, inputs, chips, cards, tables, modals, toasts, skeletons
-  app.css               shell and per-screen layouts
-assets/js/
-  icons.js              66-icon set on a 24px grid
-  data.js               NZ sample data (patients, clinicians, appointments, invoices, ACC)
-  ui.js                 formatting, chips, overlays, toasts, focus management
-  app.js                routing, roles, theme, global search, command palette
-  views/                one module per screen
+index.html              app entry
+login.html              sign-in entry
+vite.config.js          two-entry build
+src/
+  main.jsx              app root — HashRouter
+  login.jsx             sign-in root
+  App.jsx               routes, role, theme, command palette
+  components/
+    Shell.jsx           sidebar, top bar, global search, keyboard shortcuts
+    CommandPalette.jsx  Ctrl+K — grouped commands, arrow/enter, focus trapped
+    BrandScene.jsx      the three.js sign-in scene (dynamically imported)
+    Primitives.jsx      chips, avatars, banners, cards, empty states, skeletons
+  lib/
+    ui.jsx              overlays and toasts — focus trap, Escape, focus restore
+    format.js           NZD, dates, ages, GST totals, status maps
+    theme.js            theme and persisted local state
+  data/sample.js        NZ sample data (494 patients, clinicians, appointments,
+                        invoices, ACC queue, billing codes, recalls)
+  views/                one module per screen, plus StyleGuide.jsx
+  styles/               tokens, base, components, app, auth, fonts
+  fonts/                the bundled IBM Plex woff2 files
 ```
 
 State is in-memory only — a reload resets the prototype. Theme, role and sidebar
@@ -148,12 +178,20 @@ Healthlink delivery, and Xero sync.
 
 The prototype was checked in headless Chromium:
 
-- **Smoke** — all 14 routes render, four role dashboards, light and dark, command
-  palette, global search, tablet width with no horizontal scroll, zero console errors
+- **Smoke** — all 16 routes render, the sign-in page and its three.js canvas,
+  four role dashboards, light and dark, zero console errors
 - **Accessibility** — accessible names on every control and field across all
   routes, focus ring on 25 tabbed elements, focus trapping in dialogs
+- **Keyboard** — every `g`-then-letter jump, and that a lone `g` or a `g` typed
+  into a field never navigates
 - **Contrast** — 50 token pairings computed with alpha compositing against their
   real backgrounds, both themes
 - **Interaction** — 11 end-to-end flows: arrival status, calendar drag,
   letter autosave and template insert, AI scribe, kanban drag, ACC fix-now
   revalidation, inbox approval, split invoicing, command palette routing
+- **Sign-in, search and consult** — the three-step login, the four-field patient
+  search with NHI check-digit validation, and the consult screen end to end:
+  SOAP autosave, BMI, templates, dot phrases, the confidential flag, the
+  function rail, services for invoicing, and sign-and-file
+- **Patient grid** — 494 records, full-width layout, pinned Name and Actions
+  columns, sticky header, sorting, paging and live filtering

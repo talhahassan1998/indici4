@@ -411,11 +411,11 @@
   box-shadow: var(--sh-3); border-radius: 3px;
   padding: 52px 56px; font-size: 12.5px; line-height: 1.65;
 }
-.pdf-page .pdf-brand { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #14635C; padding-bottom: 14px; margin-bottom: 26px; }
-.pdf-page .pdf-brand h3 { font-size: 17px; font-weight: 800; color: #0F4E49; letter-spacing: -0.02em; }
+.pdf-page .pdf-brand { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #15803E; padding-bottom: 14px; margin-bottom: 26px; }
+.pdf-page .pdf-brand h3 { font-size: 17px; font-weight: 800; color: #116330; letter-spacing: -0.02em; }
 .pdf-page .pdf-brand .pdf-org { font-size: 10px; color: #5D584E; line-height: 1.5; text-align: right; }
 .pdf-page .pdf-sig { margin-top: 34px; }
-.pdf-page .pdf-sig .sig-mark { font-family: "Segoe Script", "Bradley Hand", cursive; font-size: 24px; color: #14635C; }
+.pdf-page .pdf-sig .sig-mark { font-family: "Segoe Script", "Bradley Hand", cursive; font-size: 24px; color: #116330; }
 .pdf-page .pdf-ft { margin-top: 42px; padding-top: 12px; border-top: 1px solid #DCD8D0; font-size: 9.5px; color: #7D766B; display: flex; justify-content: space-between; }
 
 /* AI scribe panel */

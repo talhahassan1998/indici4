@@ -119,8 +119,8 @@ function Preview({ item, toast, nav, onClear }) {
                 <span className="t-sm"><b>Waiting for your approval.</b> Typed by {K.st(l.typedBy).name}, {relTime(l.updated)}.</span>
               </Banner>
               <div className="card card-flat" style={{ background: '#fff', color: '#151B18', padding: '26px 30px', fontSize: 13, lineHeight: 1.7 }}>
-                <div style={{ borderBottom: '2px solid #1E4A34', paddingBottom: 10, marginBottom: 18, display: 'flex', justifyContent: 'space-between' }}>
-                  <b style={{ color: '#1E4A34', fontSize: 15 }}>Kora Health</b>
+                <div style={{ borderBottom: '2px solid #116330', paddingBottom: 10, marginBottom: 18, display: 'flex', justifyContent: 'space-between' }}>
+                  <b style={{ color: '#116330', fontSize: 15 }}>Kora Health</b>
                   <span style={{ fontSize: 10, color: '#4E5852' }}>{fmtDate(K.TODAY)}</span></div>
                 <p><b>Re: {p.first} {p.last}, NHI {p.nhi}</b></p>
                 <p style={{ marginTop: 10 }}>Dear {K.gp(l.to).name},</p>

@@ -100,7 +100,7 @@ export default function Admin() {
                   <div className="field"><label className="label">Signature</label>
                     <div className="row g-4">
                       <div className="card card-flat" style={{ background: '#fff', padding: '14px 22px' }}>
-                        <span style={{ fontFamily: "'Segoe Script','Bradley Hand',cursive", fontSize: 26, color: '#1E4A34' }}>
+                        <span style={{ fontFamily: "'Segoe Script','Bradley Hand',cursive", fontSize: 26, color: '#116330' }}>
                           {u.signature || u.name}</span></div>
                       <div className="col g-2">
                         <button className="btn btn-secondary btn-sm"><Upload size={14} /> Upload image</button>
@@ -234,8 +234,8 @@ export default function Admin() {
           <div className="card-hd"><h3>Preview</h3></div>
           <div className="card-bd" style={{ background: 'var(--bg-sunken)' }}>
             <div className="card" style={{ background: '#fff', color: '#151B18', padding: '26px 28px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #1E4A34', paddingBottom: 12 }}>
-                <div><b style={{ color: '#1E4A34', fontSize: 17 }}>Kora Health</b>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #116330', paddingBottom: 12 }}>
+                <div><b style={{ color: '#116330', fontSize: 17 }}>Kora Health</b>
                   <div style={{ fontSize: 9.5, color: '#4E5852', letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700 }}>Specialist Clinic</div></div>
                 <div style={{ fontSize: 9.5, color: '#4E5852', textAlign: 'right' }}>{K.clinics[0].addr}<br />GST {K.org.gst}</div>
               </div>

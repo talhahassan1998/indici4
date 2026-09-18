@@ -29,16 +29,16 @@ The design system is a route inside the app — `#/styleguide`.
 
 | | |
 |---|---|
-| **Accent** | Pounamu `#2A6044` — a deep, desaturated pine; carries every primary action |
-| **Secondary** | Clay `#B87848` — the warm earth tone green needs opposite it |
-| **Neutrals** | Greys tinted a few degrees toward the brand, on a `#F3F6F4` ground |
-| **Type** | IBM Plex superfamily — Serif for headings, Sans for the interface, Mono for every identifier and figure |
-| **Shape** | 3px chips, 5px controls, 7px cards, 10px overlays — radius scales with density |
+| **Accent** | Pounamu `#15803E`, with `#17A24A` one step brighter; carries every primary action |
+| **Secondary** | Clay `#B87848`, the warm earth tone green needs opposite it |
+| **Neutrals** | Near-neutral greys with a faint green cast, on a `#F6F9F7` ground |
+| **Type** | IBM Plex superfamily: Serif for headings, Sans for the interface, Mono for every identifier and figure |
+| **Shape** | 3px chips, 5px controls, 7px cards, 10px overlays; radius scales with density |
 | **Elevation** | Flat. A hairline separates; a shadow means the thing genuinely floats, so only overlays get one |
 
-Success reuses the brand green rather than introducing a second one — two
-competing greens is what makes green systems unreadable. Every other status
-is deliberately far from green in hue.
+Success reuses the brand green rather than introducing a second one. Two
+competing greens is what makes green systems unreadable, and every other
+status is deliberately far from green in hue.
 
 ### Avoiding the generic-AI look
 

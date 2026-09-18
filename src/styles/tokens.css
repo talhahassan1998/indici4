@@ -1,23 +1,23 @@
 /* ==========================================================================
-   Kora Health — Design Tokens
-   A calm, clinical-but-warm system. Deep teal accent ("Kauri"), warm gold
-   secondary ("Kowhai"), warm-neutral greys. Never blue-on-white hospital.
+   Kora Health - Design Tokens
+   A calm, clinical-but-warm system. Clean green accent ("Pounamu"), clay
+   secondary, near-neutral greys. Never blue-on-white hospital.
    ========================================================================== */
 
 :root {
-  /* ---- Brand ramp: Pounamu — a deep, desaturated pine.
-         Institutional rather than "eco startup"; holds white text at every
-         step from 600 down. ---- */
-  --pou-50:  #EFF4F0;
-  --pou-100: #DBE7DE;
-  --pou-200: #B7CFBE;
-  --pou-300: #8CB198;
-  --pou-400: #5E9071;
-  --pou-500: #3D7455;
-  --pou-600: #2A6044;
-  --pou-700: #1E4A34;
-  --pou-800: #163628;
-  --pou-900: #0D231A;
+  /* ---- Brand ramp: Pounamu. 600 and 500 are sampled from the reference
+         build; the light steps are muted rather than candy-bright, because
+         they sit behind text on screens people read for eight hours. ---- */
+  --pou-50:  #F1F8F4;
+  --pou-100: #E5EFE7;
+  --pou-200: #D2E7DA;
+  --pou-300: #A3D3B4;
+  --pou-400: #54B577;
+  --pou-500: #17A24A;
+  --pou-600: #15803E;
+  --pou-700: #116330;
+  --pou-800: #0D4A25;
+  --pou-900: #083018;
 
   /* ---- Secondary: clay. Green needs a warm earth tone opposite it, not
          another cool hue, or the whole interface goes cold. ---- */
@@ -37,18 +37,18 @@
   /* ---- Neutrals, tinted a few degrees toward the brand so greys sit with
          the green instead of fighting it ---- */
   --n-0:   #FFFFFF;
-  --n-25:  #FAFBFA;
-  --n-50:  #F3F6F4;
-  --n-100: #E8EDEA;
-  --n-150: #DCE3DE;
-  --n-200: #CBD4CE;
-  --n-300: #AFBAB3;
+  --n-25:  #FCFDFC;
+  --n-50:  #F6F9F7;
+  --n-100: #EDF1EE;
+  --n-150: #E1E7E3;
+  --n-200: #CFD7D2;
+  --n-300: #B2BCB6;
   --n-400: #8B978F;
   --n-500: #5E6862;
   --n-600: #4E5852;
   --n-700: #39423C;
   --n-800: #262D29;
-  --n-900: #151B18;
+  --n-900: #141A17;
 
   /* ---- Dark-mode ink: near-black with a green cast ---- */
   --ink-900: #0B100D;
@@ -63,14 +63,14 @@
   /* Success reuses the brand green rather than introducing a second one —
      two competing greens is the thing that makes green systems unreadable.
      Everything else is deliberately far from green in hue. */
-  --ok-fg:      #24573D;   /* arrived / paid / done */
-  --ok-bg:      #E2EEE7;
-  --ok-line:    #B2CFBD;
+  --ok-fg:      #146B35;   /* arrived / paid / done */
+  --ok-bg:      #E3F0E8;
+  --ok-line:    #B4D7C2;
   --warn-fg:    #8A5A12;   /* waiting / pending */
   --warn-bg:    #F8EDD8;
   --warn-line:  #E4C793;
   --bad-fg:     #A33528;   /* DNA / overdue / error */
-  --bad-bg:     #FAE6E2;
+  --bad-bg:     #FDE9E7;
   --bad-line:   #EBB2A8;
   --draft-fg:   #4E5852;   /* draft / inactive */
   --draft-bg:   #E8EDEA;
@@ -80,8 +80,8 @@
   --info-line:  #AECCE0;
 
   /* ---- Appointment type hues (calendar) ---- */
-  --appt-consult:  #2A6044;
-  --appt-followup: #5E9071;
+  --appt-consult:  #15803E;
+  --appt-followup: #54B577;
   --appt-procedure:#7A4E7E;
   --appt-acc:      #9A5C31;
   --appt-telehealth:#2C5B79;
@@ -94,7 +94,7 @@
   --surface-2:     var(--n-25);
   --surface-3:     var(--n-50);
   --surface-inv:   var(--pou-800);
-  --overlay:       rgba(13, 35, 26, 0.42);
+  --overlay:       rgba(8, 48, 24, 0.40);
 
   --text:          var(--n-900);
   --text-muted:    var(--n-600);
@@ -105,7 +105,7 @@
   --line:          var(--n-150);   /* decorative hairline */
   --line-strong:   var(--n-200);   /* stronger divider */
   --line-faint:    var(--n-100);
-  --line-field:    #8E887D;        /* control boundary — meets 3:1 on every surface */
+  --line-field:    #859089;        /* control boundary, meets 3:1 on every surface */
 
   --accent:        var(--pou-600);
   --accent-hover:  var(--pou-700);
@@ -118,8 +118,8 @@
   --warm-soft:     var(--clay-50);
   --warm-text:     var(--clay-600);
 
-  --focus:         var(--pou-500);
-  --focus-halo:    rgba(61, 116, 85, 0.24);
+  --focus:         var(--pou-600);
+  --focus-halo:    rgba(23, 162, 74, 0.26);
 
   /* ---- Radii. Scaled to the density of the thing: dense controls stay
          nearly square, only true overlays get a soft corner. ---- */
@@ -214,29 +214,29 @@
   --line-faint:    var(--ink-700);
   --line-field:    #6B7B78;
 
-  --accent:        #4E9A6B;
-  --accent-hover:  #5FAC7B;
-  --accent-press:  #74BE8E;
-  --accent-soft:   rgba(78,154,107,.15);
-  --accent-soft-2: rgba(78,154,107,.26);
-  --accent-text:   #86C79C;
-  --text-on-accent:#061A10;
+  --accent:        #29A459;
+  --accent-hover:  #3DB86C;
+  --accent-press:  #58CA83;
+  --accent-soft:   rgba(41,164,89,.12);
+  --accent-soft-2: rgba(41,164,89,.22);
+  --accent-text:   #6ED295;
+  --text-on-accent:#04180C;
 
   --warm:          var(--clay-300);
   --warm-soft:     rgba(210,156,116,.14);
   --warm-text:     var(--clay-200);
 
-  --focus:         #6FBA8A;
-  --focus-halo:    rgba(111, 186, 138, 0.28);
+  --focus:         #4CC77E;
+  --focus-halo:    rgba(76, 199, 126, 0.30);
 
-  --ok-fg:      #7FC79A;  --ok-bg:   rgba(127,199,154,.14);  --ok-line:  rgba(127,199,154,.30);
+  --ok-fg:      #6ED295;  --ok-bg:   rgba(110,210,149,.14);  --ok-line:  rgba(110,210,149,.30);
   --warn-fg:    #E0B063;  --warn-bg: rgba(224,176,99,.14);    --warn-line:rgba(224,176,99,.30);
   --bad-fg:     #EE8E7C;  --bad-bg:  rgba(238,142,124,.14);   --bad-line: rgba(238,142,124,.30);
   --draft-fg:   #9FACA4;  --draft-bg:rgba(159,172,164,.12);   --draft-line:rgba(159,172,164,.26);
   --info-fg:    #8FBEDD;  --info-bg: rgba(143,190,221,.14);   --info-line:rgba(143,190,221,.30);
 
-  --appt-consult:  #4E9A6B;
-  --appt-followup: #86C79C;
+  --appt-consult:  #29A459;
+  --appt-followup: #6ED295;
   --appt-procedure:#B78CBB;
   --appt-acc:      #DFAE7E;
   --appt-telehealth:#8FBEDD;
@@ -255,7 +255,7 @@
     --surface:       #131A16;
     --surface-2:     #18211C;
     --surface-3:     #1F2923;
-    --surface-inv:   #F3F6F4;
+    --surface-inv:   #F6F9F7;
     --overlay:       rgba(4, 8, 6, 0.68);
 
     --text:          #E9EEEA;
@@ -268,28 +268,28 @@
     --line-faint:    #1F2923;
     --line-field:    #6A7C71;
 
-    --accent:        #4E9A6B;
-    --accent-hover:  #5FAC7B;
-    --accent-press:  #74BE8E;
-    --accent-soft:   rgba(78,154,107,.15);
-    --accent-soft-2: rgba(78,154,107,.26);
-    --accent-text:   #86C79C;
-    --text-on-accent:#061A10;
+    --accent:        #29A459;
+    --accent-hover:  #3DB86C;
+    --accent-press:  #58CA83;
+    --accent-soft:   rgba(41,164,89,.12);
+    --accent-soft-2: rgba(41,164,89,.22);
+    --accent-text:   #6ED295;
+    --text-on-accent:#04180C;
 
     --warm:          #D29C74;
     --warm-soft:     rgba(210,156,116,.14);
     --warm-text:     #E6C0A4;
 
-    --focus:         #6FBA8A;
-    --focus-halo:    rgba(111, 186, 138, 0.28);
+    --focus:         #4CC77E;
+    --focus-halo:    rgba(76, 199, 126, 0.30);
 
-    --ok-fg:   #7FC79A; --ok-bg:   rgba(127,199,154,.14); --ok-line:  rgba(127,199,154,.30);
+    --ok-fg:   #6ED295; --ok-bg:   rgba(110,210,149,.14); --ok-line:  rgba(110,210,149,.30);
     --warn-fg: #E0B063; --warn-bg: rgba(224,176,99,.14);   --warn-line:rgba(224,176,99,.30);
     --bad-fg:  #EE8E7C; --bad-bg:  rgba(238,142,124,.14);  --bad-line: rgba(238,142,124,.30);
     --draft-fg:#9FACA4; --draft-bg:rgba(159,172,164,.12);  --draft-line:rgba(159,172,164,.26);
     --info-fg: #8FBEDD; --info-bg: rgba(143,190,221,.14);  --info-line:rgba(143,190,221,.30);
 
-    --appt-consult:#4E9A6B; --appt-followup:#86C79C; --appt-procedure:#B78CBB;
+    --appt-consult:#29A459; --appt-followup:#6ED295; --appt-procedure:#B78CBB;
     --appt-acc:#DFAE7E; --appt-telehealth:#8FBEDD; --appt-admin:#9FACA4;
 
     --sh-1: none;

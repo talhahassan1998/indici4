@@ -33,16 +33,36 @@ const ICONS = {
   TriangleAlert, Upload, User, UserCheck, UserPlus, Users, X,
 };
 
-function Ramp({ name, steps, flip }) {
+/* Relative luminance, so each swatch label picks the readable ink rather than
+   flipping at a hard-coded step. */
+const lum = hex => {
+  const c = [1, 3, 5].map(i => {
+    const v = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+
+function Ramp({ name, steps, hexes }) {
   return (
     <div className="ramp mt-3">
-      {steps.map((s, i) => (
-        <div key={s} title={`--${name}-${s}`}
-          style={{ background: `var(--${name}-${s})`, color: i >= flip ? '#fff' : 'var(--n-900)' }}>{s}</div>
-      ))}
+      {steps.map((s, i) => {
+        const L = lum(hexes[i]);
+        const onWhite = 1.05 / (L + 0.05);
+        return (
+          <div key={s} title={`--${name}-${s}: ${hexes[i]}`}
+            style={{ background: hexes[i], color: onWhite >= 4.5 ? '#fff' : '#141A17' }}>{s}</div>
+        );
+      })}
     </div>
   );
 }
+
+const POU = ['#F1F8F4', '#E5EFE7', '#D2E7DA', '#A3D3B4', '#54B577',
+             '#17A24A', '#15803E', '#116330', '#0D4A25', '#083018'];
+const CLAY = ['#FBF1EA', '#F4E1D3', '#E6C0A4', '#D29C74', '#B87848', '#9A5C31', '#7C4826'];
+const NEUT = ['#FFFFFF', '#FCFDFC', '#F6F9F7', '#EDF1EE', '#E1E7E3', '#CFD7D2',
+              '#B2BCB6', '#8B978F', '#5E6862', '#4E5852', '#39423C', '#262D29', '#141A17'];
 
 function Section({ id, title, lede, children }) {
   return (
@@ -73,7 +93,7 @@ export default function StyleGuide() {
       <div className="field">
         <label className="label" htmlFor="sgReason">Reason <span className="req">*</span></label>
         <select className="select" id="sgReason" data-autofocus>
-          <option>Patient requested — rebooking</option>
+          <option>Patient requested, rebooking</option>
           <option>Patient unwell</option>
           <option>Clinician unavailable</option>
         </select>
@@ -127,21 +147,21 @@ export default function StyleGuide() {
       </p>
 
       <Section id="colour" title="Colour"
-        lede="One confident accent, one warm secondary, and a warm-neutral grey ramp. Every pairing below meets WCAG AA — 4.5:1 for body text, 3:1 for large text and UI boundaries — in both themes.">
+        lede="One confident accent, one warm secondary, and a near-neutral grey ramp. Every pairing below meets WCAG AA in both themes: 4.5:1 for body text, 3:1 for large text and UI boundaries.">
         <div className="sg-block">
-          <span className="t-eyebrow">Pounamu — primary</span>
-          <Ramp name="pou" steps={[50, 100, 200, 300, 400, 500, 600, 700, 800, 900]} flip={4} />
+          <span className="t-eyebrow">Pounamu · primary</span>
+          <Ramp name="pou" steps={[50, 100, 200, 300, 400, 500, 600, 700, 800, 900]} hexes={POU} />
           <p className="t-xs subtle mt-2">600 is the default action colour. 700/800 are hover and pressed.
             50/100 are soft fills behind icons and selected rows.</p>
         </div>
         <div className="sg-block">
-          <span className="t-eyebrow">Clay — secondary highlight</span>
-          <Ramp name="clay" steps={[50, 100, 200, 300, 400, 500, 600]} flip={4} />
-          <p className="t-xs subtle mt-2">Emphasis and ACC-related surfaces — never destructive, never “safe”.</p>
+          <span className="t-eyebrow">Clay · secondary highlight</span>
+          <Ramp name="clay" steps={[50, 100, 200, 300, 400, 500, 600]} hexes={CLAY} />
+          <p className="t-xs subtle mt-2">Emphasis and ACC-related surfaces. Never destructive, never “safe”.</p>
         </div>
         <div className="sg-block">
-          <span className="t-eyebrow">Warm neutrals — surfaces and text</span>
-          <Ramp name="n" steps={[0, 25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900]} flip={8} />
+          <span className="t-eyebrow">Neutrals · surfaces and text</span>
+          <Ramp name="n" steps={[0, 25, 50, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900]} hexes={NEUT} />
         </div>
         <div className="sg-block">
           <span className="t-eyebrow">Semantic status</span>
@@ -165,7 +185,7 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="type" title="Typography"
-        lede="IBM Plex Sans for the interface, Plex Serif for mastheads and letter bodies, Plex Mono for every number a clinic reads at a glance — times, money, NHI, claim numbers.">
+        lede="IBM Plex Sans for the interface, Plex Serif for mastheads and letter bodies, Plex Mono for every number a clinic reads at a glance: times, money, NHI, claim numbers.">
         <div className="sg-block">
           {[['t-display / 34', 'Kia ora, Dr Fenwick', 't-display'],
             ['t-h1 / 28', 'Today’s clinic', 't-h1'],
@@ -223,7 +243,7 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="inputs" title="Inputs"
-        lede="Every field has a visible label. Errors say what to do, not just what is wrong — the same voice used for ACC validation.">
+        lede="Every field has a visible label. Errors say what to do, not just what is wrong, in the same voice used for ACC validation.">
         <div className="sg-block">
           <div className="sg-auto">
             <div className="field"><label className="label" htmlFor="sg1">Patient name</label>
@@ -232,10 +252,10 @@ export default function StyleGuide() {
               <div className="input-group"><span className="ic-lead"><Search size={15} /></span>
                 <input className="input" id="sg2" placeholder="Search…" /></div></div>
             <div className="field"><label className="label" htmlFor="sg3">Appointment type</label>
-              <select className="select" id="sg3"><option>New consultation — 45 min</option><option>Follow-up — 20 min</option></select></div>
+              <select className="select" id="sg3"><option>New consultation, 45 min</option><option>Follow-up, 20 min</option></select></div>
             <div className="field"><label className="label" htmlFor="sg4">Claim number <span className="req">*</span></label>
               <input className="input t-mono" id="sg4" defaultValue="ACC-2026-4481" aria-invalid="true" aria-describedby="sg4err" />
-              <span className="err" id="sg4err">Claim numbers have five digits after the year — check the ACC45.</span></div>
+              <span className="err" id="sg4err">Claim numbers have five digits after the year. Check the ACC45.</span></div>
             <div className="field"><label className="label" htmlFor="sg5">Amount</label>
               <div className="input-group"><input className="input input-money" id="sg5" defaultValue="395.00" />
                 <span className="affix">NZD</span></div>
@@ -256,7 +276,7 @@ export default function StyleGuide() {
               <span className="t-sm">Selected row</span></span>
           </div>
           <div className="field mt-5" style={{ maxWidth: 420 }}>
-            <label className="label" htmlFor="sg8">Patient share — {share}%</label>
+            <label className="label" htmlFor="sg8">Patient share · {share}%</label>
             <input className="range" id="sg8" type="range" min="0" max="100" value={share}
               onChange={e => setShare(+e.target.value)} style={{ '--pct': `${share}%` }} /></div>
         </div>
@@ -291,7 +311,7 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="cards" title="Cards"
-        lede="A hairline border, a radius that varies with the job — and shadow only when something floats. Numbers are large because a practice manager reads them from across the desk.">
+        lede="A hairline border, a radius that varies with the job, and shadow only when something floats. Numbers are large because a practice manager reads them from across the desk.">
         <div className="sg-block">
           <div className="sg-auto">
             <div className="card stat">
@@ -366,7 +386,7 @@ export default function StyleGuide() {
           <div className="row g-3 wrap">
             {[['ok', 'Success toast', 'Payment recorded', '$454.25 by EFTPOS · receipt emailed'],
               ['warn', 'Warning toast', 'Recorded as DNA', 'Wiremu Kawiti · 2:45pm'],
-              ['bad', 'Error toast', 'ACC submission failed', 'Claim number not recognised — check the ACC45.'],
+              ['bad', 'Error toast', 'ACC submission failed', 'Claim number not recognised. Check the ACC45.'],
               ['info', 'Info toast', 'Xero sync started', '5 invoices queued for sync.'],
             ].map(([kind, label, title, body]) => (
               <button className="btn btn-secondary" key={kind} onClick={() => toast(title, body, kind)}>{label}</button>
@@ -385,8 +405,8 @@ export default function StyleGuide() {
           <div className="divider" />
           <div className="col g-3">
             <Banner icon={<Info size={16} />}>A text reminder is sent 24 hours before the appointment.</Banner>
-            <Banner tone="ok" icon={<Check size={16} />}>Everything validates — 3 invoices totalling $675.00 are ready to send to ACC.</Banner>
-            <Banner tone="warn" icon={<Clock size={16} />}>Waiting for your approval — typed by Josh Petersen, 2 hours ago.</Banner>
+            <Banner tone="ok" icon={<Check size={16} />}>Everything validates. 3 invoices totalling $675.00 are ready to send to ACC.</Banner>
+            <Banner tone="warn" icon={<Clock size={16} />}>Waiting for your approval. Typed by Josh Petersen, 2 hours ago.</Banner>
             <Banner tone="bad" icon={<TriangleAlert size={16} />}>Date of injury is missing. ACC will reject invoices on this claim.</Banner>
           </div>
           <div className="divider" />
@@ -398,7 +418,7 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="icons" title="Icons"
-        lede="One 24px grid, 1.75 stroke, rounded joins — Lucide, drawn as vectors so they stay crisp at any zoom. Icons never carry meaning alone: they sit beside a label or an accessible name.">
+        lede="Lucide on one 24px grid, 1.75 stroke, rounded joins, drawn as vectors so they stay crisp at any zoom. Icons never carry meaning alone: they sit beside a label or an accessible name.">
         <div className="sg-block">
           <div className="icon-grid">
             {Object.entries(ICONS).map(([n, Ic]) => (
@@ -417,7 +437,7 @@ export default function StyleGuide() {
           <div className="do-dont">
             <div className="do"><b className="t-sm">Do</b>
               <ul className="mt-2 col g-2 t-sm">
-                <li>· Put the exception first — errors, unpaid, overdue.</li>
+                <li>· Put the exception first: errors, unpaid, overdue.</li>
                 <li>· Name the fix: “Add the injury date on the patient record”.</li>
                 <li>· Keep common actions reachable from anywhere (Ctrl K).</li>
                 <li>· Autosave, and say so quietly.</li>
@@ -438,7 +458,7 @@ export default function StyleGuide() {
               <p className="t-sm muted">Every action reachable by Tab. <span className="kbd">/</span> search,{' '}
                 <span className="kbd">Ctrl K</span> palette, <span className="kbd">[</span> sidebar.</p></div>
             <div className="col g-2"><span className="t-eyebrow">Focus</span>
-              <p className="t-sm muted">A 2px accent ring with 2px offset — never removed, never invisible on a coloured surface.</p></div>
+              <p className="t-sm muted">A 2px accent ring with 2px offset. Never removed, never invisible on a coloured surface.</p></div>
             <div className="col g-2"><span className="t-eyebrow">Motion</span>
               <p className="t-sm muted">110–280ms, and everything stops under <span className="t-mono t-xs">prefers-reduced-motion</span>.</p></div>
           </div>

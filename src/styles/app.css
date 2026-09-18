@@ -253,8 +253,13 @@
 .tl-row[data-status="consult"] .tl-node { background: var(--info-fg); box-shadow: 0 0 0 2px var(--info-line); }
 .tl-row[data-status="done"]    .tl-node { background: var(--text-subtle); box-shadow: 0 0 0 2px var(--line-strong); }
 .tl-row[data-status="dna"]     .tl-node { background: var(--bad-fg); box-shadow: 0 0 0 2px var(--bad-line); }
-.tl-patient b { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.tl-patient span { font-size: var(--fs-xs); color: var(--text-subtle); }
+/* Name and metadata were inline siblings with no separation, so they ran
+   together as one word. Baseline-aligned flex gives the gap and keeps the row
+   to a single line. */
+.tl-patient { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
+.tl-patient b { font-size: var(--fs-sm); font-weight: var(--fw-semi); flex: none; }
+.tl-patient span { font-size: var(--fs-xs); color: var(--text-subtle);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Work queue widget rows */
 .work-row {

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { money, fmtDate, fmtDateShort, fmtClock, invoiceTotals, daysOverdue } from '../lib/format.js';
-import { Chip, FunderChip, Avatar, Banner, Empty, Switch } from '../components/Primitives.jsx';
+import { Chip, FunderChip, Avatar, Banner, Empty, Switch, Nil } from '../components/Primitives.jsx';
 import { useUi, Drawer, Modal, Menu } from '../lib/ui.jsx';
 
 export default function Billing() {
@@ -176,7 +176,7 @@ function InvoiceDrawer({ close, inv, toast, onDone, onPay }) {
       <div className="col g-5">
         {od > 0 && (
           <Banner tone="bad" icon={<TriangleAlert size={15} />}>
-            <b>{od} days overdue.</b> Due {fmtDate(inv.due)} — a reminder has not been sent yet.
+            <b>{od} days overdue.</b> Due {fmtDate(inv.due)}. No reminder has been sent yet.
           </Banner>
         )}
         {inv.reconciled && (
@@ -308,9 +308,9 @@ function CreateInvoice({ close, apptId, toast, onDone }) {
                 <td><select className="select" data-li={n} data-k="code" aria-label="Billable item"
                   value={it.code || '__custom'} onChange={e => pickCode(n, e.target.value)}>
                   {active.map(b => <option value={b.code} key={b.code}>{b.name}</option>)}
-                  <option value="__custom">Other — describe below</option>
+                  <option value="__custom">Other, describe below</option>
                 </select></td>
-                <td><span className="t-mono t-xs">{it.code || '—'}</span></td>
+                <td>{it.code ? <span className="t-mono t-xs">{it.code}</span> : <Nil label="No billing code" />}</td>
                 <td className="num-cell" style={{ width: 68 }}>
                   <input className="input input-money" data-li={n} data-k="q" type="number" min="1" value={it.q}
                     aria-label="Quantity" onChange={e => setItem(n, 'q', e.target.value)} /></td>
@@ -323,7 +323,7 @@ function CreateInvoice({ close, apptId, toast, onDone }) {
               </tr>
             ))}</tbody>
           </table>
-          <p className="hint"><RefreshCw size={12} /> Codes and prices are mastered in Xero and synced into Kora —
+          <p className="hint"><RefreshCw size={12} /> Codes and prices are mastered in Xero and synced into Kora.
             last sync {fmtClock(K.XERO_SYNC)} today.</p>
         </div>
 
@@ -363,10 +363,10 @@ function CreateInvoice({ close, apptId, toast, onDone }) {
               <span className="sb-b" style={{ width: `${100 - pct}%` }}>{100 - pct >= 14 ? money(incl - patientShare) : ''}</span>
             </div>
             <div className="split-viz">
-              <div className="card card-flat card-bd col g-2"><span className="t-eyebrow">Invoice 1 — patient</span>
+              <div className="card card-flat card-bd col g-2"><span className="t-eyebrow">Invoice 1 · patient</span>
                 <b className="t-h3 num">{money(patientShare)}</b>
                 <span className="t-xs subtle">{pt.first} {pt.last} · due in 14 days</span></div>
-              <div className="card card-flat card-bd col g-2"><span className="t-eyebrow">Invoice 2 — third party</span>
+              <div className="card card-flat card-bd col g-2"><span className="t-eyebrow">Invoice 2 · third party</span>
                 <b className="t-h3 num">{money(incl - patientShare)}</b>
                 <span className="t-xs subtle">{payer === 'Private' ? 'Southern Cross' : payer}</span></div>
             </div>

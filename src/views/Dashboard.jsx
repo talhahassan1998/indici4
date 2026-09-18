@@ -38,7 +38,7 @@ function Masthead({ user, figures }) {
   const short = user.name.split(' ').slice(0, 2).join(' ');
   return (
     <div className="masthead">
-      <p className="mh-date">{fmtLongDate(K.TODAY)} · {fmtTime(NOW)} · {K.cln('c1').short}</p>
+      <p className="mh-date">{fmtLongDate(K.TODAY)} · {fmtTime(NOW)}</p>
       <h1>{part}, <em>{short}</em>.</h1>
       <div className="stat-strip">
         {figures.map(f => (
@@ -116,7 +116,7 @@ function ClinicList({ list, showClinician, onArrive, onMenu }) {
               <span className="tl-spine"><i className="tl-node" /></span>
               <span className="tl-patient grow truncate">
                 <b>{p.first} {p.last}</b>
-                <span>{p.nhi} · {t.name}{showClinician ? ` · ${K.st(a.cl).name}` : ''} · {a.note}</span>
+                <span>{p.nhi} · {a.note || t.name}{showClinician ? ` · ${K.st(a.cl).name}` : ''}</span>
               </span>
               <span className="row g-2">
                 {p.alerts.length > 0 && (

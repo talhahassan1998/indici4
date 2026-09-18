@@ -4,8 +4,8 @@
 const TODAY = new Date(2026, 8, 17); // Thu 17 Sep 2026
 
 const clinics = [
-  { id: 'c1', name: 'Kora Specialists — Newmarket', short: 'Newmarket', addr: '212 Broadway, Newmarket, Auckland 1023', phone: '09 523 8840' },
-  { id: 'c2', name: 'Kora Specialists — Takapuna',  short: 'Takapuna',  addr: '4 Anzac Street, Takapuna, Auckland 0622', phone: '09 486 2210' },
+  { id: 'c1', name: 'Kora Specialists, Newmarket', short: 'Newmarket', addr: '212 Broadway, Newmarket, Auckland 1023', phone: '09 523 8840' },
+  { id: 'c2', name: 'Kora Specialists, Takapuna',  short: 'Takapuna',  addr: '4 Anzac Street, Takapuna, Auckland 0622', phone: '09 486 2210' },
   { id: 'c3', name: 'Ascot Day Surgery (visiting)',  short: 'Ascot',     addr: '90 Green Lane East, Remuera, Auckland 1051', phone: '09 520 9400' },
 ];
 
@@ -29,15 +29,15 @@ const gps = [
 ];
 
 const patients = [
-  { id:'p1',  first:'Te Aroha',  last:'Ngata',      dob:'1974-03-12', sex:'F', nhi:'JKL8407', phone:'021 442 907',  email:'tearoha.ngata@xtra.co.nz',  addr:'18 Kōwhai Road, Sandringham, Auckland 1025', gp:'g1', funder:'ACC',           alerts:['Penicillin allergy'], warn:['Interpreter — te reo Māori preferred'], nok:'Hemi Ngata (husband) · 021 550 118', claim:'ACC-2026-44817', injury:'2026-07-28', tone:1 },
-  { id:'p2',  first:'Hemi',      last:'Waititi',    dob:'1959-11-02', sex:'M', nhi:'PQR2218', phone:'027 819 4402', email:'hemi.waititi@gmail.com',    addr:'7A Seabrook Ave, New Lynn, Auckland 0600',   gp:'g4', funder:'Southern Cross', alerts:[],                     warn:['Anticoagulated — dabigatran'], nok:'Marama Waititi (daughter) · 027 300 991', claim:null, injury:null, tone:2 },
+  { id:'p1',  first:'Te Aroha',  last:'Ngata',      dob:'1974-03-12', sex:'F', nhi:'JKL8407', phone:'021 442 907',  email:'tearoha.ngata@xtra.co.nz',  addr:'18 Kōwhai Road, Sandringham, Auckland 1025', gp:'g1', funder:'ACC',           alerts:['Penicillin allergy'], warn:['Interpreter: te reo Māori preferred'], nok:'Hemi Ngata (husband) · 021 550 118', claim:'ACC-2026-44817', injury:'2026-07-28', tone:1 },
+  { id:'p2',  first:'Hemi',      last:'Waititi',    dob:'1959-11-02', sex:'M', nhi:'PQR2218', phone:'027 819 4402', email:'hemi.waititi@gmail.com',    addr:'7A Seabrook Ave, New Lynn, Auckland 0600',   gp:'g4', funder:'Southern Cross', alerts:[],                     warn:['Anticoagulated (dabigatran)'], nok:'Marama Waititi (daughter) · 027 300 991', claim:null, injury:null, tone:2 },
   { id:'p3',  first:'Margaret',  last:"O'Connell",  dob:'1948-06-24', sex:'F', nhi:'BCD9132', phone:'09 445 2218',  email:'m.oconnell48@outlook.co.nz',addr:'22 Lake Road, Devonport, Auckland 0624',     gp:'g5', funder:'Private',       alerts:['Latex allergy'],      warn:['Falls risk'],                  nok:'Peter O\'Connell (son) · 021 774 209', claim:null, injury:null, tone:3 },
   { id:'p4',  first:'Siosaia',   last:'Tupou',      dob:'1991-01-19', sex:'M', nhi:'MNP5567', phone:'022 634 7781', email:'s.tupou91@gmail.com',       addr:'44 Rata Street, Māngere, Auckland 2022',     gp:'g1', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Ana Tupou (partner) · 022 118 640', claim:'ACC-2026-45102', injury:'2026-08-30', tone:4 },
   { id:'p5',  first:'Priya',     last:'Naidu',      dob:'1986-09-08', sex:'F', nhi:'STU7714', phone:'021 077 3312', email:'priya.naidu@kiwilink.nz',   addr:'3/58 Balmoral Road, Mt Eden, Auckland 1024', gp:'g4', funder:'Southern Cross', alerts:['NSAID sensitivity'],  warn:[],                              nok:'Ravi Naidu (husband) · 021 448 205', claim:null, injury:null, tone:5 },
   { id:'p6',  first:'Wiremu',    last:'Kawiti',     dob:'2003-04-30', sex:'M', nhi:'DEF3383', phone:'020 411 8890', email:'w.kawiti@studentmail.ac.nz',addr:'11 Puriri Drive, Henderson, Auckland 0612',  gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Rangi Kawiti (mother) · 021 660 774', claim:'ACC-2026-45330', injury:null, tone:1 },
   { id:'p7',  first:'Ngaire',    last:'Solomon',    dob:'1966-12-15', sex:'F', nhi:'GHJ6025', phone:'027 220 5518', email:'ngaire.solomon@ihug.co.nz', addr:'9 Rewi Street, Onehunga, Auckland 1061',     gp:'g2', funder:'Private',       alerts:[],                     warn:[],                              nok:'Dean Solomon (husband) · 027 884 110', claim:null, injury:null, tone:2 },
   { id:'p8',  first:'James',     last:'Sutherland', dob:'1981-07-07', sex:'M', nhi:'VWX4453', phone:'021 938 0064', email:'jsutherland@workmail.nz',   addr:'160 Hurstmere Road, Takapuna, Auckland 0622',gp:'g5', funder:'Southern Cross', alerts:[],                     warn:[],                              nok:'Emma Sutherland (wife) · 021 300 447', claim:null, injury:null, tone:3 },
-  { id:'p9',  first:'Mele',      last:'Fifita',     dob:'1995-02-21', sex:'F', nhi:'YZA1171', phone:'022 500 9913', email:'mele.fifita@gmail.com',     addr:'5 Favona Road, Māngere, Auckland 2024',      gp:'g1', funder:'ACC',           alerts:['Codeine — nausea'],   warn:[],                              nok:'Sione Fifita (brother) · 022 774 300', claim:'ACC-2026-44290', injury:'2026-06-11', tone:4 },
+  { id:'p9',  first:'Mele',      last:'Fifita',     dob:'1995-02-21', sex:'F', nhi:'YZA1171', phone:'022 500 9913', email:'mele.fifita@gmail.com',     addr:'5 Favona Road, Māngere, Auckland 2024',      gp:'g1', funder:'ACC',           alerts:['Codeine (nausea)'],   warn:[],                              nok:'Sione Fifita (brother) · 022 774 300', claim:'ACC-2026-44290', injury:'2026-06-11', tone:4 },
   { id:'p10', first:'Bruce',     last:'Lockhart',   dob:'1953-10-05', sex:'M', nhi:'JKM8806', phone:'09 418 6673',  email:'brucel53@xtra.co.nz',       addr:'31 Wairau Road, Glenfield, Auckland 0629',   gp:'g2', funder:'Private',       alerts:[],                     warn:['Pacemaker in situ'],           nok:'Judith Lockhart (wife) · 021 552 908', claim:null, injury:null, tone:5 },
   { id:'p11', first:'Anahera',   last:'Tait',       dob:'1989-05-27', sex:'F', nhi:'NPP3348', phone:'021 664 1129', email:'anahera.tait@korohealth.nz',addr:'77 Hillsborough Rd, Hillsborough, Akld 1042',gp:'g3', funder:'ACC',           alerts:[],                     warn:[],                              nok:'Tama Tait (partner) · 021 883 447', claim:'ACC-2026-45611', injury:'2026-09-02', tone:1 },
   { id:'p12', first:'Rangi',     last:'Mātaira',    dob:'1972-08-14', sex:'M', nhi:'QRS9968', phone:'027 445 2207', email:'r.mataira@nzpost.co.nz',    addr:'14 Tiverton Road, Avondale, Auckland 0600',  gp:'g4', funder:'Southern Cross', alerts:['Sulfa drugs'],        warn:[],                              nok:'Hine Mātaira (wife) · 027 119 662', claim:null, injury:null, tone:2 },
@@ -104,12 +104,12 @@ patients.forEach((p, i) => {
 
 /* ---- Recalls and prompts: what the consult screen nags about ---- */
 const recalls = [
-  { pt:'p1',  kind:'Vaccine schedule', text:'Influenza — annual',              due:'2027-04-01', status:'due' },
+  { pt:'p1',  kind:'Vaccine schedule', text:'Influenza, annual',              due:'2027-04-01', status:'due' },
   { pt:'p1',  kind:'Vaccine schedule', text:'Zoster 65Y',                      due:'2039-03-12', status:'future' },
-  { pt:'p1',  kind:'Screening',        text:'Cervical screening — 5 yearly',   due:'2026-10-02', status:'overdue' },
-  { pt:'p1',  kind:'Review',           text:'ACC45 review — right knee',       due:'2026-10-15', status:'due' },
+  { pt:'p1',  kind:'Screening',        text:'Cervical screening, 5 yearly',   due:'2026-10-02', status:'overdue' },
+  { pt:'p1',  kind:'Review',           text:'ACC45 review, right knee',       due:'2026-10-15', status:'due' },
   { pt:'p3',  kind:'Screening',        text:'Bowel screening kit',             due:'2026-09-30', status:'due' },
-  { pt:'p12', kind:'Monitoring',       text:'Methotrexate bloods — 3 monthly', due:'2026-09-20', status:'due' },
+  { pt:'p12', kind:'Monitoring',       text:'Methotrexate bloods, 3 monthly', due:'2026-09-20', status:'due' },
 ];
 
 const problems = [
@@ -234,7 +234,7 @@ staff.push(...extraProviders);
       addr: `${int(1,220)} ${pick(STREETS)}, ${suburb}, ${city} ${pc}`,
       gp: pick(gps).id,
       funder: pick(FUNDERS),
-      alerts: rnd() < 0.14 ? [pick(['Penicillin allergy','NSAID sensitivity','Latex allergy','Sulfa drugs','Codeine — nausea'])] : [],
+      alerts: rnd() < 0.14 ? [pick(['Penicillin allergy','NSAID sensitivity','Latex allergy','Sulfa drugs','Codeine (nausea)'])] : [],
       warn: rnd() < 0.08 ? [pick(['Falls risk','Interpreter required','Anticoagulated','Pacemaker in situ'])] : [],
       nok: '', claim: null, injury: null,
       tone: int(1, 5),
@@ -269,26 +269,26 @@ const apptTypes = [
 
 // status: booked | arrived | consult | done | dna | cancelled
 const appts = [
-  { id:'a1',  pt:'p1',  cl:'u1', clinic:'c1', start: 8*60+30,  type:'t1', status:'done',    note:'Right knee — post fall at work',            invoiced:true  },
-  { id:'a2',  pt:'p4',  cl:'u1', clinic:'c1', start: 9*60+15,  type:'t3', status:'done',    note:'ACC review — shoulder',                      invoiced:false },
-  { id:'a3',  pt:'p3',  cl:'u1', clinic:'c1', start: 9*60+45,  type:'t2', status:'consult', note:'Hip — 6 week review',                        invoiced:false },
+  { id:'a1',  pt:'p1',  cl:'u1', clinic:'c1', start: 8*60+30,  type:'t1', status:'done',    note:'Right knee, post fall at work',            invoiced:true  },
+  { id:'a2',  pt:'p4',  cl:'u1', clinic:'c1', start: 9*60+15,  type:'t3', status:'done',    note:'ACC review, shoulder',                      invoiced:false },
+  { id:'a3',  pt:'p3',  cl:'u1', clinic:'c1', start: 9*60+45,  type:'t2', status:'consult', note:'Hip, 6 week review',                        invoiced:false },
   { id:'a4',  pt:'p9',  cl:'u1', clinic:'c1', start:10*60+15,  type:'t2', status:'arrived', note:'Wrist ORIF follow-up',                       invoiced:false },
-  { id:'a5',  pt:'p8',  cl:'u1', clinic:'c1', start:10*60+45,  type:'t1', status:'booked',  note:'New — lumbar back pain',                     invoiced:false },
-  { id:'a6',  pt:'p13', cl:'u1', clinic:'c1', start:11*60+30,  type:'t5', status:'booked',  note:'Telehealth — result discussion',             invoiced:false },
-  { id:'a7',  pt:'p12', cl:'u1', clinic:'c1', start:13*60+30,  type:'t4', status:'booked',  note:'Ganglion excision — local',                  invoiced:false },
-  { id:'a8',  pt:'p6',  cl:'u1', clinic:'c1', start:14*60+45,  type:'t2', status:'dna',     note:'Ankle — did not attend',                     invoiced:false },
-  { id:'a9',  pt:'p14', cl:'u1', clinic:'c1', start:15*60+15,  type:'t3', status:'booked',  note:'ACC review — lumbar',                        invoiced:false },
-  { id:'a10', pt:'p11', cl:'u1', clinic:'c1', start:16*60,     type:'t2', status:'booked',  note:'Shoulder — 2 week post-op',                  invoiced:false },
+  { id:'a5',  pt:'p8',  cl:'u1', clinic:'c1', start:10*60+45,  type:'t1', status:'booked',  note:'New, lumbar back pain',                     invoiced:false },
+  { id:'a6',  pt:'p13', cl:'u1', clinic:'c1', start:11*60+30,  type:'t5', status:'booked',  note:'Telehealth, result discussion',             invoiced:false },
+  { id:'a7',  pt:'p12', cl:'u1', clinic:'c1', start:13*60+30,  type:'t4', status:'booked',  note:'Ganglion excision, local',                  invoiced:false },
+  { id:'a8',  pt:'p6',  cl:'u1', clinic:'c1', start:14*60+45,  type:'t2', status:'dna',     note:'Ankle, did not attend',                     invoiced:false },
+  { id:'a9',  pt:'p14', cl:'u1', clinic:'c1', start:15*60+15,  type:'t3', status:'booked',  note:'ACC review, lumbar',                        invoiced:false },
+  { id:'a10', pt:'p11', cl:'u1', clinic:'c1', start:16*60,     type:'t2', status:'booked',  note:'Shoulder, 2 week post-op',                  invoiced:false },
 
   { id:'b1',  pt:'p2',  cl:'u2', clinic:'c1', start: 8*60,     type:'t1', status:'done',    note:'Hernia assessment',                          invoiced:true  },
   { id:'b2',  pt:'p5',  cl:'u2', clinic:'c1', start: 9*60,     type:'t2', status:'done',    note:'Gallbladder follow-up',                      invoiced:true  },
-  { id:'b3',  pt:'p10', cl:'u2', clinic:'c1', start:10*60,     type:'t1', status:'arrived', note:'New — abdominal pain',                       invoiced:false },
+  { id:'b3',  pt:'p10', cl:'u2', clinic:'c1', start:10*60,     type:'t1', status:'arrived', note:'New, abdominal pain',                       invoiced:false },
   { id:'b4',  pt:'p7',  cl:'u2', clinic:'c1', start:11*60,     type:'t6', status:'booked',  note:'Post-op wound check',                        invoiced:false },
-  { id:'b5',  pt:'p1',  cl:'u2', clinic:'c1', start:14*60,     type:'t2', status:'booked',  note:'Second opinion — knee',                      invoiced:false },
+  { id:'b5',  pt:'p1',  cl:'u2', clinic:'c1', start:14*60,     type:'t2', status:'booked',  note:'Second opinion, knee',                      invoiced:false },
 
-  { id:'d1',  pt:'p12', cl:'u3', clinic:'c2', start: 9*60+30,  type:'t1', status:'done',    note:'New — inflammatory arthritis',               invoiced:false },
+  { id:'d1',  pt:'p12', cl:'u3', clinic:'c2', start: 9*60+30,  type:'t1', status:'done',    note:'New, inflammatory arthritis',               invoiced:false },
   { id:'d2',  pt:'p14', cl:'u3', clinic:'c2', start:10*60+30,  type:'t2', status:'arrived', note:'Methotrexate review',                        invoiced:false },
-  { id:'d3',  pt:'p5',  cl:'u3', clinic:'c2', start:11*60+15,  type:'t5', status:'booked',  note:'Telehealth — bloods',                        invoiced:false },
+  { id:'d3',  pt:'p5',  cl:'u3', clinic:'c2', start:11*60+15,  type:'t5', status:'booked',  note:'Telehealth, bloods',                        invoiced:false },
   { id:'d4',  pt:'p3',  cl:'u3', clinic:'c2', start:13*60,     type:'t2', status:'booked',  note:'Polymyalgia review',                         invoiced:false },
   { id:'d5',  pt:'p9',  cl:'u3', clinic:'c2', start:15*60,     type:'t2', status:'booked',  note:'Joint injection review',                     invoiced:false },
 
@@ -300,7 +300,7 @@ const appts = [
 
 const blocks = [
   { cl:'u1', clinic:'c1', start:12*60,    mins:60, label:'Lunch' },
-  { cl:'u2', clinic:'c1', start:12*60,    mins:90, label:'Theatre list — Ascot' },
+  { cl:'u2', clinic:'c1', start:12*60,    mins:90, label:'Theatre list, Ascot' },
   { cl:'u3', clinic:'c2', start:12*60,    mins:45, label:'Lunch' },
   { cl:'u4', clinic:'c1', start:10*60+30, mins:150,label:'Annual leave (half day)' },
   { cl:'u2', clinic:'c1', start:15*60+30, mins:90, label:'MDT meeting' },
@@ -311,9 +311,9 @@ const letters = [
   { id:'l1', pt:'p1',  cl:'u1', title:'Initial orthopaedic assessment',   to:'g1', cc:['ACC'],            status:'pending',  updated:'2026-09-17T09:10', typedBy:'u6', channel:'Healthlink', words:412, aiAssisted:true },
   { id:'l2', pt:'p4',  cl:'u1', title:'ACC45 supporting report',           to:'g1', cc:['ACC'],            status:'pending',  updated:'2026-09-17T08:52', typedBy:'u6', channel:'Healthlink', words:318, aiAssisted:true },
   { id:'l3', pt:'p3',  cl:'u1', title:'Six week hip review',               to:'g5', cc:[],                 status:'draft',    updated:'2026-09-17T10:04', typedBy:null, channel:'Healthlink', words:96,  aiAssisted:false },
-  { id:'l4', pt:'p2',  cl:'u2', title:'Hernia repair — operative plan',    to:'g4', cc:['Southern Cross'], status:'pending',  updated:'2026-09-16T16:40', typedBy:'u6', channel:'Email',      words:527, aiAssisted:false },
+  { id:'l4', pt:'p2',  cl:'u2', title:'Hernia repair: operative plan',    to:'g4', cc:['Southern Cross'], status:'pending',  updated:'2026-09-16T16:40', typedBy:'u6', channel:'Email',      words:527, aiAssisted:false },
   { id:'l5', pt:'p12', cl:'u3', title:'Rheumatology first assessment',     to:'g4', cc:[],                 status:'approved', updated:'2026-09-16T15:12', typedBy:'u6', channel:'Healthlink', words:688, aiAssisted:true },
-  { id:'l6', pt:'p9',  cl:'u1', title:'Wrist ORIF — 8 week progress',      to:'g1', cc:['ACC'],            status:'sent',     updated:'2026-09-15T11:22', typedBy:'u6', channel:'Healthlink', words:352, aiAssisted:false },
+  { id:'l6', pt:'p9',  cl:'u1', title:'Wrist ORIF, 8 week progress',      to:'g1', cc:['ACC'],            status:'sent',     updated:'2026-09-15T11:22', typedBy:'u6', channel:'Healthlink', words:352, aiAssisted:false },
   { id:'l7', pt:'p10', cl:'u2', title:'Referral to gastroenterology',      to:'g2', cc:[],                 status:'draft',    updated:'2026-09-17T07:58', typedBy:null, channel:'Healthlink', words:0,   aiAssisted:false },
   { id:'l8', pt:'p14', cl:'u3', title:'Methotrexate monitoring plan',      to:'g3', cc:[],                 status:'pending',  updated:'2026-09-16T14:05', typedBy:'u6', channel:'Email',      words:274, aiAssisted:true },
 ];
@@ -341,15 +341,15 @@ const letterTemplates = [
 
 // Inbox: letters awaiting approval, results, referrals, messages
 const inbox = [
-  { id:'i1', kind:'approval', pt:'p1',  from:'Josh Petersen',        subj:'Initial orthopaedic assessment — ready for approval', at:'2026-09-17T09:10', unread:true,  pri:'normal', letter:'l1' },
-  { id:'i2', kind:'approval', pt:'p4',  from:'Josh Petersen',        subj:'ACC45 supporting report — ready for approval',        at:'2026-09-17T08:52', unread:true,  pri:'high',   letter:'l2' },
-  { id:'i3', kind:'result',   pt:'p9',  from:'Auckland Radiology',   subj:'XR Right wrist — union progressing',                  at:'2026-09-17T08:20', unread:true,  pri:'normal' },
-  { id:'i4', kind:'result',   pt:'p12', from:'Awanui Labs',          subj:'CRP 48 mg/L · ESR 62 mm/hr — ABNORMAL',               at:'2026-09-17T07:41', unread:true,  pri:'high'   },
-  { id:'i5', kind:'referral', pt:'p10', from:'Dr Michael Toomey',    subj:'Referral — 72M epigastric pain, weight loss',          at:'2026-09-16T17:33', unread:false, pri:'high'   },
+  { id:'i1', kind:'approval', pt:'p1',  from:'Josh Petersen',        subj:'Initial orthopaedic assessment: ready for approval', at:'2026-09-17T09:10', unread:true,  pri:'normal', letter:'l1' },
+  { id:'i2', kind:'approval', pt:'p4',  from:'Josh Petersen',        subj:'ACC45 supporting report: ready for approval',        at:'2026-09-17T08:52', unread:true,  pri:'high',   letter:'l2' },
+  { id:'i3', kind:'result',   pt:'p9',  from:'Auckland Radiology',   subj:'XR Right wrist: union progressing',                  at:'2026-09-17T08:20', unread:true,  pri:'normal' },
+  { id:'i4', kind:'result',   pt:'p12', from:'Awanui Labs',          subj:'CRP 48 mg/L, ESR 62 mm/hr (ABNORMAL)',               at:'2026-09-17T07:41', unread:true,  pri:'high'   },
+  { id:'i5', kind:'referral', pt:'p10', from:'Dr Michael Toomey',    subj:'Referral: 72M epigastric pain, weight loss',          at:'2026-09-16T17:33', unread:false, pri:'high'   },
   { id:'i6', kind:'message',  pt:'p3',  from:'Mereana Hopa',         subj:'Patient asking to move Friday appointment',            at:'2026-09-16T16:02', unread:false, pri:'normal' },
-  { id:'i7', kind:'approval', pt:'p2',  from:'Josh Petersen',        subj:'Hernia repair — operative plan',                       at:'2026-09-16T16:40', unread:false, pri:'normal', letter:'l4' },
-  { id:'i8', kind:'result',   pt:'p5',  from:'Awanui Labs',          subj:'LFTs — within normal limits',                          at:'2026-09-16T11:15', unread:false, pri:'low'    },
-  { id:'i9', kind:'referral', pt:'p13', from:'Dr Bridget Neale',     subj:'Referral — 27F recurrent shoulder dislocation',        at:'2026-09-15T14:48', unread:false, pri:'normal' },
+  { id:'i7', kind:'approval', pt:'p2',  from:'Josh Petersen',        subj:'Hernia repair: operative plan',                       at:'2026-09-16T16:40', unread:false, pri:'normal', letter:'l4' },
+  { id:'i8', kind:'result',   pt:'p5',  from:'Awanui Labs',          subj:'LFTs: within normal limits',                          at:'2026-09-16T11:15', unread:false, pri:'low'    },
+  { id:'i9', kind:'referral', pt:'p13', from:'Dr Bridget Neale',     subj:'Referral: 27F recurrent shoulder dislocation',        at:'2026-09-15T14:48', unread:false, pri:'normal' },
   { id:'i10',kind:'message',  pt:'p1',  from:'ACC Provider Services',subj:'Claim ACC-2026-44817 approved for 6 sessions',         at:'2026-09-15T09:30', unread:false, pri:'normal' },
 ];
 
@@ -360,7 +360,7 @@ const invoices = [
   { id:'INV-10480', pt:'p5',  cl:'u2', date:'2026-09-17', due:'2026-10-01', payer:'Southern Cross', status:'paid',    items:[{d:'Follow-up',q:1,p:195.00}], paid:224.25 },
   { id:'INV-10479', pt:'p6',  cl:'u4', date:'2026-09-17', due:'2026-10-01', payer:'ACC',            status:'sent',    items:[{d:'Post-op check',q:1,p:85.00}], paid:0 },
   { id:'INV-10478', pt:'p11', cl:'u4', date:'2026-09-17', due:'2026-10-01', payer:'ACC',            status:'paid',    items:[{d:'Suture removal',q:1,p:85.00}], paid:97.75 },
-  { id:'INV-10471', pt:'p3',  cl:'u1', date:'2026-09-10', due:'2026-09-24', payer:'Private',        status:'sent',    items:[{d:'Follow-up',q:1,p:195.00},{d:'Injection — joint',q:1,p:120.00}], paid:0 },
+  { id:'INV-10471', pt:'p3',  cl:'u1', date:'2026-09-10', due:'2026-09-24', payer:'Private',        status:'sent',    items:[{d:'Follow-up',q:1,p:195.00},{d:'Injection, joint',q:1,p:120.00}], paid:0 },
   { id:'INV-10465', pt:'p8',  cl:'u1', date:'2026-09-03', due:'2026-09-17', payer:'Southern Cross', status:'paid',    items:[{d:'New consultation',q:1,p:395.00}], paid:454.25 },
   { id:'INV-10452', pt:'p10', cl:'u2', date:'2026-08-20', due:'2026-09-03', payer:'Private',        status:'overdue', items:[{d:'New consultation',q:1,p:395.00},{d:'Ultrasound guidance',q:1,p:180.00}], paid:0 },
   { id:'INV-10448', pt:'p7',  cl:'u2', date:'2026-08-14', due:'2026-08-28', payer:'Private',        status:'overdue', items:[{d:'Minor procedure',q:1,p:860.00}], paid:0 },
@@ -392,15 +392,15 @@ const accHistory = [
 
 // Tasks: todo | doing | done
 const tasks = [
-  { id:'k1', title:'Chase MRI report — right knee',        pt:'p1',  who:'u5', due:'2026-09-17', col:'todo',  pri:'high',   tag:'Imaging' },
+  { id:'k1', title:'Chase MRI report for the right knee',        pt:'p1',  who:'u5', due:'2026-09-17', col:'todo',  pri:'high',   tag:'Imaging' },
   { id:'k2', title:'Send ACC45 once signed',               pt:'p4',  who:'u6', due:'2026-09-17', col:'todo',  pri:'high',   tag:'ACC' },
-  { id:'k3', title:'Book theatre — ganglion excision',     pt:'p12', who:'u5', due:'2026-09-18', col:'todo',  pri:'normal', tag:'Theatre' },
+  { id:'k3', title:'Book theatre for the ganglion excision',     pt:'p12', who:'u5', due:'2026-09-18', col:'todo',  pri:'normal', tag:'Theatre' },
   { id:'k4', title:'Southern Cross prior approval',        pt:'p2',  who:'u7', due:'2026-09-19', col:'doing', pri:'normal', tag:'Billing' },
   { id:'k5', title:'Type Friday dictations',               pt:'p3',  who:'u6', due:'2026-09-18', col:'doing', pri:'normal', tag:'Letters' },
   { id:'k6', title:'Follow up unpaid INV-10452',           pt:'p10', who:'u7', due:'2026-09-15', col:'todo',  pri:'high',   tag:'Billing' },
   { id:'k7', title:'Confirm interpreter for Thursday',     pt:'p1',  who:'u5', due:'2026-09-16', col:'doing', pri:'normal', tag:'Admin' },
   { id:'k8', title:'Upload pre-admission bloods',          pt:'p8',  who:'u4', due:'2026-09-16', col:'done',  pri:'normal', tag:'Clinical' },
-  { id:'k9', title:'Recall — 6 month review',              pt:'p7',  who:'u5', due:'2026-09-12', col:'done',  pri:'low',    tag:'Recall' },
+  { id:'k9', title:'Recall for a 6 month review',              pt:'p7',  who:'u5', due:'2026-09-12', col:'done',  pri:'low',    tag:'Recall' },
   { id:'k10',title:'Reconcile Xero payments batch',        pt:null,  who:'u7', due:'2026-09-16', col:'done',  pri:'normal', tag:'Billing' },
   { id:'k11',title:'Update consent form wording',          pt:null,  who:'u7', due:'2026-09-22', col:'todo',  pri:'low',    tag:'Admin' },
 ];
@@ -408,26 +408,26 @@ const tasks = [
 // Patient timeline events
 const timeline = {
   p1: [
-    { at:'2026-09-17T08:30', kind:'note',    by:'u1', title:'Consultation note — right knee',  body:'45F, fall at work 28 July. Persistent medial joint line pain, mechanical locking. Examination: effusion +, McMurray positive medially. Plan: MRI, ACC45 update, review 4 weeks.', signed:false },
+    { at:'2026-09-17T08:30', kind:'note',    by:'u1', title:'Consultation note, right knee',  body:'45F, fall at work 28 July. Persistent medial joint line pain, mechanical locking. Examination: effusion +, McMurray positive medially. Plan: MRI, ACC45 update, review 4 weeks.', signed:false },
     { at:'2026-09-17T09:05', kind:'letter',  by:'u1', title:'Initial orthopaedic assessment',  body:'To Dr Helen Prasad, Ōtāhuhu Family Doctors · CC ACC', status:'pending' },
-    { at:'2026-09-17T09:12', kind:'invoice', by:'u5', title:'INV-10482 — New consultation',    body:'$395.00 to ACC · Draft', status:'draft' },
+    { at:'2026-09-17T09:12', kind:'invoice', by:'u5', title:'INV-10482 · New consultation',    body:'$395.00 to ACC · Draft', status:'draft' },
     { at:'2026-09-14T14:20', kind:'result',  by:null, title:'XR Right knee',                   body:'No acute bony injury. Mild medial compartment narrowing.', status:'normal' },
     { at:'2026-08-02T10:10', kind:'rx',      by:'u1', title:'Naproxen 500mg BD',               body:'30 tablets · 1 repeat · dispensed Chemist Warehouse Sandringham' },
-    { at:'2026-07-29T11:45', kind:'note',    by:'u1', title:'ACC45 lodged',                    body:'Claim ACC-2026-44817 lodged for right knee — work injury 28/07/2026.', signed:true },
+    { at:'2026-07-29T11:45', kind:'note',    by:'u1', title:'ACC45 lodged',                    body:'Claim ACC-2026-44817 lodged for right knee, work injury 28/07/2026.', signed:true },
   ],
   p9: [
-    { at:'2026-09-17T08:20', kind:'result', by:null, title:'XR Right wrist', body:'Distal radius fracture — union progressing, hardware intact.', status:'normal' },
-    { at:'2026-09-15T11:22', kind:'letter', by:'u1', title:'Wrist ORIF — 8 week progress', body:'To Dr Helen Prasad · CC ACC', status:'sent' },
-    { at:'2026-07-30T09:00', kind:'invoice',by:'u5', title:'INV-10430 — Follow-up', body:'$224.25 incl GST to ACC · Paid', status:'paid' },
+    { at:'2026-09-17T08:20', kind:'result', by:null, title:'XR Right wrist', body:'Distal radius fracture. Union progressing, hardware intact.', status:'normal' },
+    { at:'2026-09-15T11:22', kind:'letter', by:'u1', title:'Wrist ORIF, 8 week progress', body:'To Dr Helen Prasad · CC ACC', status:'sent' },
+    { at:'2026-07-30T09:00', kind:'invoice',by:'u5', title:'INV-10430 · Follow-up', body:'$224.25 incl GST to ACC · Paid', status:'paid' },
   ],
 };
 
 const notes = [
-  { id:'n1', pt:'p1',  by:'u1', at:'2026-09-17T08:30', title:'Consultation note — right knee', signed:false },
+  { id:'n1', pt:'p1',  by:'u1', at:'2026-09-17T08:30', title:'Consultation note, right knee', signed:false },
   { id:'n2', pt:'p3',  by:'u1', at:'2026-09-17T09:50', title:'Hip review note',                signed:false },
   { id:'n3', pt:'p2',  by:'u2', at:'2026-09-17T08:10', title:'Hernia assessment',              signed:false },
   { id:'n4', pt:'p12', by:'u3', at:'2026-09-16T10:05', title:'Rheumatology assessment',        signed:false },
-  { id:'n5', pt:'p10', by:'u2', at:'2026-09-16T09:15', title:'Abdominal pain — workup',        signed:false },
+  { id:'n5', pt:'p10', by:'u2', at:'2026-09-16T09:15', title:'Abdominal pain workup',        signed:false },
 ];
 
 
@@ -455,7 +455,7 @@ const org = {
   bank:'12-3456-0078901-00', bankName:'Kora Health Ltd',
   email:'accounts@korahealth.nz', phone:'09 523 8840',
   terms:'Payment due within 14 days. Please quote the invoice number as reference.',
-  xeroOrg:'Kora Health Limited', xeroBrand:'Kora Specialists — standard',
+  xeroOrg:'Kora Health Limited', xeroBrand:'Kora Specialists, standard',
 };
 
 /* ---- Doctor timetables: recurring weekly sessions per location ---- */
@@ -496,9 +496,9 @@ const medicines = [
   { id:'m2', name:'Paracetamol',        form:'500 mg tablet', dose:'Two tablets four times daily as needed', classes:[],       qty:100,repeats:2, funded:true  },
   { id:'m3', name:'Codeine phosphate',  form:'30 mg tablet',  dose:'One tablet up to four times daily', classes:['Opioid','Codeine'], qty:20, repeats:0, funded:true },
   { id:'m4', name:'Amoxicillin',        form:'500 mg capsule',dose:'One capsule three times daily for 7 days', classes:['Penicillin'], qty:21, repeats:0, funded:true },
-  { id:'m5', name:'Methotrexate',       form:'10 mg tablet',  dose:'Once weekly — Tuesdays. With folic acid.', classes:['DMARD'], qty:12, repeats:5, funded:true },
+  { id:'m5', name:'Methotrexate',       form:'10 mg tablet',  dose:'Once weekly, Tuesdays. With folic acid.', classes:['DMARD'], qty:12, repeats:5, funded:true },
   { id:'m6', name:'Omeprazole',         form:'20 mg capsule', dose:'One capsule daily before food', classes:[],                qty:30, repeats:5, funded:true  },
-  { id:'m7', name:'Prednisone',         form:'20 mg tablet',  dose:'Reducing course — see instructions', classes:['Steroid'],  qty:30, repeats:0, funded:true  },
+  { id:'m7', name:'Prednisone',         form:'20 mg tablet',  dose:'Reducing course, see instructions', classes:['Steroid'],  qty:30, repeats:0, funded:true  },
   { id:'m8', name:'Celecoxib',          form:'200 mg capsule',dose:'One capsule daily', classes:['NSAID'],                     qty:30, repeats:1, funded:false },
   { id:'m9', name:'Cotrimoxazole',      form:'480 mg tablet', dose:'Two tablets twice daily', classes:['Sulfa'],               qty:20, repeats:0, funded:true  },
 ];
@@ -534,10 +534,10 @@ const testCatalogue = [
 ];
 
 const testRequests = [
-  { id:'tr1', pt:'p1',  by:'u1', at:'2026-09-17T08:45', test:'t-mri',  provider:'tp-rad1', urgency:'routine', status:'sent',     note:'Right knee — query medial meniscal tear' },
+  { id:'tr1', pt:'p1',  by:'u1', at:'2026-09-17T08:45', test:'t-mri',  provider:'tp-rad1', urgency:'routine', status:'sent',     note:'Right knee, query medial meniscal tear' },
   { id:'tr2', pt:'p12', by:'u3', at:'2026-09-16T10:20', test:'t-rf',   provider:'tp-lab1', urgency:'urgent',  status:'resulted', note:'Query inflammatory arthritis' },
   { id:'tr3', pt:'p14', by:'u3', at:'2026-09-15T14:00', test:'t-lft',  provider:'tp-lab1', urgency:'routine', status:'resulted', note:'Methotrexate monitoring' },
-  { id:'tr4', pt:'p9',  by:'u1', at:'2026-09-14T09:05', test:'t-xr',   provider:'tp-rad2', urgency:'routine', status:'resulted', note:'Right wrist — union check' },
+  { id:'tr4', pt:'p9',  by:'u1', at:'2026-09-14T09:05', test:'t-xr',   provider:'tp-rad2', urgency:'routine', status:'resulted', note:'Right wrist, union check' },
 ];
 
 // The NHI alphabet omits I and O so they cannot be misread as 1 and 0.
@@ -595,11 +595,11 @@ const KORA = {
       total += val * (7 - (i + 1));
     }
     const rem = total % 11;
-    if (rem === 0) return { state: 'bad', why: 'Check digit does not match — re-read the NHI.' };
+    if (rem === 0) return { state: 'bad', why: 'Check digit does not match. Re-read the NHI.' };
     const cd = (11 - rem) === 10 ? 0 : 11 - rem;
     return cd === Number(v[6])
       ? { state: 'ok', nhi: v }
-      : { state: 'bad', why: `Check digit does not match — did you mean ${v.slice(0, 6)}${cd}?` };
+      : { state: 'bad', why: `Check digit does not match: did you mean ${v.slice(0, 6)}${cd}?` };
   },
 
   /* Medicines whose class matches something in the patient's allergy list. */
@@ -613,7 +613,7 @@ const KORA = {
     return null;
   },
 
-  ptName: id => { const p = patients.find(x => x.id === id); return p ? `${p.first} ${p.last}` : '—'; },
+  ptName: id => { const p = patients.find(x => x.id === id); return p ? `${p.first} ${p.last}` : 'Unknown patient'; },
   ptInitials: id => { const p = patients.find(x => x.id === id); return p ? (p.first[0] + p.last[0]) : '?'; },
 };
 

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { money, fmtTime, fmtClock } from '../lib/format.js';
-import { Chip, Avatar, Banner, Switch } from '../components/Primitives.jsx';
+import { Chip, Avatar, Banner, Switch, Nil } from '../components/Primitives.jsx';
 import { useUi } from '../lib/ui.jsx';
 
 const CARDS = [
@@ -16,7 +16,7 @@ const CARDS = [
   { id: 'rooms', Icon: Clock, title: 'Clinics & timetables', sub: 'Sessions, rooms, leave and blocked time', meta: '12 sessions/week' },
   { id: 'brand', Icon: Mail, title: 'Letter branding', sub: 'Letterhead, logo, footer, signature blocks', meta: 'Kora default' },
   { id: 'tpl', Icon: LayoutTemplate, title: 'Templates', sub: 'Letter and note templates with merge fields', meta: `${K.letterTemplates.length} templates` },
-  { id: 'codes', Icon: ReceiptText, title: 'Billing codes', sub: 'Synced from Xero — prices, accounts, ACC codes', meta: `${K.billingCodes.length} codes` },
+  { id: 'codes', Icon: ReceiptText, title: 'Billing codes', sub: 'Synced from Xero: prices, accounts, ACC codes', meta: `${K.billingCodes.length} codes` },
   { id: 'integ', Icon: Link2, title: 'Integrations', sub: 'Xero, ACC, Healthlink, AI scribe', meta: '4 connected' },
   { id: 'audit', Icon: Shield, title: 'Security & audit', sub: 'Access log, 2FA, data retention', meta: 'AA compliant' },
 ];
@@ -157,7 +157,7 @@ export default function Admin() {
         <tbody>{K.billingCodes.map(b => (
           <tr key={b.code}><td className="t-mono t-sm"><b>{b.code}</b></td><td>{b.name}</td>
             <td className="num-cell">{money(b.price)}</td><td className="t-mono t-sm">{b.acct}</td>
-            <td className="t-sm">{b.tax}</td><td className="t-mono t-sm">{b.acc || <span className="subtle">—</span>}</td>
+            <td className="t-sm">{b.tax}</td><td className="t-mono t-sm">{b.acc || <Nil label="No ACC code" />}</td>
             <td>{b.active ? <Chip status="paid" label="Active" /> : <Chip status="draft" label="Archived" />}</td></tr>
         ))}</tbody></table></div>
         <div className="card-ft row"><span className="t-xs subtle">{K.billingCodes.length} codes · last synced {fmtClock(K.XERO_SYNC)} today</span></div>
@@ -187,7 +187,7 @@ export default function Admin() {
               <span><b className="t-sm">{c.name}</b><br /><span className="t-xs subtle">{c.spec}</span></span></span></td>
             {DAYS.map((d, di) => {
               const sess = K.timetables.filter(t => t.cl === c.id && t.day === di);
-              if (!sess.length) return <td key={d}><span className="t-xs subtle">—</span></td>;
+              if (!sess.length) return <td key={d}><Nil label="Not working" /></td>;
               return (
                 <td key={d} style={{ minWidth: 150 }}><div className="col g-2">{sess.map((t, i) => (
                   <button className="card card-flat" key={i} data-edit-session
@@ -212,7 +212,7 @@ export default function Admin() {
           <tr key={t.id}><td><b>{t.name}</b></td><td><span className="chip">{t.group}</span></td>
             <td className="t-sm">{t.fields.length ? t.fields.map(f => <span className="chip" key={f.k}>{f.label}</span>)
               : <span className="subtle">No prompts</span>}</td>
-            <td>{t.pinned ? <span className="chip chip-accent">Pinned</span> : <span className="subtle t-xs">—</span>}</td></tr>
+            <td>{t.pinned ? <span className="chip chip-accent">Pinned</span> : <Nil label="Not pinned" />}</td></tr>
         ))}</tbody></table></div></section>
     </div>
   );

@@ -72,7 +72,7 @@ export default function Acc() {
       {bad.length ? (
         <Banner tone="bad" icon={<TriangleAlert size={17} />}>
           <b>{bad.length} submissions will be rejected as they are</b><br />
-          <span className="t-sm">Each one is missing something ACC requires. Use <b>Fix now</b> to jump straight to the field —
+          <span className="t-sm">Each one is missing something ACC requires. Use <b>Fix now</b> to jump straight to the field.
           fixing a patient record usually clears more than one row.</span>
         </Banner>
       ) : (

@@ -141,7 +141,7 @@
 /* --------------------------------------------------------------- Chips */
 .chip {
   display: inline-flex; align-items: center; gap: 5px;
-  height: 19px; padding: 0 6px;
+  height: 19px; padding: 0 7px;
   border-radius: var(--r-xs);
   font-size: var(--fs-2xs); font-weight: var(--fw-bold);
   letter-spacing: 0.055em; text-transform: uppercase;
@@ -149,7 +149,20 @@
   background: var(--draft-bg); color: var(--draft-fg);
   box-shadow: inset 0 0 0 1px var(--draft-line);
 }
+/* Reserved for a genuinely live indicator (the running consult timer), not
+   for restating a status the chip's colour and label already give. */
 .chip .dot { width: 5px; height: 5px; border-radius: 1px; background: currentColor; flex: none; }
+
+/* No value recorded. A rule, not a character, so it sits below the text in
+   weight and never reads as content. */
+.nil {
+  /* position: relative so the visually-hidden label inside is contained here.
+     Without it the absolute label resolves against the document and escapes
+     the grid's overflow, extending the page scroll by the table's full height. */
+  position: relative;
+  display: inline-block; width: 9px; height: 1px; vertical-align: middle;
+  background: var(--text-subtle); opacity: .55;
+}
 .chip-ok    { background: var(--ok-bg);    color: var(--ok-fg);    box-shadow: inset 0 0 0 1px var(--ok-line); }
 .chip-warn  { background: var(--warn-bg);  color: var(--warn-fg);  box-shadow: inset 0 0 0 1px var(--warn-line); }
 .chip-bad   { background: var(--bad-bg);   color: var(--bad-fg);   box-shadow: inset 0 0 0 1px var(--bad-line); }

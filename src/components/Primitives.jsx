@@ -2,15 +2,20 @@
 import K from '../data/sample.js';
 import { STATUS, FUNDER_CLS } from '../lib/format.js';
 
-export function Chip({ status, label, tone, dot = true, lg, children }) {
+export function Chip({ status, label, tone, lg, children }) {
   const s = STATUS[status] || {};
   const cls = tone ? `chip-${tone}` : (s.cls || '');
   return (
     <span className={`chip ${cls} ${lg ? 'chip-lg' : ''}`}>
-      {dot && <i className="dot" />}
       {children || label || s.label || status}
     </span>
   );
+}
+
+/* "No value recorded" in a cell. An em-dash here reads as content and carries
+   no accessible name; this is lighter and announces itself as "None". */
+export function Nil({ label = 'None' }) {
+  return <span className="nil"><span className="sr-only">{label}</span></span>;
 }
 
 export function FunderChip({ funder }) {

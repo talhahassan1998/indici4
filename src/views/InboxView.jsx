@@ -116,7 +116,7 @@ function Preview({ item, toast, nav, onClear }) {
           {item.kind === 'approval' && l && (
             <>
               <Banner tone="warn" icon={<Clock size={15} />}>
-                <span className="t-sm"><b>Waiting for your approval</b> — typed by {K.st(l.typedBy).name}, {relTime(l.updated)}.</span>
+                <span className="t-sm"><b>Waiting for your approval.</b> Typed by {K.st(l.typedBy).name}, {relTime(l.updated)}.</span>
               </Banner>
               <div className="card card-flat" style={{ background: '#fff', color: '#151B18', padding: '26px 30px', fontSize: 13, lineHeight: 1.7 }}>
                 <div style={{ borderBottom: '2px solid #1E4A34', paddingBottom: 10, marginBottom: 18, display: 'flex', justifyContent: 'space-between' }}>

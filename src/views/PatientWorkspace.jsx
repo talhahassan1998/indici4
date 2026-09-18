@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateShort, fmtClock, age, money, invoiceTotals, fmtTime, relTime } from '../lib/format.js';
-import { Chip, FunderChip, Avatar, Banner, Empty } from '../components/Primitives.jsx';
+import { Chip, FunderChip, Avatar, Banner, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Modal, Menu, useAutosave, SavedIndicator } from '../lib/ui.jsx';
 
 const TABS = [
@@ -97,7 +97,7 @@ export default function PatientWorkspace() {
         {tab === 'tests' && <TestsTab p={p} onNew={newTest} />}
         {tab === 'invoices' && <InvoicesTab p={p} />}
         {tab === 'referrals' && <Empty icon={<Share2 size={22} />} title="No referrals on file"
-          body="Referrals in and out — including the referrer, expiry, and session counts." />}
+          body="Referrals in and out, including the referrer, expiry, and session counts." />}
         {tab === 'docs' && <Empty icon={<Copy size={22} />} title="No documents attached"
           body="Drag and drop scans, consent forms and imaging reports here." />}
       </div>
@@ -127,10 +127,10 @@ function Summary({ p }) {
       <div className="col-4 col g-4">
         <section className="card"><div className="card-hd"><h3>Contact</h3></div>
           <div className="card-bd"><dl className="kv">
-            <dt>Mobile</dt><dd>{p.phone || '—'}</dd>
+            <dt>Mobile</dt><dd>{p.phone || <Nil label="No mobile" />}</dd>
             <dt>Email</dt><dd className="truncate">{p.email}</dd>
             <dt>Address</dt><dd>{p.addr}</dd>
-            <dt>Next of kin</dt><dd>{p.nok || '—'}</dd>
+            <dt>Next of kin</dt><dd>{p.nok || <Nil label="Not recorded" />}</dd>
           </dl></div></section>
         <section className="card"><div className="card-hd"><h3>General practice</h3></div>
           <div className="card-bd"><dl className="kv">
@@ -144,7 +144,7 @@ function Summary({ p }) {
           <section className="card"><div className="card-hd"><h3>ACC claim</h3><span className="spacer" />
             <Chip status={p.injury ? 'approved' : 'overdue'} label={p.injury ? 'Active' : 'Incomplete'} /></div>
             <div className="card-bd"><dl className="kv">
-              <dt>Claim number</dt><dd className="t-mono">{p.claim || '—'}</dd>
+              <dt>Claim number</dt><dd className="t-mono">{p.claim || <Nil label="No claim" />}</dd>
               <dt>Date of injury</dt><dd>{p.injury ? fmtDate(p.injury) : <span className="bad-t">Missing</span>}</dd>
             </dl></div></section>
         ) : (
@@ -279,7 +279,7 @@ function RxTab({ p, onNew }) {
     <div className="col g-4">
       {p.alerts.length > 0 && (
         <Banner tone="bad" icon={<TriangleAlert size={16} />}>
-          <b>Recorded allergies — checked on every prescription</b><br />
+          <b>Recorded allergies, checked on every prescription</b><br />
           <span className="t-sm">{p.alerts.join(' · ')}</span>
         </Banner>
       )}
@@ -366,7 +366,7 @@ function RxModal({ close, p, toast, onDone }) {
       med: medId, pharmacy, status: viaPrint ? 'dispensed' : 'sent', qty: Number(qty), repeats: Number(repeats) });
     close(); onDone();
     toast(viaPrint ? 'Prescription printed' : 'Prescription sent',
-      viaPrint ? `${m.name} — signed and printed` : `${m.name} → ${K.pharm(pharmacy).name}`, 'ok');
+      viaPrint ? `${m.name}, signed and printed` : `${m.name} → ${K.pharm(pharmacy).name}`, 'ok');
   };
 
   return (
@@ -380,12 +380,12 @@ function RxModal({ close, p, toast, onDone }) {
       <div className="col g-4">
         <div className="field"><label className="label" htmlFor="rxMed">Medicine</label>
           <select className="select" id="rxMed" value={medId} onChange={e => pick(e.target.value)}>
-            {K.medicines.map(x => <option value={x.id} key={x.id}>{x.name} {x.form}{x.funded ? '' : ' — unfunded'}</option>)}
+            {K.medicines.map(x => <option value={x.id} key={x.id}>{x.name} {x.form}{x.funded ? '' : ' · unfunded'}</option>)}
           </select></div>
         {clash && (
           <>
             <Banner tone="bad" icon={<TriangleAlert size={16} />}>
-              <b>Allergy warning — {m.name} is a {clash.cls}</b><br />
+              <b>Allergy warning. {m.name} is a {clash.cls}</b><br />
               <span className="t-sm">This patient’s record says: <b>{clash.alert}</b>. Choose another medicine, or record why you are overriding.</span>
             </Banner>
             <div className="field"><label className="label" htmlFor="rxOverride">Reason for overriding <span className="req">*</span></label>
@@ -401,11 +401,11 @@ function RxModal({ close, p, toast, onDone }) {
         </div>
         <div className="field"><label className="label" htmlFor="rxDose">Directions</label>
           <textarea className="textarea" id="rxDose" rows={2} value={dose} onChange={e => setDose(e.target.value)} /></div>
-        {!m.funded && <Banner tone="warn"><span className="t-sm">Not funded by Pharmac — the patient pays the full cost.</span></Banner>}
+        {!m.funded && <Banner tone="warn"><span className="t-sm">Not funded by Pharmac. The patient pays the full cost.</span></Banner>}
         <div className="divider" />
         <div className="field"><label className="label" htmlFor="rxPharm">Send electronically to</label>
           <select className="select" id="rxPharm" value={pharmacy} onChange={e => setPharmacy(e.target.value)}>
-            {K.pharmacies.map(x => <option value={x.id} key={x.id}>{x.name} — {x.addr}</option>)}
+            {K.pharmacies.map(x => <option value={x.id} key={x.id}>{x.name} · {x.addr}</option>)}
           </select>
           <span className="hint">The pharmacy receives it before the patient arrives.</span></div>
       </div>

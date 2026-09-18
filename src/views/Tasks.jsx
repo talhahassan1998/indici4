@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { SquareKanban, List, Plus, Clock, Check, User } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateShort, daysOverdue } from '../lib/format.js';
-import { Chip, Avatar, Empty } from '../components/Primitives.jsx';
+import { Chip, Avatar, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Modal } from '../lib/ui.jsx';
 
 const COLS = [
@@ -110,7 +110,7 @@ export default function Tasks() {
                   onClick={() => { t.col = t.col === 'done' ? 'todo' : 'done'; force(n => n + 1); }}><Check size={11} /></span></td>
                 <td><b className={`t-sm ${t.col === 'done' ? 'subtle' : ''}`}
                   style={t.col === 'done' ? { textDecoration: 'line-through' } : undefined}>{t.title}</b></td>
-                <td className="t-sm">{p ? `${p.first} ${p.last}` : <span className="subtle">—</span>}</td>
+                <td className="t-sm">{p ? `${p.first} ${p.last}` : <Nil label="No patient linked" />}</td>
                 <td><span className="row g-2"><Avatar id={t.who} size="xs" /><span className="t-sm">{K.st(t.who).name}</span></span></td>
                 <td><span className="chip">{t.tag}</span></td>
                 <td className={`t-sm ${od ? 'bad-t' : ''}`}>{fmtDate(t.due)}</td>
@@ -145,7 +145,7 @@ function NewTask({ close, ptId, toast, onDone }) {
         <div className="grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
           <div className="field"><label className="label" htmlFor="tkWho">Assign to</label>
             <select className="select" id="tkWho" value={who} onChange={e => setWho(e.target.value)}>
-              {K.staff.map(s => <option value={s.id} key={s.id}>{s.name} — {s.role}</option>)}</select></div>
+              {K.staff.map(s => <option value={s.id} key={s.id}>{s.name} · {s.role}</option>)}</select></div>
           <div className="field"><label className="label" htmlFor="tkDue">Due</label>
             <input className="input" id="tkDue" type="date" value={due} onChange={e => setDue(e.target.value)} /></div>
         </div>
@@ -153,7 +153,7 @@ function NewTask({ close, ptId, toast, onDone }) {
           <div className="field"><label className="label" htmlFor="tkPt">Link to patient</label>
             <select className="select" id="tkPt" value={pt} onChange={e => setPt(e.target.value)}>
               <option value="">No patient</option>
-              {K.patients.slice(0, 20).map(p => <option value={p.id} key={p.id}>{p.first} {p.last} — {p.nhi}</option>)}</select></div>
+              {K.patients.slice(0, 20).map(p => <option value={p.id} key={p.id}>{p.first} {p.last} · {p.nhi}</option>)}</select></div>
           <div className="field"><label className="label" htmlFor="tkTag">Tag</label>
             <select className="select" id="tkTag" value={tag} onChange={e => setTag(e.target.value)}>
               {['Imaging', 'ACC', 'Theatre', 'Billing', 'Letters', 'Admin', 'Clinical', 'Recall'].map(x => <option key={x}>{x}</option>)}</select></div>

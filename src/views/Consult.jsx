@@ -49,7 +49,7 @@ const TEMPLATES = {
     a: 'Medial meniscal tear.', p: 'MRI right knee. Review with result in four weeks. Selected duties.' },
   'Post-operative review': { s: 'Routine post-operative review.', o: 'Wound clean and dry. Sutures intact.',
     a: 'Satisfactory progress.', p: 'Remove sutures at 14 days. Physiotherapy.' },
-  'ACC review': { s: 'ACC review — work capacity.', o: 'Improving range of movement.',
+  'ACC review': { s: 'ACC review for work capacity.', o: 'Improving range of movement.',
     a: 'Progressing as expected.', p: 'ACC45 updated. Fit for selected duties. Review six weeks.' },
 };
 
@@ -128,7 +128,7 @@ export default function Consult() {
         {SOAP.filter(x => !note[x.k].trim()).length > 0 ? (
           <Banner tone="warn" icon={<TriangleAlert size={15} />}>
             <span className="t-sm"><b>{SOAP.filter(x => !note[x.k].trim()).map(x => x.label).join(', ')}</b> empty.
-            You can still sign — the note records what you wrote.</span>
+            You can still sign. The note records what you wrote.</span>
           </Banner>
         ) : <Banner tone="ok" icon={<Check size={15} />}><span className="t-sm">All four SOAP sections completed.</span></Banner>}
         <dl className="kv">
@@ -167,7 +167,7 @@ export default function Consult() {
           const prev = (K.timeline[p.id] || []).find(e => e.kind === 'note');
           if (!prev) return toast('No earlier consult', 'Nothing to copy forward.', 'warn');
           setNote(n => ({ ...n, s: prev.body })); bump();
-          toast('Copied forward', 'Pasted into Subjective — edit before signing.', 'ok');
+          toast('Copied forward', 'Pasted into Subjective. Edit before signing.', 'ok');
         }}><Copy size={14} /> Copy last consult</button>
       </div>
       <div className="card-bd-tight row g-4 wrap" style={{ borderBottom: '1px solid var(--line-faint)' }}>
@@ -186,9 +186,9 @@ export default function Consult() {
               <label className="label" htmlFor={`soap-${sx.k}`}>{sx.label}</label>
               <button className="btn btn-ghost btn-sm" data-dots={sx.k} onClick={e => setMenu({ anchor: e.currentTarget, items: [
                 { heading: 'Insert a dot phrase' },
-                { icon: <Plus size={15} />, label: '.normalknee — normal knee examination',
+                { icon: <Plus size={15} />, label: '.normalknee · normal knee examination',
                   action: () => { setSoap(sx.k, (note[sx.k] ? note[sx.k] + ' ' : '') + 'Full range of movement. No effusion. Ligaments stable. Neurovascularly intact.'); } },
-                { icon: <Plus size={15} />, label: '.noredflags — no red flags',
+                { icon: <Plus size={15} />, label: '.noredflags · no red flags',
                   action: () => { setSoap(sx.k, (note[sx.k] ? note[sx.k] + ' ' : '') + 'No night pain, no weight loss, no fevers.'); } },
               ]})}><Plus size={12} /> Go to dots</button>
             </div>
@@ -372,7 +372,7 @@ function Prompts({ p, toast }) {
             <span className="t-xs subtle" style={{ display: 'block' }}>{r.kind} · due {fmtDate(r.due)}</span>
             <span className="row g-2 mt-2">
               <button className="btn btn-soft btn-sm" onClick={() => toast('Recall actioned', r.text, 'ok')}><Check size={12} /> Action</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => toast('Recall deferred', `${r.text} — pushed out three months.`, 'info')}>Defer</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => toast('Recall deferred', `${r.text}, pushed out three months.`, 'info')}>Defer</button>
             </span>
           </span>
           <Chip status={r.status === 'overdue' ? 'overdue' : r.status === 'due' ? 'pending' : 'draft'}
@@ -423,7 +423,7 @@ function ProblemsPanel({ p }) {
       <div className="divider" />
       <div className="col g-2"><span className="t-eyebrow">Allergies</span>
         {p.alerts.length ? p.alerts.map(a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>)
-          : <span className="t-sm subtle">None recorded — confirm with the patient.</span>}
+          : <span className="t-sm subtle">None recorded. Confirm with the patient.</span>}
       </div>
     </div>
   );
@@ -446,7 +446,7 @@ function Transcribe({ toast }) {
         <span className="mic-timer">00:00</span></div>
       <button className="btn btn-primary btn-block" onClick={() => toast('Transcribing', 'Recording started. Tell the patient a scribe is in use.', 'ok')}>
         <Mic size={15} /> Start transcribing</button>
-      <div className="ai-flag"><TriangleAlert size={14} /> Draft only — you review before it enters the note</div>
+      <div className="ai-flag"><TriangleAlert size={14} /> Draft only. You review it before it enters the note</div>
       <p className="t-xs subtle">The transcript fills Subjective and Objective. Audio is deleted once the note is signed.</p>
     </div>
   );

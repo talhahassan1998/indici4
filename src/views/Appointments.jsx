@@ -205,7 +205,7 @@ function BookingPanel({ ptId, setPtId, onClose, onBook, toast }) {
         </div>
         <div className="field"><label className="label" htmlFor="bkType">Appointment type <span className="req">*</span></label>
           <select className="select" id="bkType" value={typeId} onChange={e => setTypeId(e.target.value)}>
-            {K.apptTypes.map(t => <option value={t.id} key={t.id}>{t.name} — {t.mins} min · {t.price ? money(t.price) : 'No charge'}</option>)}
+            {K.apptTypes.map(t => <option value={t.id} key={t.id}>{t.name}, {t.mins} min · {t.price ? money(t.price) : 'No charge'}</option>)}
           </select></div>
         <div className="field"><label className="label" htmlFor="bkTime">Start time</label>
           <input className="input" id="bkTime" type="time" value={time} onChange={e => setTime(e.target.value)} /></div>

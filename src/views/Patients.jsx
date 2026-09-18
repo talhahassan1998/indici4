@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, age, money } from '../lib/format.js';
-import { Avatar, Switch, Empty } from '../components/Primitives.jsx';
+import { Avatar, Switch, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Menu } from '../lib/ui.jsx';
 
 const COLS = [
@@ -135,7 +135,7 @@ export default function Patients() {
       <div className="ps-head">
         <div className="page-title">
           <h1 className="t-h2">Search Patient</h1>
-          <span className="page-sub">Kora Specialists · Newmarket · <b className="num">{K.patients.length.toLocaleString('en-NZ')}</b> records</span>
+          <span className="page-sub">Kora Specialists, Newmarket</span>
         </div>
         <span className="spacer" />
         <div className="row g-2">
@@ -233,11 +233,11 @@ export default function Patients() {
                   <td className="t-mono t-xs">{p.nhi}</td>
                   <td className="t-mono t-xs subtle">{p.chart}</td>
                   <td className="wrap-cell t-xs">{p.addr}</td>
-                  <td className="t-xs">{landline || <span className="subtle">—</span>}</td>
-                  <td className="t-xs">{mobile || <span className="subtle">—</span>}</td>
+                  <td className="t-xs">{landline || <Nil label="No landline" />}</td>
+                  <td className="t-xs">{mobile || <Nil label="No mobile" />}</td>
                   <td className="t-xs">{K.st(p.provider).name.replace(/^(Dr|Nurse) /, '')}</td>
                   <td>{p.fund === 'F' ? <span className="chip chip-ok">F</span> : <span className="subtle">N</span>}</td>
-                  <td>{p.csc ? <span className="chip chip-warm">CSC</span> : <span className="subtle">—</span>}</td>
+                  <td>{p.csc ? <span className="chip chip-warm">CSC</span> : <Nil label="No Community Services Card" />}</td>
                   <td>{p.enrol === 'NES' ? <span className="chip chip-ok">NES</span> : <span className="chip">U</span>}</td>
                   <td>{p.reg}</td>
                   <td className="t-xs">{p.payGrp}</td>
@@ -246,7 +246,7 @@ export default function Patients() {
                   <td><span className="p-actions">
                     {ACTIONS.map((a, i) => a.sep ? <span className="pa-sep" key={i} /> : (
                       <button className="pa tip" key={a.id} data-tip={a.label}
-                        aria-label={`${a.label} — ${p.first} ${p.last}`}
+                        aria-label={`${a.label}, ${p.first} ${p.last}`}
                         onClick={e => { e.stopPropagation(); act(a.id, p.id, e.currentTarget); }}>
                         <a.Icon size={15} />
                       </button>

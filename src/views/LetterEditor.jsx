@@ -82,7 +82,7 @@ export default function LetterEditor() {
           <button className="btn btn-ghost btn-sm" onClick={e => setMenu({ anchor: e.currentTarget, items: [
             { heading: 'Insert merge field' },
             ...[['Patient name', `${pt.first} ${pt.last}`], ['NHI', pt.nhi], ['Date of birth', fmtDate(pt.dob)],
-                ['ACC claim', pt.claim || '—'], ['Today’s date', fmtDate(K.TODAY)]].map(([l, v]) => ({
+                ['ACC claim', pt.claim || 'not recorded'], ['Today’s date', fmtDate(K.TODAY)]].map(([l, v]) => ({
               label: l, icon: <Plus size={15} />, action: () => insert(`<span class="merge">${v}</span> `),
             })),
           ]})}><Plus size={13} /> Merge field</button>
@@ -93,10 +93,10 @@ export default function LetterEditor() {
         <div className="ed-recipients">
           <div className="recip-row"><span className="label">To</span>
             <div className="recip-chips">
-              <span className="chip chip-accent chip-lg chip-removable">{to.name} — {to.practice}</span>
+              <span className="chip chip-accent chip-lg chip-removable">{to.name} · {to.practice}</span>
               <button className="btn btn-ghost btn-sm" data-act="pickto" onClick={e => setMenu({ anchor: e.currentTarget, items: [
                 { heading: 'Suggested from the patient record' },
-                ...K.gps.map(g => ({ label: `${g.name} — ${g.practice}`, icon: <Check size={15} />,
+                ...K.gps.map(g => ({ label: `${g.name} · ${g.practice}`, icon: <Check size={15} />,
                   action: () => { setTo(g); bump(); toast('Recipient changed', g.practice, 'ok'); } })),
               ]})}><ChevronDown size={13} /> Change</button>
             </div></div>
@@ -142,7 +142,7 @@ export default function LetterEditor() {
                   <Send size={15} /> Approve and send via {channel}</button></>}>
               <div className="col g-4">
                 <div className="card card-flat card-bd col g-3">
-                  <div className="row between"><span className="t-eyebrow">To</span><span className="t-sm"><b>{to.name}</b> — {to.practice}</span></div>
+                  <div className="row between"><span className="t-eyebrow">To</span><span className="t-sm"><b>{to.name}</b> · {to.practice}</span></div>
                   <div className="row between"><span className="t-eyebrow">Channel</span><span className="t-sm">{channel}</span></div>
                   <div className="row between"><span className="t-eyebrow">Signed by</span><span className="t-sm">{cl.name} · MCNZ {cl.mcnz}</span></div>
                 </div>
@@ -216,7 +216,7 @@ export default function LetterEditor() {
             {secs < 3 && !draft && <span className="hint">Record at least a few seconds to generate.</span>}
             {draft && (
               <>
-                <div className="ai-flag"><TriangleAlert size={14} /> AI draft — review before use</div>
+                <div className="ai-flag"><TriangleAlert size={14} /> AI draft. Review before use</div>
                 <div className="ai-draft" dangerouslySetInnerHTML={{ __html: draft }} />
                 <div className="row g-2">
                   <button className="btn btn-primary grow" data-act="insert" onClick={() => {
@@ -263,7 +263,7 @@ function TemplateModal({ close, tpl, onInsert, toast }) {
       icon={<LayoutTemplate size={15} />} onClose={close}
       footer={<><button className="btn btn-ghost" onClick={close}>Cancel</button>
         <button className="btn btn-primary" data-ins onClick={() => {
-          const rows = tpl.fields.map(f => `<b>${f.label}:</b> <span class="merge">${vals[f.k] || '—'}</span>`);
+          const rows = tpl.fields.map(f => `<b>${f.label}:</b> <span class="merge">${vals[f.k] || 'not recorded'}</span>`);
           onInsert(`<h2>${tpl.name}</h2><p>${rows.join('<br>')}</p>`);
           close(); toast('Template inserted', tpl.name, 'ok');
         }}><Plus size={15} /> Insert into letter</button></>}>

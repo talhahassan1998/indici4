@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, LayoutTemplate, Filter, Sparkles, Mail } from 'lucide-react';
 import K from '../data/sample.js';
 import { relTime } from '../lib/format.js';
-import { Chip, Avatar, Empty } from '../components/Primitives.jsx';
+import { Chip, Avatar, Empty, Nil } from '../components/Primitives.jsx';
 
 export default function Letters() {
   const nav = useNavigate();
@@ -43,7 +43,7 @@ export default function Letters() {
                 <span className="t-sm">{p.first} {p.last}<br /><span className="t-xs subtle t-mono">{p.nhi}</span></span></span></td>
               <td className="t-sm">{K.gp(l.to).name}<br /><span className="t-xs subtle">{K.gp(l.to).practice}</span></td>
               <td className="t-sm">{K.st(l.cl).name}</td>
-              <td className="t-sm">{l.typedBy ? K.st(l.typedBy).name : <span className="subtle">—</span>}</td>
+              <td className="t-sm">{l.typedBy ? K.st(l.typedBy).name : <Nil label="Not typed yet" />}</td>
               <td className="t-sm">{l.channel}</td><td className="t-sm">{relTime(l.updated)}</td>
               <td><Chip status={l.status} /></td>
             </tr>

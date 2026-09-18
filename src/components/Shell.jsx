@@ -193,7 +193,7 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
               items: [
                 { heading: 'View the app as' },
                 ...Object.entries(ROLES).map(([k, r]) => ({
-                  icon: <User size={15} />, label: `${r.label} — ${r.desc.split(' · ')[0]}`,
+                  icon: <User size={15} />, label: `${r.label} · ${r.desc.split(' · ')[0]}`,
                   action: () => setRole(k),
                 })),
               ],

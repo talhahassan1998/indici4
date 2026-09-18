@@ -15,6 +15,13 @@ export default defineConfig({
         main: 'index.html',
         login: 'login.html',
       },
+      // Stable, unhashed filenames: the build is republished to a static host
+      // in place, and hashed names leave an orphan behind on every deploy.
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name][extname]',
+      },
     },
   },
 });

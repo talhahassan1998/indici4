@@ -287,6 +287,17 @@ Sidebar, four labelled groups, 254px expanded and 68px collapsed. Count badges
 sit on the right of the item and carry a tone (`bad` for overdue, `warm` for
 waiting). Active item: `--accent-soft` fill plus a 3px accent edge.
 
+**The collapse control lives in the sidebar**, in the brand row, because it is
+the only thing on screen whose whole job is that panel. Collapsed, the brand
+row stacks: the mark, then the control that brings the sidebar back. The foot
+of the sidebar names the practice and the build, which is what people quote to
+support.
+
+**The account lives in the top-right corner** — avatar, name, role, chevron —
+where people look for it, next to the notification bell. Below 1180px the name
+and role drop and the avatar carries it. Both placements are asserted in the
+smoke suite so they cannot drift back.
+
 ---
 
 ## 5. Layout Principles

@@ -27,9 +27,17 @@
 }
 .brand {
   display: flex; align-items: center; gap: 10px;
-  height: var(--topbar-h); padding: 0 var(--s-4); flex: none;
+  height: var(--topbar-h); padding: 0 10px 0 var(--s-4); flex: none;
   border-bottom: 1px solid var(--line-faint);
 }
+.brand-name { flex: 1 1 auto; }
+/* The collapse control, in the panel it collapses. */
+.rail-toggle {
+  flex: none; width: 40px; height: 40px; border-radius: var(--r-sm);
+  display: grid; place-items: center; color: var(--text-subtle);
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.rail-toggle:hover { background: var(--accent-soft); color: var(--accent-text); }
 .brand-mark {
   width: 30px; height: 30px; border-radius: var(--r-xs); flex: none;
   background: var(--pou-700);
@@ -68,22 +76,27 @@
 .app[data-rail="true"] .nav-label,
 .app[data-rail="true"] .nav-group-label,
 .app[data-rail="true"] .brand-name,
-.app[data-rail="true"] .sidebar-ft .u-meta { display: none; }
+.app[data-rail="true"] .sidebar-ft .sf-org,
+.app[data-rail="true"] .sidebar-ft .sf-ver { display: none; }
 .app[data-rail="true"] .nav-item { justify-content: center; padding: 0; }
 .app[data-rail="true"] .nav-item .badge-count { position: absolute; top: 3px; right: 6px; }
-.app[data-rail="true"] .brand { justify-content: center; padding: 0; }
+/* Collapsed, the brand row stacks: the mark, then the control that brings the
+   sidebar back. 68px is wide enough for both, one above the other. */
+.app[data-rail="true"] .brand {
+  flex-direction: column; justify-content: center; gap: 6px;
+  height: auto; padding: var(--s-3) 0;
+}
 .app[data-rail="true"] .nav-group-label { display: block; height: 1px; padding: 0; margin: var(--s-3) 10px; background: var(--line-faint); overflow: hidden; color: transparent; }
 
-.sidebar-ft { flex: none; padding: var(--s-3); border-top: 1px solid var(--line-faint); }
-.u-card {
-  display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 7px 8px; border-radius: var(--r-sm);
-  transition: background var(--dur-1) var(--ease);
+/* The account moved to the top right, so the foot of the sidebar says which
+   practice and which build you are looking at, which is what people ask
+   support about. */
+.sidebar-ft {
+  flex: none; padding: var(--s-3) var(--s-4); border-top: 1px solid var(--line-faint);
+  display: flex; flex-direction: column; gap: 1px; min-height: 52px; justify-content: center;
 }
-.u-card:hover { background: var(--surface-3); }
-.u-meta { min-width: 0; text-align: left; line-height: 1.25; }
-.u-meta b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.u-meta span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
+.sf-org { font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text-muted); }
+.sf-ver { font-size: var(--fs-xs); color: var(--text-subtle); }
 
 /* ------------------------------------------------------------- Topbar */
 .app-main { min-width: 0; display: flex; flex-direction: column; }
@@ -119,7 +132,29 @@
 /* `flex: none` meant the cluster kept its full width and pushed past the bar
    at anything under about 1500px, which is where the top of the screen looked
    broken. It shrinks now; the search beside it gives up space first. */
-.topbar-actions { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; min-width: 0; }
+.topbar-actions {
+  display: flex; align-items: center; gap: 6px;
+  flex: 0 1 auto; min-width: 0;
+  /* The search is capped at 620px, so the space it does not take would
+     otherwise pool after this cluster and leave the account short of the
+     corner. `auto` pushes the cluster to the edge and puts the gap in front. */
+  margin-left: auto;
+}
+.tb-divider { width: 1px; height: 26px; background: var(--line); flex: none; margin: 0 4px; }
+
+/* The account button, top right. It is a real target, so it takes the control
+   height like everything else on the bar. */
+.u-card {
+  display: flex; align-items: center; gap: 9px; flex: none;
+  height: var(--h-md); padding: 0 8px 0 6px; border-radius: var(--r-sm);
+  transition: background var(--dur-1) var(--ease);
+}
+.u-card:hover { background: var(--surface-3); }
+.u-card .ic { color: var(--text-subtle); }
+.u-meta { min-width: 0; text-align: left; line-height: 1.2; }
+.u-meta b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); white-space: nowrap; }
+.u-meta span { display: block; font-size: var(--fs-xs); color: var(--text-subtle); white-space: nowrap; }
+@media (max-width: 1180px) { .u-card .u-meta { display: none; } }
 .role-switch {
   display: flex; align-items: center; gap: 7px; height: var(--h-md); padding: 0 12px;
   border-radius: var(--r-sm); background: var(--surface);

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, CalendarDays, Users, Inbox, Mail, SquareCheckBig, ReceiptText,
-  ShieldCheck, ChartColumn, Settings, Search, PanelLeft, Bell, Moon, Sun, Sparkles,
+  ShieldCheck, ChartColumn, Settings, Search, PanelLeftClose, PanelLeftOpen, Bell, Moon, Sun, Sparkles,
   ChevronDown, User, LogOut,
 } from 'lucide-react';
 import K from '../data/sample.js';
@@ -93,6 +93,9 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
   return (
     <div className="app" data-rail={String(rail)}>
       <nav className="app-sidebar" aria-label="Main">
+        {/* The control that collapses the sidebar belongs to the sidebar, not
+            to the bar above it: it is the only thing on screen whose whole
+            job is that panel. */}
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -100,6 +103,10 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
             </svg>
           </span>
           <span className="brand-name"><b>Kora Health</b><span>Newmarket</span></span>
+          <button className="rail-toggle tip" data-tip={rail ? 'Expand sidebar' : 'Collapse sidebar'}
+            onClick={() => setRail(r => !r)} aria-label="Toggle sidebar" aria-expanded={!rail}>
+            {rail ? <PanelLeftOpen size={19} /> : <PanelLeftClose size={19} />}
+          </button>
         </div>
 
         <div className="nav">
@@ -122,30 +129,13 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
         </div>
 
         <div className="sidebar-ft">
-          <button className="u-card" onClick={e => setMenu({
-            anchor: e.currentTarget,
-            items: [
-              { heading: user.name },
-              { icon: <User size={15} />, label: 'My profile & signature', action: () => nav('/admin/users') },
-              { icon: theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />, label: theme === 'dark' ? 'Light mode' : 'Dark mode', action: toggleTheme },
-              '-',
-              { icon: <LogOut size={15} />, label: 'Sign out', danger: true, action: onSignOut },
-            ],
-          })}>
-            <Avatar id={user.id} />
-            <span className="u-meta grow"><b>{user.name}</b><span>{user.spec}</span></span>
-            <ChevronDown size={14} className="ic" />
-          </button>
+          <span className="sf-org">Kora Specialists</span>
+          <span className="sf-ver">Newmarket · v2.4</span>
         </div>
       </nav>
 
       <div className="app-main">
         <header className="app-topbar">
-          <button className="btn btn-ghost btn-icon tip" data-tip={rail ? 'Expand sidebar' : 'Collapse sidebar'}
-            onClick={() => setRail(r => !r)} aria-label="Toggle sidebar" aria-expanded={!rail}>
-            <PanelLeft size={17} />
-          </button>
-
           <div className="global-search" role="search">
             <span className="ic-lead"><Search size={16} /></span>
             <input className="input" ref={searchRef} type="search" value={q} autoComplete="off"
@@ -209,6 +199,25 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
             <button className="btn btn-ghost btn-icon tip" data-tip={theme === 'dark' ? 'Light mode' : 'Dark mode'}
               onClick={toggleTheme} aria-label="Toggle dark mode">
               {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+
+            <span className="tb-divider" aria-hidden="true" />
+
+            {/* Who you are signed in as, in the corner people look for it.
+                Below 1180px the name drops and the avatar carries it. */}
+            <button className="u-card" aria-label={`Account: ${user.name}`} onClick={e => setMenu({
+              anchor: e.currentTarget,
+              items: [
+                { heading: `${user.name} · ${user.spec}` },
+                { icon: <User size={15} />, label: 'My profile & signature', action: () => nav('/admin/users') },
+                { icon: theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />, label: theme === 'dark' ? 'Light mode' : 'Dark mode', action: toggleTheme },
+                '-',
+                { icon: <LogOut size={15} />, label: 'Sign out', danger: true, action: onSignOut },
+              ],
+            })}>
+              <Avatar id={user.id} size="sm" />
+              <span className="u-meta"><b>{user.name}</b><span>{user.spec}</span></span>
+              <ChevronDown size={15} className="ic" />
             </button>
           </div>
         </header>

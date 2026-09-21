@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Search, Plus, RefreshCw, Check, TriangleAlert, ReceiptText, Send, CreditCard,
-  EllipsisVertical, Download, Trash2, Printer, Copy, Eye, Pencil, ChevronDown,
+  EllipsisVertical, Download, Trash2, Printer, Copy, Eye, Pencil,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { money, fmtDate, fmtDateShort, fmtClock, invoiceTotals, daysOverdue } from '../lib/format.js';
@@ -160,24 +160,23 @@ export default function Billing() {
                 <td className="num-cell"><b>{money(t.incl)}</b></td>
                 <td><span className="cell2"><span><Chip status={i.status} /></span>
                   {i.reconciled && <span>matched in Xero</span>}</span></td>
-                {/* Named, like the patient grid. Three unlabelled glyphs per row
-                    is the same problem in a smaller table. */}
+                {/* Vectors on 44px targets, each with its name for a screen
+                    reader and a tooltip for everyone else. The Pay cell is
+                    always here, empty on a settled invoice, so Send and More
+                    stay in a column down the list. */}
                 <td className="act-col"><span className="row-actions">
-                  {/* The Pay cell is always here, empty on a settled invoice,
-                      so Send and More stay in a column down the list instead
-                      of sliding left and right row by row. */}
                   <span>
                     {i.status !== 'paid' && (
-                      <button className="btn btn-secondary btn-sm" data-pay
+                      <button className="act-icon tip" data-tip="Record payment" data-pay
                         aria-label={`Record payment for ${i.id}`}
                         onClick={() => open(close => <PayModal close={close} inv={i} toast={toast} onDone={() => force(n => n + 1)} />)}>
-                        <CreditCard size={16} /> Pay</button>
+                        <CreditCard size={20} /></button>
                     )}
                   </span>
-                  <button className="btn btn-secondary btn-sm" aria-label={`Send ${i.id}`}
+                  <button className="act-icon tip" data-tip="Send invoice" aria-label={`Send ${i.id}`}
                     onClick={() => { if (i.status === 'draft') i.status = 'sent'; force(n => n + 1); toast('Invoice sent', i.id, 'ok'); }}>
-                    <Send size={16} /> Send</button>
-                  <button className="btn btn-ghost btn-sm" aria-label={`More actions for ${i.id}`}
+                    <Send size={20} /></button>
+                  <button className="act-icon tip" data-tip="More actions" aria-label={`More actions for ${i.id}`}
                     onClick={e => setMenu({ anchor: e.currentTarget, items: [
                       { heading: i.id },
                       { icon: <Eye size={15} />, label: 'View invoice', action: () => openInvoice(i) },
@@ -185,7 +184,7 @@ export default function Billing() {
                       { icon: <Printer size={15} />, label: 'Print receipt', action: () => toast('Receipt', 'Sent to the printer.', 'ok') },
                       '-',
                       { icon: <Trash2 size={15} />, label: 'Void invoice', danger: true, action: () => toast('Void', 'Voiding needs a reason and manager approval.', 'warn') },
-                    ]})}>More <ChevronDown size={15} /></button>
+                    ]})}><EllipsisVertical size={20} /></button>
                 </span></td>
               </tr>
             );

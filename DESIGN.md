@@ -311,11 +311,20 @@ hundred rows is a pager nobody uses.
 **The foot of the grid** (`.grid-foot`) totals what the filter is showing. A
 list of money that does not add itself up makes people reach for a calculator.
 
-**Row actions are named and they sit in fixed cells.** Named because three
-unlabelled glyphs per row is the patient grid's old problem in a smaller
-table. Fixed cells because a row that offers two actions and a row that offers
-three otherwise slide past each other, and the right-hand side of the list
-frays. A cell that has nothing to put in it stays empty rather than closing up.
+**Row actions are vectors, not buttons** (`.act-icon`). No border and no fill
+at rest: the glyph and the space around it are the whole control. The target
+is still 44px square, because "it is only an icon" is not a reason to make it
+hard to hit, and every one carries an `aria-label` and a tooltip. One size,
+one stroke, one family, so a column of them reads as a set.
+
+They **sit in fixed cells** of one control width with an even gap. A row that
+offers two actions and a row that offers three otherwise slide past each
+other, and the right-hand side of the list frays. A cell with nothing to put
+in it stays empty rather than closing up.
+
+In the last column a tooltip is anchored to the right edge rather than
+centred: centred, its overhang counts as content in the scroll container and
+the grid grows a horizontal scrollbar for a label nobody has hovered yet.
 
 **A grid should fit the panel it is in.** When it does not, take a column out
 rather than leaving a scrollbar: the invoice list lost its per-row *Excl GST*,

@@ -239,6 +239,8 @@ The prototype was checked in headless Chromium:
 - **Consistency** — one tab design across every track in the product, nothing
   scrolled out of a tab row, and every two-line cell leading with the heavier,
   larger line
-- **Invoice list** — row actions visible without hovering, labelled, 44px, and
-  aligned in columns down the table; the table fits its panel; and the footer
-  totals match the rows on screen, before and after a filter
+- **Row actions** — drawn as vectors with no border or fill, one icon size,
+  44px targets, an accessible name and a tooltip each, evenly spaced and
+  aligned in columns down both grids
+- **Invoice list** — the table fits its panel, and the footer totals match the
+  rows on screen, before and after a filter

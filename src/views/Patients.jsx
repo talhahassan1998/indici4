@@ -4,7 +4,7 @@ import {
   Search, Filter, Plus, Link2, Download, Check, TriangleAlert, User, Pencil, FilePen,
   SquareCheckBig, DollarSign, CalendarDays, Bell, Syringe, House, UserPlus, UserCheck,
   Printer, IdCard, EllipsisVertical, ChevronLeft, ChevronRight, Mail, Pill, FlaskConical,
-  ReceiptText, Copy, ChevronDown,
+  ReceiptText, Copy,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, age, money } from '../lib/format.js';
@@ -33,11 +33,16 @@ const COLS = [
   { k: null,       label: 'Actions' },
 ];
 
-/* The two things someone actually does from a search result. Everything else
-   the old toolbar carried is still here, in a named menu, one press away. */
+/* The things someone actually does from a search result, as vectors on a
+   44px target: no border, no fill, just the glyph with room around it.
+   Everything else the old toolbar carried is still in a named menu, one press
+   away. Each one carries its name for a screen reader and a tooltip for
+   everybody else. */
 const PRIMARY = [
-  { id: 'open',    Icon: User,         label: 'Open' },
-  { id: 'book',    Icon: CalendarDays, label: 'Book' },
+  { id: 'open',    Icon: User,         label: 'Open patient record' },
+  { id: 'book',    Icon: CalendarDays, label: 'Book appointment' },
+  { id: 'letter',  Icon: Mail,         label: 'Write letter' },
+  { id: 'account', Icon: ReceiptText,  label: 'Account and invoices' },
 ];
 
 const MORE = [
@@ -330,12 +335,14 @@ export default function Patients() {
                   <td className={`num-cell ${bal > 0 ? 'bad-t' : 'subtle'}`}>{bal > 0 ? <b>{money(bal)}</b> : '$0.00'}</td>
                   <td><span className="p-actions">
                     {PRIMARY.map(a => (
-                      <button className="btn btn-secondary btn-sm" key={a.id}
+                      <button className="act-icon tip" key={a.id} data-tip={a.label}
+                        aria-label={`${a.label} — ${K.displayName(p)}`}
                         onClick={e => { e.stopPropagation(); act(a.id, p.id, e.currentTarget); }}>
-                        <a.Icon size={16} /> {a.label}
+                        <a.Icon size={20} />
                       </button>
                     ))}
-                    <button className="btn btn-ghost btn-sm" aria-label={`More actions for ${p.first} ${p.last}`}
+                    <button className="act-icon tip" data-tip="More actions"
+                      aria-label={`More actions for ${p.first} ${p.last}`}
                       onClick={e => {
                         e.stopPropagation();
                         setMenu({ anchor: e.currentTarget, items: [
@@ -345,7 +352,7 @@ export default function Patients() {
                             action: () => act(m.id, p.id, e.currentTarget),
                           })),
                         ]});
-                      }}>More <ChevronDown size={15} /></button>
+                      }}><EllipsisVertical size={20} /></button>
                   </span></td>
                 </tr>
               );

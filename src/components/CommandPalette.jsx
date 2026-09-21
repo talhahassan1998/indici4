@@ -8,7 +8,7 @@ import {
 import K from '../data/sample.js';
 import { age } from '../lib/format.js';
 
-export default function CommandPalette({ onClose, nav, theme, toggleTheme, toast }) {
+export default function CommandPalette({ onClose, nav, theme, toggleTheme, toast, onSignOut }) {
   const [q, setQ] = useState('');
   const [active, setActive] = useState(0);
   const inputRef = useRef(null);
@@ -31,7 +31,7 @@ export default function CommandPalette({ onClose, nav, theme, toggleTheme, toast
       go('ACC submissions', 'Validate and submit', ShieldCheck, '/acc'),
       go('Admin settings', 'Clinic, users, templates', Settings, '/admin'),
       { g: 'Go to', label: 'Design system', sub: 'Palette, type, components', Icon: Sparkles, run: () => nav('/styleguide') },
-      { g: 'Go to', label: 'Sign-in screen', sub: 'View the authentication design', Icon: Lock, run: () => { window.location.href = './login.html'; } },
+      { g: 'Actions', label: 'Sign out', sub: 'End this session and return to sign-in', Icon: Lock, run: onSignOut },
       { g: 'Actions', label: theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode', sub: 'Toggle appearance', Icon: theme === 'dark' ? Sun : Moon, run: toggleTheme },
       { g: 'Actions', label: 'Sync items to Xero', sub: 'Push today’s invoices', Icon: RefreshCw, run: () => toast('Xero sync started', '5 invoices queued for sync.', 'info') },
       { g: 'Actions', label: 'Submit ACC batch', sub: '3 invoices ready', Icon: Send, run: () => nav('/acc') },
@@ -41,7 +41,7 @@ export default function CommandPalette({ onClose, nav, theme, toggleTheme, toast
       sub: `${p.nhi} · ${age(p.dob)}y · ${p.funder}`, Icon: User, run: () => nav(`/patient/${p.id}`),
     }));
     return list;
-  }, [nav, theme, toggleTheme, toast]);
+  }, [nav, theme, toggleTheme, toast, onSignOut]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();

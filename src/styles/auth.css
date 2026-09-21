@@ -1,173 +1,270 @@
 /* ==========================================================================
-   Kora Health — authentication
-   Split canvas: a quiet brand panel that carries real product substance,
-   and a form column sized for a keyboard, not a marketing page.
+   Kora Health - sign-in
+
+   One dark canvas rather than a split screen, with the content weighted to
+   the left and the contour field breathing in the space that is left. The
+   surface redefines the token subset it needs, so every shared component
+   (input, button, switch, chip) renders correctly on it without a single
+   component override.
    ========================================================================== */
 
 .auth {
+  --surface:       #12211A;
+  --surface-2:     #16281E;
+  --surface-3:     #1C3326;
+  --text:          #E9F1EB;
+  --text-muted:    #A7BCAF;
+  --text-subtle:   #90A89A;
+  --line:          #27402F;
+  --line-strong:   #365343;
+  --line-faint:    #1E3427;
+  --line-field:    #6E8D7A;
+  --accent:        #29A459;
+  --accent-hover:  #3DB86C;
+  --accent-press:  #58CA83;
+  --accent-soft:   rgba(41,164,89,.14);
+  --accent-soft-2: rgba(41,164,89,.24);
+  --accent-text:   #6ED295;
+  --text-on-accent:#04180C;
+  --focus:         #4CC77E;
+  --focus-halo:    rgba(76,199,126,.30);
+
+  position: relative;
+  min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(430px, 0.95fr);
-  min-height: 100vh;
-  background: var(--bg);
+  grid-template-rows: auto 1fr auto;
+  background: #061A0F;
+  color: var(--text);
+  overflow: hidden;
 }
 
-/* ---------------------------------------------------------- brand panel */
-.auth-brand {
-  position: relative; overflow: hidden;
-  display: flex; flex-direction: column; justify-content: space-between;
-  padding: var(--s-8) var(--s-9);
-  color: #fff;
-  background: var(--pou-800);
+/* The contour field sits under everything, never over content. */
+.brand-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.auth::after {
+  /* Settle the field toward the left so the panel always has a quiet ground. */
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(100deg, #061A0F 26%, rgba(6,26,15,.72) 48%, rgba(6,26,15,0) 78%);
 }
-/* A fine ruled field, like graph paper on a clinic form — flat colour with a
-   texture, rather than a gradient standing in for an idea. */
-.auth-brand::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
-  background-image:
-    repeating-linear-gradient(to right, rgba(255,255,255,.05) 0 1px, transparent 1px 34px),
-    repeating-linear-gradient(to bottom, rgba(255,255,255,.05) 0 1px, transparent 1px 34px);
-  mask-image: linear-gradient(115deg, #000 10%, transparent 72%);
+/* Name the children explicitly: a `.auth > *` rule here would also catch the
+   scene and knock it out of absolute positioning, turning it into a grid row. */
+.auth > .auth-bar,
+.auth > .auth-stage,
+.auth > .auth-foot { position: relative; z-index: 2; }
+
+/* ------------------------------------------------------------------ top bar */
+.auth-bar {
+  display: flex; align-items: center; gap: var(--s-4);
+  padding: 18px var(--s-7);
+  border-bottom: 1px solid rgba(255,255,255,.07);
 }
-
-.auth-wordmark { display: flex; align-items: center; gap: 11px; position: relative; }
-.auth-wordmark .brand-mark { width: 36px; height: 36px; border-radius: 11px; background: rgba(255,255,255,.14);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
-.auth-wordmark .brand-mark svg { width: 21px; height: 21px; }
-.auth-wordmark b { font-family: var(--font-display); font-size: var(--fs-lg);
-  font-weight: 700; letter-spacing: -0.01em; text-transform: none; }
-/* Only the subtitle, not the wrapper — otherwise the wordmark inherits it. */
-.auth-wordmark > span > span { font-size: var(--fs-2xs); letter-spacing: 0.12em;
-  text-transform: uppercase; color: rgba(255,255,255,.60); font-weight: var(--fw-semi);
-  display: block; line-height: 1.2; margin-top: 2px; }
-
-.auth-pitch { position: relative; max-width: 30ch; }
-.auth-pitch h1 { font-family: var(--font-display); font-size: var(--fs-4xl); line-height: 1.08;
-                 font-weight: 700; letter-spacing: -0.02em; }
-.auth-pitch p { margin-top: var(--s-4); font-size: var(--fs-md); line-height: var(--lh-base); color: rgba(255,255,255,.74); max-width: 42ch; }
-
-/* Operational notices — the login screen is where a practice actually reads them. */
-.notice-stack { position: relative; display: flex; flex-direction: column; gap: var(--s-3); max-width: 480px; }
-.notice {
-  border-radius: var(--r-md); padding: 14px 16px;
-  background: rgba(255,255,255,.07);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.13);
-  backdrop-filter: blur(2px);
+.auth-mark { display: flex; align-items: center; gap: 10px; }
+.auth-mark .brand-mark {
+  width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+  display: grid; place-items: center;
 }
-.notice.is-alert { background: rgba(233,178,84,.13); box-shadow: inset 0 0 0 1px rgba(233,178,84,.34); }
-.notice .n-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-.notice .n-head b { font-size: var(--fs-sm); font-weight: var(--fw-bold); }
-.notice p { font-size: var(--fs-xs); line-height: var(--lh-base); color: rgba(255,255,255,.76); }
-.notice p b { color: #fff; }
-.notice .n-new {
-  font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
-  text-transform: uppercase; padding: 2px 7px; border-radius: var(--r-pill);
-  background: var(--clay-300); color: #2B2117;
+.auth-mark .brand-mark svg { width: 17px; height: 17px; }
+.auth-mark b { font-family: var(--font-display); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.01em; }
+.auth-when { margin-left: auto; display: flex; align-items: baseline; gap: 12px; }
+.auth-when b { font-size: var(--fs-xs); font-weight: var(--fw-semi); letter-spacing: .07em;
+  text-transform: uppercase; color: var(--text-muted); }
+.auth-when .t-mono { font-size: var(--fs-sm); color: var(--text); font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------------------------------- stage */
+/* Deliberately not 50/50. Small left gutter, a large open right, so the
+   composition has a direction instead of a seam down the middle. */
+.auth-stage {
+  display: grid;
+  grid-template-columns: minmax(var(--s-6), 0.5fr) minmax(0, 456px) minmax(0, 384px) minmax(0, 1.1fr);
+  /* Columns share a top edge, and the block as a whole is centred between
+     the bar and the footer. */
+  align-items: start;
+  align-content: start;
+  gap: var(--s-6);
+  padding: clamp(var(--s-6), 5vh, var(--s-9)) 0 var(--s-7);
+  min-height: 0;
 }
-.notice .n-links { display: flex; gap: var(--s-4); margin-top: 9px; }
-.notice .n-links a { font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--clay-200); }
+.auth-panel { grid-column: 2; }
+.auth-aside { grid-column: 3; }
 
-/* A strip of real numbers, not decoration — this is what the practice sees. */
-.auth-strip { position: relative; display: flex; gap: var(--s-7); flex-wrap: wrap;
-  padding-top: var(--s-5); border-top: 1px solid rgba(255,255,255,.14); }
-.auth-strip .as { display: flex; flex-direction: column; gap: 2px; }
-.auth-strip .as b { font-size: var(--fs-2xl); font-weight: var(--fw-x); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-.auth-strip .as span { font-size: var(--fs-xs); color: rgba(255,255,255,.66); }
-
-.auth-foot { position: relative; display: flex; gap: var(--s-4); flex-wrap: wrap;
-  font-size: var(--fs-xs); color: rgba(255,255,255,.52); }
-.auth-foot a { color: rgba(255,255,255,.72); }
-
-/* ---------------------------------------------------------- form column */
-.auth-form-col {
-  display: flex; flex-direction: column; justify-content: center;
-  padding: var(--s-8) var(--s-9);
-  background: var(--surface);
-  border-left: 1px solid var(--line);
+/* -------------------------------------------------------------------- panel */
+.auth-panel {
+  position: relative;
+  background: rgba(18,33,26,.82);
+  backdrop-filter: blur(14px);
+  border-radius: var(--r-lg);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 24px 60px rgba(0,0,0,.34);
+  padding: var(--s-6) var(--s-6) var(--s-7);
+  overflow: hidden;
 }
-.auth-card { width: 100%; max-width: 384px; margin: 0 auto; }
-.auth-card h2 { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
-                letter-spacing: -0.015em; }
-.auth-card .auth-sub { margin-top: 5px; font-size: var(--fs-sm); color: var(--text-muted); }
-
-.auth-step { display: flex; align-items: center; gap: 7px; margin-bottom: var(--s-5); }
-.auth-step i { width: 22px; height: 2px; background: var(--line-strong); display: block; }
-.auth-step i.on { background: var(--accent); }
-
-/* Practice picker reads as a control, not a dropdown afterthought */
-.practice-pick {
-  display: flex; align-items: center; gap: 11px; width: 100%;
-  padding: 10px 12px; border-radius: var(--r-sm); text-align: left;
-  background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line-field);
-  transition: background var(--dur-1) var(--ease);
+/* The one structural signature: the panel is anchored to the brand, not
+   floating free of it. */
+.auth-panel::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(to bottom, var(--accent), rgba(41,164,89,.22));
 }
-.practice-pick:hover { background: var(--surface-3); }
-.practice-pick .pp-main { min-width: 0; flex: 1; }
-.practice-pick b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.practice-pick span { display: block; font-size: var(--fs-xs); color: var(--text-subtle); }
+.auth-panel h1 {
+  font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.15;
+}
+.auth-sub { margin-top: 6px; font-size: var(--fs-sm); color: var(--text-muted); max-width: 44ch; }
 
-/* "or" rule between password and single sign-on */
+/* Numbered, labelled steps. Three unlabelled dots tell nobody anything. */
+.auth-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  list-style: none; margin-bottom: var(--s-6);
+}
+.auth-steps li {
+  display: flex; align-items: center; gap: 7px;
+  padding-top: 9px; border-top: 2px solid var(--line-strong);
+  font-size: var(--fs-2xs); letter-spacing: .09em; text-transform: uppercase;
+  color: var(--text-subtle); font-weight: var(--fw-bold);
+}
+.auth-steps .s-n {
+  display: inline-grid; place-items: center; min-width: 16px; height: 16px;
+  border-radius: var(--r-xs); font-family: var(--font-mono); font-size: 9.5px;
+  background: var(--surface-3); color: var(--text-subtle);
+}
+.auth-steps li[data-state="now"] { border-top-color: var(--accent); color: var(--text); }
+.auth-steps li[data-state="now"] .s-n { background: var(--accent); color: var(--text-on-accent); }
+.auth-steps li[data-state="done"] { border-top-color: var(--accent-text); color: var(--accent-text); }
+.auth-steps li[data-state="done"] .s-n { background: transparent; color: var(--accent-text);
+  box-shadow: inset 0 0 0 1px var(--accent-text); }
+
+.auth-back {
+  display: inline-flex; align-items: center; gap: 4px; margin-bottom: 10px;
+  font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted);
+  background: none; border: 0; cursor: pointer; padding: 2px 0;
+}
+.auth-back:hover { color: var(--text); }
+.auth-remember { align-items: flex-start; }
+
+.auth-demo { font-size: var(--fs-2xs); color: var(--text-subtle); text-align: center; }
+.auth-demo b { color: var(--text-muted); }
+
 .or-rule { display: flex; align-items: center; gap: var(--s-3); color: var(--text-subtle); }
 .or-rule::before, .or-rule::after { content: ""; height: 1px; flex: 1; background: var(--line); }
-.or-rule span { font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps); text-transform: uppercase; }
+.or-rule span { font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase; font-weight: var(--fw-bold); }
 
-.btn-sso { justify-content: flex-start; gap: 11px; height: 42px; }
-.btn-sso .ms-tile { display: grid; grid-template-columns: 9px 9px; grid-gap: 2px; flex: none; }
-.btn-sso .ms-tile i { width: 9px; height: 9px; display: block; }
-
-/* Practice and location, chosen after authentication */
-.ctx-option {
-  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
-  padding: 11px 12px; border-radius: var(--r-sm);
-  background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-field);
-  transition: background var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
-}
-.ctx-option:hover { background: var(--surface-2); }
-.ctx-option[aria-checked="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
-.ctx-option .co-main { flex: 1; min-width: 0; }
-.ctx-option b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.ctx-option span { display: block; font-size: var(--fs-xs); color: var(--text-subtle); }
-.ctx-option .co-tick { color: var(--accent); opacity: 0; flex: none; }
-.ctx-option[aria-checked="true"] .co-tick { opacity: 1; }
-
-/* Six-box verification code */
-.code-row { display: flex; gap: 8px; }
-.code-row input {
-  width: 100%; height: 52px; text-align: center;
-  font-size: var(--fs-xl); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums;
-  border: 1px solid var(--line-field); border-radius: var(--r-sm);
-  background: var(--surface); color: var(--text);
-  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
-}
-.code-row input:focus { outline: none; border-color: var(--focus); box-shadow: var(--sh-focus); }
-.code-row input.filled { border-color: var(--accent); background: var(--accent-soft); }
-
-.auth-legal {
-  margin-top: var(--s-7); padding-top: var(--s-5); border-top: 1px solid var(--line-faint);
-  font-size: var(--fs-xs); color: var(--text-subtle); line-height: var(--lh-base);
-}
-.auth-legal .row { gap: var(--s-4); flex-wrap: wrap; }
+.btn-sso { justify-content: center; gap: 10px; }
+.ms-tile { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; width: 15px; height: 15px; }
+.ms-tile i { display: block; border-radius: 1px; }
 
 .pw-wrap { position: relative; }
-.pw-wrap .pw-toggle {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  width: 28px; height: 28px; display: grid; place-items: center;
-  border-radius: var(--r-xs); color: var(--text-subtle);
-}
-.pw-wrap .pw-toggle:hover { background: var(--surface-3); color: var(--text); }
 .pw-wrap .input { padding-right: 38px; }
-
-@media (max-width: 980px) {
-  .auth { grid-template-columns: 1fr; }
-  .auth-brand { padding: var(--s-6); gap: var(--s-6); min-height: auto; }
-  .auth-pitch h1 { font-size: var(--fs-2xl); }
-  .auth-pitch p, .auth-foot { display: none; }
-  .auth-form-col { border-left: 0; border-top: 1px solid var(--line); padding: var(--s-7) var(--s-5); }
+.pw-toggle {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; display: grid; place-items: center;
+  border: 0; background: none; color: var(--text-subtle); cursor: pointer; border-radius: var(--r-sm);
 }
-@media (max-width: 520px) {
-  .auth-strip { gap: var(--s-5); }
-  .code-row input { height: 46px; font-size: var(--fs-lg); }
-}
+.pw-toggle:hover { color: var(--text); background: var(--surface-3); }
 
-/* The WebGL scene sits behind the ruled field, never above the content. */
-.brand-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.auth-brand > *:not(.brand-scene) { position: relative; z-index: 1; }
+/* Verification code */
+.code-row { display: flex; gap: 9px; }
+.code-row input {
+  width: 46px; height: 54px; text-align: center;
+  font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: var(--fw-semi);
+  color: var(--text); background: var(--surface-2);
+  border: 0; border-radius: var(--r-sm);
+  box-shadow: inset 0 0 0 1px var(--line-field);
+}
+.code-row input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.code-row input.filled { box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+
+/* Practice and location choices */
+.ctx-option {
+  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+  padding: 11px 12px; border-radius: var(--r-sm); background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--text);
+  transition: background var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.ctx-option:hover { background: var(--surface-3); }
+.ctx-option .co-ic { display: grid; place-items: center; width: 28px; height: 28px; flex: none;
+  border-radius: var(--r-xs); background: var(--surface-3); color: var(--text-subtle); }
+.ctx-option .co-main { flex: 1; min-width: 0; }
+.ctx-option .co-main b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.ctx-option .co-main span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctx-option .co-tick { opacity: 0; color: var(--accent-text); flex: none; }
+.ctx-option[aria-checked="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.ctx-option[aria-checked="true"] .co-ic { background: var(--accent); color: var(--text-on-accent); }
+.ctx-option[aria-checked="true"] .co-tick { opacity: 1; }
+
+/* -------------------------------------------------------------------- aside */
+.auth-aside { display: flex; flex-direction: column; gap: var(--s-4); }
+
+/* Status dots here carry real state, which is the only reason they exist. */
+.sys-board {
+  border-radius: var(--r-md);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.09);
+  background: rgba(18,33,26,.60);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.sys-head { display: flex; align-items: baseline; justify-content: space-between;
+  padding: 12px 14px 9px; border-bottom: 1px solid var(--line-faint); }
+.sys-head .t-2xs { color: var(--text-subtle); }
+.sys-row {
+  display: grid; grid-template-columns: 7px 1fr auto; align-items: center; gap: 10px;
+  padding: 9px 14px; border-bottom: 1px solid var(--line-faint);
+}
+.sys-row:last-child { border-bottom: 0; }
+.sys-row i { width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
+.sys-row[data-state="slow"] i { background: var(--warn-fg); }
+.sys-row[data-state="down"] i { background: var(--bad-fg); }
+.sys-row b { font-size: var(--fs-xs); font-weight: var(--fw-semi); }
+.sys-row span { font-size: var(--fs-2xs); color: var(--text-subtle); font-family: var(--font-mono); }
+
+.auth-notice {
+  border-radius: var(--r-md); padding: 13px 15px;
+  background: rgba(224,176,99,.10);
+  box-shadow: inset 0 0 0 1px rgba(224,176,99,.28);
+}
+.auth-notice b { display: flex; align-items: center; gap: 7px; font-size: var(--fs-xs);
+  font-weight: var(--fw-bold); color: #E9C47E; }
+.auth-notice p { margin-top: 5px; font-size: var(--fs-2xs); line-height: var(--lh-base); color: var(--text-muted); }
+.auth-notice a { display: inline-block; margin-top: 8px; font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold); color: #E9C47E; }
+
+/* Step three: the canvas answers with where you are about to be. */
+.aside-practice { padding-top: 2px; }
+.aside-practice h2 { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 700;
+  letter-spacing: -0.025em; line-height: 1.05; margin-top: 6px; }
+.aside-practice > .t-mono { color: var(--text-subtle); margin-top: 6px; display: block; }
+.aside-locs { margin-top: var(--s-5); display: flex; flex-direction: column; }
+.aside-loc { padding: 11px 0 11px 13px; border-left: 2px solid var(--line-strong); }
+.aside-loc b { display: block; font-size: var(--fs-sm); color: var(--text-subtle); }
+.aside-loc span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
+.aside-loc.is-on { border-left-color: var(--accent); }
+.aside-loc.is-on b { color: var(--text); }
+.aside-loc.is-on span { color: var(--text-muted); }
+
+/* ------------------------------------------------------------------- footer */
+.auth-foot {
+  display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap;
+  padding: 14px var(--s-7);
+  border-top: 1px solid rgba(255,255,255,.07);
+  font-size: var(--fs-2xs); color: var(--text-subtle);
+}
+.auth-foot p { max-width: 70ch; }
+.auth-foot a { color: var(--text-muted); font-weight: var(--fw-semi); }
+.auth-foot a:hover { color: var(--text); }
+
+/* ------------------------------------------------------------------ narrower */
+@media (max-width: 1180px) {
+  .auth-stage { grid-template-columns: minmax(var(--s-5), 1fr) minmax(0, 456px) minmax(0, 360px) minmax(var(--s-5), 1fr); }
+}
+@media (max-width: 940px) {
+  .auth-stage {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--s-6) var(--s-5);
+    gap: var(--s-5);
+  }
+  .auth-panel, .auth-aside { grid-column: 1; max-width: 456px; width: 100%; }
+  .auth::after { background: linear-gradient(to bottom, #061A0F 30%, rgba(6,26,15,.86)); }
+}
+@media (max-width: 560px) {
+  .auth-bar, .auth-foot { padding-inline: var(--s-5); }
+  .auth-panel { padding: var(--s-5); }
+  .code-row input { width: 100%; height: 48px; }
+  .auth-when b { display: none; }
+}

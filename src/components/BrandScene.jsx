@@ -1,8 +1,13 @@
-/* The one place a 3D scene earns its keep: the sign-in brand panel.
-   Slowly drifting depth layers, rendered small and paused when the tab is
-   hidden. It is decorative only — aria-hidden, skipped entirely under
-   prefers-reduced-motion, and never loaded by the clinical app. */
+/* The one place a 3D scene earns its keep: the sign-in canvas.
+   A contour field, the way a topographic map or a stack of traces reads.
+   Decorative only: aria-hidden, skipped entirely under prefers-reduced-motion,
+   paused when the tab is hidden, and never loaded by the clinical app. */
 import { useEffect, useRef } from 'react';
+
+const LINES = 46;   // contours front to back
+const STEPS = 112;  // samples along each contour
+const SPAN_X = 40;
+const SPAN_Z = 34;
 
 export default function BrandScene() {
   const host = useRef(null);
@@ -19,48 +24,84 @@ export default function BrandScene() {
       if (!alive || !host.current) return;
       const el = host.current;
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(55, el.clientWidth / el.clientHeight, 0.1, 100);
-      camera.position.z = 16;
+      const camera = new THREE.PerspectiveCamera(46, el.clientWidth / el.clientHeight, 0.1, 200);
+      // Looking down the field rather than along it, so the contours spread
+      // across the frame instead of bunching at the horizon.
+      camera.position.set(3, 11.5, 19);
+      camera.lookAt(0, -0.5, -5);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setSize(el.clientWidth, el.clientHeight);
       el.appendChild(renderer.domElement);
 
-      // Concentric rings on separate planes — a contour reading, not a blob.
-      const group = new THREE.Group();
-      const ringColor = new THREE.Color('#7FC79A');
-      for (let i = 0; i < 9; i++) {
-        const r = 2.2 + i * 1.15;
-        const geo = new THREE.TorusGeometry(r, 0.012, 8, 220);
-        const mat = new THREE.MeshBasicMaterial({
-          color: ringColor, transparent: true, opacity: 0.30 - i * 0.026,
-        });
-        const ring = new THREE.Mesh(geo, mat);
-        ring.position.z = -i * 0.75;
-        ring.userData.spin = (i % 2 ? 1 : -1) * (0.016 + i * 0.002);
-        group.add(ring);
+      /* One geometry for every contour, drawn as a single LineSegments: one
+         draw call, and the height field lives in the vertex shader so the
+         animation costs no JavaScript per frame. */
+      const verts = [];
+      const rows = [];
+      for (let l = 0; l < LINES; l++) {
+        const v = l / (LINES - 1);
+        const z = (v - 0.5) * SPAN_Z;
+        for (let s = 0; s < STEPS - 1; s++) {
+          const a = (s / (STEPS - 1) - 0.5) * SPAN_X;
+          const b = ((s + 1) / (STEPS - 1) - 0.5) * SPAN_X;
+          verts.push(a, 0, z, b, 0, z);
+          rows.push(v, v);
+        }
       }
-      group.rotation.x = 0.62;
-      group.rotation.z = -0.2;
-      scene.add(group);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      geo.setAttribute('aRow', new THREE.Float32BufferAttribute(rows, 1));
 
-      // A sparse particle field for depth.
-      const count = 220;
-      const pos = new Float32Array(count * 3);
-      for (let i = 0; i < count; i++) {
-        pos[i * 3] = (Math.random() - 0.5) * 34;
-        pos[i * 3 + 1] = (Math.random() - 0.5) * 22;
-        pos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 4;
-      }
-      const pGeo = new THREE.BufferGeometry();
-      pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      const dust = new THREE.Points(pGeo, new THREE.PointsMaterial({
-        color: '#B7CFBE', size: 0.055, transparent: true, opacity: 0.5,
-      }));
-      scene.add(dust);
+      const uniforms = {
+        uTime:  { value: 0 },
+        uNear:  { value: new THREE.Color('#72E3A4') },
+        uFar:   { value: new THREE.Color('#12683A') },
+      };
 
-      let t = 0, paused = document.hidden;
+      const mat = new THREE.ShaderMaterial({
+        uniforms,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexShader: `
+          uniform float uTime;
+          attribute float aRow;
+          varying float vRow;
+          varying float vEdge;
+          void main() {
+            vRow = aRow;
+            vec3 p = position;
+            float x = p.x * 0.11;
+            float z = p.z * 0.16;
+            // Three drifting waves at different rates read as terrain rather
+            // than as one obvious sine.
+            float h = sin(x + uTime * 0.28) * 2.10
+                    + sin(x * 0.47 - z * 0.80 + uTime * 0.19) * 1.55
+                    + sin(z * 1.10 + uTime * 0.13) * 0.90;
+            // Settle the field toward the horizon so the top stays quiet.
+            p.y = h * (0.42 + aRow * 1.25);
+            vEdge = smoothstep(0.0, 0.16, 0.5 - abs(position.x) / ${SPAN_X.toFixed(1)});
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+          }`,
+        fragmentShader: `
+          uniform vec3 uNear;
+          uniform vec3 uFar;
+          varying float vRow;
+          varying float vEdge;
+          void main() {
+            vec3 c = mix(uFar, uNear, pow(vRow, 1.6));
+            float a = (0.14 + pow(vRow, 1.35) * 0.86) * vEdge;
+            gl_FragColor = vec4(c, a);
+          }`,
+      });
+
+      const field = new THREE.LineSegments(geo, mat);
+      field.rotation.y = -0.20;
+      scene.add(field);
+
+      let paused = document.hidden;
       const onVis = () => { paused = document.hidden; };
       document.addEventListener('visibilitychange', onVis);
 
@@ -73,14 +114,11 @@ export default function BrandScene() {
       const ro = new ResizeObserver(onResize);
       ro.observe(el);
 
+      const start = performance.now();
       const tick = () => {
         raf = requestAnimationFrame(tick);
         if (paused) return;
-        t += 0.004;
-        group.children.forEach(r => { r.rotation.z += r.userData.spin * 0.05; });
-        group.rotation.y = Math.sin(t) * 0.16;
-        group.rotation.x = 0.62 + Math.cos(t * 0.7) * 0.05;
-        dust.rotation.y = t * 0.06;
+        uniforms.uTime.value = (performance.now() - start) / 1000;
         renderer.render(scene, camera);
       };
       tick();
@@ -89,11 +127,12 @@ export default function BrandScene() {
         cancelAnimationFrame(raf);
         ro.disconnect();
         document.removeEventListener('visibilitychange', onVis);
-        scene.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
+        geo.dispose();
+        mat.dispose();
         renderer.dispose();
         if (renderer.domElement.parentNode) renderer.domElement.remove();
       };
-    }).catch(() => { /* decorative only — a failure must not block sign-in */ });
+    }).catch(() => { /* decorative only, a failure must not block sign-in */ });
 
     return () => { alive = false; cleanup(); };
   }, []);

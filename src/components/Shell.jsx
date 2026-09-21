@@ -45,7 +45,7 @@ const GO_TO = {
   r: '/reports', s: '/admin',
 };
 
-export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail, onPalette, children }) {
+export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail, onPalette, onSignOut, children }) {
   const nav = useNavigate();
   const loc = useLocation();
   const user = K.st(ROLES[role].user);
@@ -129,7 +129,7 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
               { icon: <User size={15} />, label: 'My profile & signature', action: () => nav('/admin/users') },
               { icon: theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />, label: theme === 'dark' ? 'Light mode' : 'Dark mode', action: toggleTheme },
               '-',
-              { icon: <LogOut size={15} />, label: 'Sign out', danger: true, action: () => { window.location.href = './login.html'; } },
+              { icon: <LogOut size={15} />, label: 'Sign out', danger: true, action: onSignOut },
             ],
           })}>
             <Avatar id={user.id} />

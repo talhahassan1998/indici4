@@ -16,8 +16,9 @@ npm run build      # static output in dist/
 npm run preview    # serve the build on :8181
 ```
 
-Two entry points: `index.html` (the app) and `login.html` (sign-in).
-The design system is a route inside the app — `#/styleguide`.
+One entry point. The app opens on sign-in, and lands on the day's
+appointments once you are through it. The design system is a route too, at
+`#/styleguide`. Sign-in accepts any username with the password `kora`.
 
 > Kora Health is fictional. Every patient, NHI number, ACC claim, invoice and
 > clinician in here is invented. The visual identity is original and is not
@@ -73,7 +74,7 @@ Both light and dark themes are full designs, not an inverted filter.
 | `#/consult/:id` | Consultation — SOAP notes, measurements, coding, prompts, sign and file |
 | `#/admin` | Settings cards, users, permissions, consultant profile |
 | `#/styleguide` | The design system, rendered from the product's own components |
-| `login.html` | Sign-in: credentials → authenticator code → practice and location |
+| `#/login` | Sign-in: credentials, authenticator code, then practice and location |
 
 ### Role-based dashboards
 
@@ -128,12 +129,14 @@ vectors on one 24px grid with a 1.75 stroke and rounded terminals, tree-shaken
 so only the 63 icons actually used ship. Every icon sits beside a label or an
 `aria-label` — none carries meaning on its own.
 
-**three.js is used in exactly one place**: the sign-in brand panel, which is a
-marketing surface rather than a clinical one. Nine concentric rings on separate
-z-planes drift behind a dust field. It is dynamically imported so the ~690 KB
-chunk never loads for the app itself, skipped entirely under
-`prefers-reduced-motion`, paused when the tab is hidden, fully disposed on
-unmount, and wrapped so a WebGL failure can never block someone signing in.
+**three.js is used in exactly one place**: the sign-in canvas, which is a brand
+surface rather than a clinical one. A contour field of 46 lines reads the way a
+topographic map does, with the height field living in a vertex shader so the
+animation costs no JavaScript per frame and the whole thing is one draw call.
+It is dynamically imported so the ~690 KB chunk never loads for the app itself,
+skipped entirely under `prefers-reduced-motion`, paused when the tab is hidden,
+fully disposed on unmount, and wrapped so a WebGL failure can never block
+someone signing in.
 Interface animation is Motion, which respects reduced-motion and leaves the
 accessibility tree alone — a PMS is used for eight hours a day on shared,
 often old clinic machines, and a WebGL canvas is the wrong tool for that.
@@ -142,16 +145,15 @@ often old clinic machines, and a WebGL canvas is the wrong tool for that.
 
 ```
 index.html              app entry
-login.html              sign-in entry
-vite.config.js          two-entry build
+public/login.html       redirect, so older links still reach sign-in
+vite.config.js          build
 src/
-  main.jsx              app root — HashRouter
-  login.jsx             sign-in root
-  App.jsx               routes, role, theme, command palette
+  main.jsx              app root, HashRouter
+  App.jsx               routes, session gate, role, theme, command palette
   components/
     Shell.jsx           sidebar, top bar, global search, keyboard shortcuts
     CommandPalette.jsx  Ctrl+K — grouped commands, arrow/enter, focus trapped
-    BrandScene.jsx      the three.js sign-in scene (dynamically imported)
+    BrandScene.jsx      the three.js contour field (dynamically imported)
     Primitives.jsx      chips, avatars, banners, cards, empty states, skeletons
   lib/
     ui.jsx              overlays and toasts — focus trap, Escape, focus restore
@@ -178,12 +180,15 @@ Healthlink delivery, and Xero sync.
 
 The prototype was checked in headless Chromium:
 
-- **Smoke** — all 16 routes render, the sign-in page and its three.js canvas,
-  four role dashboards, light and dark, zero console errors
+- **Smoke** — the app lands on sign-in unauthenticated, all 16 routes render
+  behind it, the three.js canvas draws, light and dark, zero console errors
 - **Accessibility** — accessible names on every control and field across all
   routes, focus ring on 25 tabbed elements, focus trapping in dialogs
 - **Keyboard** — every `g`-then-letter jump, and that a lone `g` or a `g` typed
   into a field never navigates
+- **Sign-in** — the surface redefines its own tokens, so it gets its own pass:
+  every visible pairing across all three steps, accessible names, and a focus
+  ring on each control
 - **Contrast** — 50 token pairings computed with alpha compositing against their
   real backgrounds, both themes
 - **Interaction** — 11 end-to-end flows: arrival status, calendar drag,

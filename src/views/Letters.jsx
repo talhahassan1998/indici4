@@ -23,7 +23,8 @@ export default function Letters() {
       <div className="toolbar">
         <div className="pill-nav" role="group" aria-label="Filter letters">
           {[['all','All'],['draft','Draft'],['pending','Awaiting approval'],['approved','Approved'],['sent','Sent']].map(([k, l]) => (
-            <button key={k} aria-pressed={f === k} onClick={() => setF(k)}>{l}{k !== 'all' && <span className="num"> {count(k)}</span>}</button>
+            <button key={k} aria-pressed={f === k} onClick={() => setF(k)}>
+              {l}{k !== 'all' && <span className="t-n">{count(k)}</span>}</button>
           ))}
         </div>
         <span className="spacer" />
@@ -37,11 +38,17 @@ export default function Letters() {
             <tr key={l.id} style={{ cursor: 'pointer' }} tabIndex={0}
               onClick={() => nav(`/letter/${l.id}`)}
               onKeyDown={e => { if (e.key === 'Enter') nav(`/letter/${l.id}`); }}>
-              <td><b>{l.title}</b>{l.aiAssisted && <span className="chip chip-warm"><Sparkles size={11} /> AI draft</span>}
-                <br /><span className="t-xs subtle">{l.words} words</span></td>
+              {/* The chip is inline-flex, so sitting it straight after the
+                  title gave it no gap at all and the two ran together. */}
+              <td><span className="cell2">
+                <span className="cell-title"><b>{l.title}</b>
+                  {l.aiAssisted && <span className="chip chip-warm"><Sparkles size={13} /> AI draft</span>}</span>
+                <span>{l.words} words</span></span></td>
               <td><span className="row g-2"><Avatar id={p.id} size="xs" />
-                <span className="t-sm">{p.first} {p.last}<br /><span className="t-xs subtle t-mono">{p.nhi}</span></span></span></td>
-              <td className="t-sm">{K.gp(l.to).name}<br /><span className="t-xs subtle">{K.gp(l.to).practice}</span></td>
+                <span className="cell2"><span>{p.first} {p.last}</span>
+                  <span className="t-mono">{p.nhi}</span></span></span></td>
+              <td><span className="cell2"><span>{K.gp(l.to).name}</span>
+                <span>{K.gp(l.to).practice}</span></span></td>
               <td className="t-sm">{K.st(l.cl).name}</td>
               <td className="t-sm">{l.typedBy ? K.st(l.typedBy).name : <Nil label="Not typed yet" />}</td>
               <td className="t-sm">{l.channel}</td><td className="t-sm">{relTime(l.updated)}</td>

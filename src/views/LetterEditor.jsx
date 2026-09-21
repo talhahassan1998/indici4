@@ -184,7 +184,7 @@ export default function LetterEditor() {
         <aside className="ai-panel" aria-label="AI scribe">
           <div className="ai-hd row g-2">
             <span className="stat-ic" style={{ background: 'var(--warm-soft)', color: 'var(--warm-text)' }}><Sparkles size={15} /></span>
-            <div className="grow"><b className="t-sm">AI scribe</b><br /><span className="t-xs subtle">Draft from your consultation</span></div>
+            <div className="grow cell2"><b>AI scribe</b><span>Draft from your consultation</span></div>
             <button className="btn btn-ghost btn-icon btn-sm" onClick={() => setAiOpen(false)} aria-label="Hide AI scribe"><X size={15} /></button>
           </div>
           <div className="drawer-bd col g-4">

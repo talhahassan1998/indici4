@@ -70,7 +70,7 @@ export default function Reports() {
             <tbody>{K.clinicians.map((c, i) => (
               <tr key={c.id}>
                 <td><span className="row g-2"><Avatar id={c.id} size="xs" />
-                  <span className="t-sm">{c.name}<br /><span className="t-xs subtle">{c.spec}</span></span></span></td>
+                  <span className="cell2"><span>{c.name}</span><span>{c.spec}</span></span></span></td>
                 <td className="num-cell">{[112, 96, 84, 120][i]}</td>
                 <td className="num-cell">{[5, 7, 4, 7][i]}</td>
                 <td className="num-cell">{[64, 48, 52, 12][i]}</td>

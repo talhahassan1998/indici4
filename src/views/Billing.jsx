@@ -152,13 +152,14 @@ export default function Billing() {
                 <td className="t-mono t-sm"><b>{i.id}</b></td>
                 <td className="grow-cell"><span className="row g-2"><Avatar id={p.id} size="xs" />
                   <span className="t-sm">{p.first} {p.last}</span></span></td>
-                <td className="t-sm">{fmtDateShort(i.date)}{od > 0 && <><br /><span className="t-xs bad-t">{od} days late</span></>}</td>
+                <td><span className="cell2"><span>{fmtDateShort(i.date)}</span>
+                  {od > 0 && <span className="bad-t">{od} days late</span>}</span></td>
                 <td><FunderChip funder={i.payer} /></td>
                 <td className="t-sm">{K.st(i.cl).name}</td>
                 <td className="num-cell subtle">{money(t.gst)}</td>
                 <td className="num-cell"><b>{money(t.incl)}</b></td>
-                <td><Chip status={i.status} />
-                  {i.reconciled && <><br /><span className="t-xs subtle">matched in Xero</span></>}</td>
+                <td><span className="cell2"><span><Chip status={i.status} /></span>
+                  {i.reconciled && <span>matched in Xero</span>}</span></td>
                 {/* Named, like the patient grid. Three unlabelled glyphs per row
                     is the same problem in a smaller table. */}
                 <td className="act-col"><span className="row-actions">
@@ -259,7 +260,8 @@ function InvoiceDrawer({ close, inv, toast, onDone, onPay }) {
               <th className="num-cell">Unit</th><th className="num-cell">Amount</th></tr></thead>
             <tbody>{inv.items.map((it, n) => (
               <tr key={n}>
-                <td className="t-sm">{it.d}{it.code && <><br /><span className="t-xs t-mono subtle">{it.code}</span></>}</td>
+                <td><span className="cell2"><span>{it.d}</span>
+                  {it.code && <span className="t-mono">{it.code}</span>}</span></td>
                 <td className="num-cell">{it.q}</td>
                 <td className="num-cell">{money(it.p)}</td>
                 <td className="num-cell"><b>{money(it.q * it.p)}</b></td>

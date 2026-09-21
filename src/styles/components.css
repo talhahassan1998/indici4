@@ -53,22 +53,6 @@
 .btn-group .btn:last-child  { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
 
 /* Segmented control */
-.segmented {
-  display: inline-flex; padding: 3px; gap: 2px;
-  background: var(--surface-3); border-radius: var(--r-sm);
-  box-shadow: inset 0 0 0 1px var(--line-faint);
-}
-.segmented button {
-  height: var(--h-sm); padding: 0 18px; border-radius: var(--r-xs);
-  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text-muted);
-  display: inline-flex; align-items: center; gap: 6px;
-  transition: all var(--dur-1) var(--ease);
-}
-.segmented button:hover { color: var(--text); }
-.segmented button[aria-pressed="true"] {
-  background: var(--surface); color: var(--text); box-shadow: var(--sh-1);
-}
-
 /* --------------------------------------------------------------- Inputs */
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .label {
@@ -338,21 +322,76 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 .tbl-compact tbody td { padding: 7px var(--s-3); }
 
 /* --------------------------------------------------------------- Tabs */
-.tabs {
-  display: flex; gap: var(--s-1); align-items: center;
-  border-bottom: 1px solid var(--line);
-  overflow-x: auto; scrollbar-width: none;
+/* ---- Tabs.
+
+   One design, used for every row of tabs in the product: a rounded track with
+   a hairline, and the selected tab marked by colour, weight and a short rule
+   under its own label. Three tab styles that each meant the same thing is two
+   styles too many, and the rule under the label reads at a glance in a way a
+   tint on its own does not. ---- */
+.tabs, .pill-nav, .segmented {
+  display: inline-flex; align-items: center; gap: 2px; flex-wrap: wrap;
+  max-width: 100%; padding: 4px;
+  background: var(--surface);
+  /* Half the track height, so a single row is a true pill and a wrapped one
+     is a sane rounded block rather than a stadium. Tabs wrap in a narrow
+     column; they never scroll out of sight. */
+  border-radius: 26px;
+  box-shadow: inset 0 0 0 1px var(--line);
 }
-.tabs::-webkit-scrollbar { display: none; }
-.tabs button {
-  position: relative; padding: 10px 12px; white-space: nowrap;
-  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text-muted);
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  display: inline-flex; align-items: center; gap: 7px;
-  transition: color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+
+.tabs button, .pill-nav button, .segmented button {
+  position: relative; flex: none;
+  height: var(--h-sm); padding: 0 15px; border-radius: var(--r-pill);
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--text-muted);
+  transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
-.tabs button:hover { color: var(--text); }
-.tabs button[aria-selected="true"] { color: var(--accent-text); border-bottom-color: var(--accent); }
+.tabs button:hover, .pill-nav button:hover, .segmented button:hover {
+  color: var(--text); background: var(--surface-3);
+}
+/* The marker sits under the label, inside the track, so it reads as belonging
+   to the word rather than to the row. */
+.tabs button::after, .pill-nav button::after, .segmented button::after {
+  content: ""; position: absolute; left: 15px; right: 15px; bottom: 7px;
+  height: 2px; border-radius: 2px; background: transparent;
+  transition: background var(--dur-1) var(--ease);
+}
+.tabs button[aria-selected="true"],
+.pill-nav button[aria-pressed="true"],
+.segmented button[aria-pressed="true"] {
+  color: var(--accent-text); font-weight: var(--fw-bold); background: transparent;
+}
+.tabs button[aria-selected="true"]::after,
+.pill-nav button[aria-pressed="true"]::after,
+.segmented button[aria-pressed="true"]::after { background: var(--accent); }
+
+/* ---- The two-line cell.
+
+   What it is, then what it is about. The first line is the thing you scan a
+   column for, so it takes the weight and the full text colour; the second is
+   context and sits back, smaller and muted. Every stacked pair in the product
+   uses this, so a name over an NHI reads the same as a recipient over a
+   practice or a letter over a word count. ---- */
+.cell2 { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cell2 > :first-child {
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text);
+}
+.cell2 > :first-child b { font-weight: inherit; color: inherit; }
+.cell2 > :last-child {
+  font-size: var(--fs-xs); font-weight: var(--fw-regular); color: var(--text-muted);
+}
+
+/* A title with a chip after it: the chip is inline-flex, so laid out as plain
+   siblings the two have no gap and read as one string. */
+.cell-title { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+
+/* A tab count is part of the label, not a badge beside it. */
+.tabs .t-n, .pill-nav .t-n, .segmented .t-n {
+  font-variant-numeric: tabular-nums; color: var(--text-subtle); font-weight: var(--fw-medium);
+}
+.tabs button[aria-selected="true"] .t-n,
+.pill-nav button[aria-pressed="true"] .t-n { color: inherit; }
 
 /* Vertical sub-nav (patient workspace) */
 .subnav { display: flex; flex-direction: column; gap: 2px; }
@@ -541,16 +580,6 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 .divider { height: 1px; background: var(--line-faint); }
 .divider-v { width: 1px; align-self: stretch; background: var(--line); }
 .dot-sep { color: var(--text-subtle); }
-.pill-nav { display: inline-flex; gap: 0; }
-.pill-nav button {
-  height: var(--h-sm); padding: 0 14px; border-radius: 0; font-size: var(--fs-sm);
-  font-weight: var(--fw-medium); color: var(--text-muted);
-  border-bottom: 2px solid transparent;
-}
-.pill-nav button:hover { color: var(--text); }
-.pill-nav button[aria-pressed="true"] {
-  color: var(--accent-text); font-weight: var(--fw-semi); border-bottom-color: var(--accent);
-}
 
 .kv { display: grid; grid-template-columns: minmax(96px, 34%) 1fr; gap: 7px var(--s-3); font-size: var(--fs-sm); align-items: baseline; }
 .kv dt { color: var(--text-subtle); font-size: var(--fs-xs); font-weight: var(--fw-medium); }

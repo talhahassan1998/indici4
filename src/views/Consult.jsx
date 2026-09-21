@@ -321,7 +321,7 @@ export default function Consult() {
 
         <div style={{ minWidth: 0 }}>
           <section className="card" style={{ position: 'sticky', top: 'calc(var(--topbar-h) + 8px)' }}>
-            <nav className="tabs" role="tablist" style={{ padding: '0 var(--s-3)' }}>
+            <nav className="tabs" role="tablist">
               {PANELS.map(t => (
                 <button role="tab" key={t} aria-selected={panel === t} data-panel={t} onClick={() => setPanel(t)}>{t}</button>
               ))}
@@ -442,7 +442,7 @@ function Transcribe({ toast }) {
   return (
     <div className="col g-4">
       <div className="mic-state off"><span className="mic-dot" />
-        <span className="t-sm"><b>Microphone ready</b><br /><span className="t-xs subtle">Consult room 2</span></span>
+        <span className="cell2"><b>Microphone ready</b><span>Consult room 2</span></span>
         <span className="mic-timer">00:00</span></div>
       <button className="btn btn-primary btn-block" onClick={() => toast('Transcribing', 'Recording started. Tell the patient a scribe is in use.', 'ok')}>
         <Mic size={15} /> Start transcribing</button>

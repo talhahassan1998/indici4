@@ -291,7 +291,7 @@ function RxTab({ p, onNew }) {
             <th className="num-cell">Repeats</th><th>Pharmacy</th><th>Date</th><th>Status</th></tr></thead>
           <tbody>{list.map(r => { const m = K.med(r.med), ph = K.pharm(r.pharmacy); return (
             <tr key={r.id}>
-              <td><b>{m.name}</b><br /><span className="t-xs subtle">{m.form}</span></td>
+              <td><span className="cell2"><b>{m.name}</b><span>{m.form}</span></span></td>
               <td className="t-sm">{m.dose}</td><td className="num-cell">{r.qty}</td><td className="num-cell">{r.repeats}</td>
               <td className="t-sm">{ph.name}</td><td className="t-sm">{fmtDateShort(r.at.slice(0, 10))}</td>
               <td><Chip status={r.status === 'dispensed' ? 'paid' : 'sent'}
@@ -315,7 +315,8 @@ function TestsTab({ p, onNew }) {
         <thead><tr><th>Test</th><th>Clinical details</th><th>Provider</th><th>Date</th><th>Urgency</th><th>Status</th></tr></thead>
         <tbody>{list.map(r => { const t = K.test(r.test), pv = K.prov(r.provider); return (
           <tr key={r.id}>
-            <td><b>{t.name}</b><br /><span className="t-xs subtle">{t.kind === 'radiology' ? 'Radiology' : 'Pathology'}</span></td>
+            <td><span className="cell2"><b>{t.name}</b>
+              <span>{t.kind === 'radiology' ? 'Radiology' : 'Pathology'}</span></span></td>
             <td className="t-sm">{r.note}</td><td className="t-sm">{pv.name}</td>
             <td className="t-sm">{fmtDateShort(r.at.slice(0, 10))}</td>
             <td>{r.urgency === 'urgent' ? <Chip status="overdue" label="Urgent" /> : <Chip status="draft" label="Routine" />}</td>

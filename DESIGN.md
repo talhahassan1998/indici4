@@ -184,6 +184,34 @@ colour change.
 - `aria-invalid` on error, with the message naming the fix, not just the fault:
   "Claim numbers have five digits after the year. Check the ACC45."
 
+### Tabs
+
+**One design, everywhere.** `.tabs`, `.pill-nav` and `.segmented` are the same
+component: a rounded track with a hairline, and the selected tab marked by
+colour, weight and a short rule under its own label. Three tab styles that all
+meant the same thing were two styles too many.
+
+The radius is half the track height, so a single row is a true pill and a
+wrapped one is a sane rounded block. **Tabs wrap; they never scroll out of
+sight.** A tab you cannot see is a tab nobody finds, and the consult side panel
+is narrow enough to prove it.
+
+### Two-line cells
+
+`.cell2` — what it is, then what it is about. The first line is the thing you
+scan a column for, so it takes the weight and the full text colour; the second
+is context and sits back, smaller and muted. A name over an NHI, a recipient
+over a practice, a letter over a word count: all the same shape, so a row can
+be read without working out which half matters.
+
+A chip after a title goes in `.cell-title`. A chip is `inline-flex`, so laid
+out as a plain sibling it gets no gap at all and the two run together as one
+string.
+
+Both rules are asserted across ten routes: one tab signature in the whole
+product, nothing scrolled out of a track, and every two-line cell heavier and
+larger on top.
+
 ### Status chips
 
 Tinted pill, 19px tall, uppercase, `--fs-2xs`, radius `--r-xs`.

@@ -107,9 +107,10 @@ export default function Acc() {
                       const n = new Set(s); n.has(a.id) ? n.delete(a.id) : n.add(a.id); return n; })}>
                     <Check size={11} /></span>
                 ) : <span className="tip" data-tip="Cannot be submitted yet" style={{ color: 'var(--bad-fg)' }}><Lock size={15} /></span>}</td>
-                <td className="t-mono t-sm"><b>{a.id}</b><br /><span className="t-xs subtle">{a.inv}</span></td>
+                <td><span className="cell2 t-mono"><b>{a.id}</b><span>{a.inv}</span></span></td>
                 <td><span className="row g-2"><Avatar id={p.id} size="xs" />
-                  <span className="t-sm">{p.first} {p.last}<br /><span className="t-xs subtle t-mono">{p.nhi}</span></span></span></td>
+                  <span className="cell2"><span>{p.first} {p.last}</span>
+                    <span className="t-mono">{p.nhi}</span></span></span></td>
                 <td className="t-mono t-sm">{p.claim || <span className="bad-t">missing</span>}</td>
                 <td className="t-sm">{fmtDateShort(a.svc)}</td>
                 <td className="t-mono t-sm">{a.code}</td>
@@ -145,7 +146,8 @@ export default function Acc() {
               <th className="num-cell">Rejected</th><th>Status</th></tr></thead>
             <tbody>{K.accHistory.map(b => (
               <tr key={b.batch}><td className="t-mono t-sm"><b>{b.batch}</b></td>
-                <td className="t-sm">{fmtDate(b.at.slice(0, 10))}<br /><span className="t-xs subtle">{fmtClock(b.at)}</span></td>
+                <td><span className="cell2"><span>{fmtDate(b.at.slice(0, 10))}</span>
+                  <span>{fmtClock(b.at)}</span></span></td>
                 <td className="num-cell">{b.count}</td><td className="num-cell"><b>{money(b.total)}</b></td>
                 <td className="num-cell ok-t">{b.accepted}</td>
                 <td className={`num-cell ${b.rejected ? 'bad-t' : 'subtle'}`}>{b.rejected}</td>

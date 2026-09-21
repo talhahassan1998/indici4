@@ -184,7 +184,7 @@ export default function Admin() {
         <tbody>{K.clinicians.map(c => (
           <tr key={c.id}>
             <td style={{ minWidth: 190 }}><span className="row g-2"><Avatar id={c.id} size="sm" />
-              <span><b className="t-sm">{c.name}</b><br /><span className="t-xs subtle">{c.spec}</span></span></span></td>
+              <span className="cell2"><b>{c.name}</b><span>{c.spec}</span></span></span></td>
             {DAYS.map((d, di) => {
               const sess = K.timetables.filter(t => t.cl === c.id && t.day === di);
               if (!sess.length) return <td key={d}><Nil label="Not working" /></td>;

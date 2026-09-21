@@ -236,6 +236,9 @@ The prototype was checked in headless Chromium:
   measured across 13 routes and must agree to the pixel
 - **Sideways overflow** — every route at 1440px and 1280px, asserting nothing
   pushes the shell wider than the window and drags the sidebar off-screen
+- **Consistency** — one tab design across every track in the product, nothing
+  scrolled out of a tab row, and every two-line cell leading with the heavier,
+  larger line
 - **Invoice list** — row actions visible without hovering, labelled, 44px, and
   aligned in columns down the table; the table fits its panel; and the footer
   totals match the rows on screen, before and after a filter

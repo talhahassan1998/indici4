@@ -18,7 +18,18 @@ npm run preview    # serve the build on :8181
 
 One entry point. The app opens on sign-in, and lands on the day's
 appointments once you are through it. The design system is a route too, at
-`#/styleguide`. Sign-in accepts any username with the password `kora`.
+`#/styleguide`.
+
+**Test accounts**, all with the password `kora2026`. The account you sign in
+with sets the role you land in, and they are listed on the sign-in screen so
+you can click one to fill the form.
+
+| Username | Who | Role |
+|---|---|---|
+| `afenwick` | Dr Alice Fenwick | Clinician |
+| `mhopa` | Mereana Hopa | Reception |
+| `jpetersen` | Josh Petersen | Typist |
+| `lbeckett` | Lorraine Beckett | Practice manager |
 
 > Kora Health is fictional. Every patient, NHI number, ACC claim, invoice and
 > clinician in here is invented. The visual identity is original and is not

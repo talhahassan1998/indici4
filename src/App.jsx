@@ -39,8 +39,9 @@ function Inner() {
 
   const roleUser = ROLES[role].user;
 
-  const signIn = () => {
+  const signIn = ({ role: r } = {}) => {
     try { sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* private mode */ }
+    if (r && ROLES[r]) setRole(r);
     setAuthed(true);
     nav('/appointments', { replace: true });
   };

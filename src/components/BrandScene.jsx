@@ -56,15 +56,17 @@ export default function BrandScene() {
 
       const uniforms = {
         uTime:  { value: 0 },
-        uNear:  { value: new THREE.Color('#72E3A4') },
-        uFar:   { value: new THREE.Color('#12683A') },
+        uNear:  { value: new THREE.Color('#15803E') },
+        uFar:   { value: new THREE.Color('#8FC6A6') },
       };
 
       const mat = new THREE.ShaderMaterial({
         uniforms,
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        // Normal blending, not additive: on a light canvas additive washes
+        // straight out to white.
+        blending: THREE.NormalBlending,
         vertexShader: `
           uniform float uTime;
           attribute float aRow;
@@ -92,7 +94,7 @@ export default function BrandScene() {
           varying float vEdge;
           void main() {
             vec3 c = mix(uFar, uNear, pow(vRow, 1.6));
-            float a = (0.14 + pow(vRow, 1.35) * 0.86) * vEdge;
+            float a = (0.12 + pow(vRow, 1.25) * 0.62) * vEdge;
             gl_FragColor = vec4(c, a);
           }`,
       });

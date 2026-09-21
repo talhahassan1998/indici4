@@ -16,6 +16,16 @@ import BrandScene from '../components/BrandScene.jsx';
 import { Switch } from '../components/Primitives.jsx';
 import { useUi } from '../lib/ui.jsx';
 
+/* Test accounts. One per role, so the prototype can be opened as any of the
+   four people the app is designed around, and the role follows you in. */
+export const TEST_PASSWORD = 'kora2026';
+export const ACCOUNTS = [
+  { u: 'afenwick',  role: 'clinician', name: 'Dr Alice Fenwick',  job: 'Orthopaedic surgeon' },
+  { u: 'mhopa',     role: 'reception', name: 'Mereana Hopa',      job: 'Reception' },
+  { u: 'jpetersen', role: 'typist',    name: 'Josh Petersen',     job: 'Medical typist' },
+  { u: 'lbeckett',  role: 'manager',   name: 'Lorraine Beckett',  job: 'Practice manager' },
+];
+
 const PRACTICES = [
   { id: 'prac-1', name: 'Kora Specialists', hpi: 'ORG-G3K291', locs: ['c1', 'c2', 'c3'] },
   { id: 'prac-2', name: 'Sandycove Medical', hpi: 'ORG-B8T740', locs: ['c2'] },
@@ -41,8 +51,8 @@ const NOW = 7 * 60 + 52;
 export default function Login({ onDone }) {
   const { toast } = useUi();
   const [step, setStep] = useState('creds');
-  const [user, setUser] = useState('');
-  const [pw, setPw] = useState('');
+  const [user, setUser] = useState(ACCOUNTS[0].u);
+  const [pw, setPw] = useState(TEST_PASSWORD);
   const [showPw, setShowPw] = useState(false);
   const [remember, setRemember] = useState(true);
   const [errs, setErrs] = useState({});
@@ -50,6 +60,7 @@ export default function Login({ onDone }) {
   const [busy, setBusy] = useState(false);
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [ctx, setCtx] = useState({ practice: 'prac-1', location: 'c1' });
+  const [acct, setAcct] = useState(ACCOUNTS[0]);
   const boxes = useRef([]);
 
   const prac = PRACTICES.find(x => x.id === ctx.practice);
@@ -66,10 +77,15 @@ export default function Login({ onDone }) {
     if (!pw) next.pw = 'Enter your password.';
     setErrs(next);
     if (Object.keys(next).length) return;
+    const account = ACCOUNTS.find(a => a.u === user.trim().toLowerCase());
     setBusy(true);
     setTimeout(() => {
       setBusy(false);
-      if (pw.toLowerCase() !== 'kora') {
+      if (!account) {
+        setErrs({ user: 'No account with that username. Try one of the test accounts listed beside this form.' });
+        return;
+      }
+      if (pw !== TEST_PASSWORD) {
         const a = attempts + 1; setAttempts(a);
         const left = 5 - a;
         setErrs({ pw: left > 0
@@ -77,7 +93,7 @@ export default function Login({ onDone }) {
           : 'Account locked. Ask your practice administrator to unlock it.' });
         return;
       }
-      setErrs({}); setStep('mfa');
+      setErrs({}); setAcct(account); setStep('mfa');
       toast('Code sent', 'Check your authenticator app for a 6-digit code.', 'info');
       setTimeout(() => boxes.current[0]?.focus(), 60);
     }, 650);
@@ -98,8 +114,8 @@ export default function Login({ onDone }) {
   const enter = e => {
     e.preventDefault();
     const loc = K.cln(ctx.location);
-    toast(`Signed in to ${prac.name}`, `${loc.short} · opening today's appointments`, 'ok');
-    setTimeout(() => onDone({ practice: prac.name, location: loc.short }), 620);
+    toast(`Signed in as ${acct.name}`, `${prac.name} · ${loc.short} · opening today's appointments`, 'ok');
+    setTimeout(() => onDone({ role: acct.role, practice: prac.name, location: loc.short }), 620);
   };
 
   return (
@@ -171,7 +187,6 @@ export default function Login({ onDone }) {
                     <i style={{ background: '#00A4EF' }} /><i style={{ background: '#FFB900' }} />
                   </span>
                   Continue with Microsoft</button>
-                <p className="auth-demo">Prototype: any username, password <b className="t-mono">kora</b></p>
               </div>
             </form>
           )}
@@ -181,7 +196,7 @@ export default function Login({ onDone }) {
               <button type="button" className="auth-back" onClick={() => setStep('creds')}>
                 <ChevronLeft size={14} /> Back</button>
               <h1>Verification</h1>
-              <p className="auth-sub">Enter the 6-digit code from your authenticator app for <b>{user}</b>.</p>
+              <p className="auth-sub">Enter the 6-digit code from your authenticator app for <b>{acct.name}</b>.</p>
               <div className="col g-4 mt-5">
                 <div className="field"><label className="label" htmlFor="code0">Verification code</label>
                   <div className="code-row">
@@ -253,7 +268,7 @@ export default function Login({ onDone }) {
             <div className="aside-practice">
               <span className="t-eyebrow">You are signing in to</span>
               <h2>{prac.name}</h2>
-              <p className="t-mono t-xs">HPI {prac.hpi}</p>
+              <p className="t-mono auth-meta">HPI {prac.hpi}</p>
               <div className="aside-locs">
                 {prac.locs.map(lid => { const c = K.cln(lid); return (
                   <div className={`aside-loc ${ctx.location === lid ? 'is-on' : ''}`} key={lid}>
@@ -264,10 +279,27 @@ export default function Login({ onDone }) {
             </div>
           ) : (
             <>
+              {step === 'creds' && (
+                <div className="acct-board">
+                  <div className="sys-head">
+                    <span className="t-eyebrow">Test accounts</span>
+                    <span className="t-mono auth-meta">password {TEST_PASSWORD}</span>
+                  </div>
+                  {ACCOUNTS.map(a => (
+                    <button type="button" className={`acct-row ${user.trim().toLowerCase() === a.u ? 'is-on' : ''}`}
+                      key={a.u} onClick={() => { setUser(a.u); setPw(TEST_PASSWORD); setErrs({}); }}>
+                      <span className="t-mono">{a.u}</span>
+                      <b>{a.name}</b>
+                      <span className="a-job">{a.job}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="sys-board">
                 <div className="sys-head">
                   <span className="t-eyebrow">Systems</span>
-                  <span className="t-mono t-2xs">checked {fmtTime(NOW - 4)}</span>
+                  <span className="t-mono auth-meta">checked {fmtTime(NOW - 4)}</span>
                 </div>
                 {SYSTEMS.map(s => (
                   <div className="sys-row" key={s.name} data-state={s.state}>
@@ -290,12 +322,11 @@ export default function Login({ onDone }) {
       </div>
 
       <footer className="auth-foot">
-        <p>This system holds patient health information. Access is logged against your name
-           under the Health Information Privacy Code.</p>
+        <p>Access is logged against your name under the Health Information Privacy Code.</p>
         <span className="spacer" />
         <a href="#" onClick={e => e.preventDefault()}>IT support</a>
         <a href="#" onClick={e => e.preventDefault()}>Accessibility</a>
-        <span className="t-mono t-2xs">3.0.114</span>
+        <span className="t-mono auth-meta">3.0.114</span>
       </footer>
     </main>
   );

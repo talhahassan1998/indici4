@@ -1,39 +1,40 @@
 /* ==========================================================================
    Kora Health - sign-in
 
-   One dark canvas rather than a split screen, with the content weighted to
-   the left and the contour field breathing in the space that is left. The
-   surface redefines the token subset it needs, so every shared component
-   (input, button, switch, chip) renders correctly on it without a single
-   component override.
+   A light canvas with the composition centred, the contour field reading as
+   fine green topography behind it. The surface pins the light token values so
+   the brand surface stays light whichever theme the app is set to, and every
+   shared component (input, button, switch) renders correctly on it without a
+   single component override.
    ========================================================================== */
 
 .auth {
-  --surface:       #12211A;
-  --surface-2:     #16281E;
-  --surface-3:     #1C3326;
-  --text:          #E9F1EB;
-  --text-muted:    #A7BCAF;
-  --text-subtle:   #90A89A;
-  --line:          #27402F;
-  --line-strong:   #365343;
-  --line-faint:    #1E3427;
-  --line-field:    #6E8D7A;
-  --accent:        #29A459;
-  --accent-hover:  #3DB86C;
-  --accent-press:  #58CA83;
-  --accent-soft:   rgba(41,164,89,.14);
-  --accent-soft-2: rgba(41,164,89,.24);
-  --accent-text:   #6ED295;
-  --text-on-accent:#04180C;
-  --focus:         #4CC77E;
-  --focus-halo:    rgba(76,199,126,.30);
+  --bg:            #EEF5F0;
+  --surface:       #FFFFFF;
+  --surface-2:     #F7FAF8;
+  --surface-3:     #EDF2EE;
+  --text:          #141A17;
+  --text-muted:    #4E5852;
+  --text-subtle:   #5E6862;
+  --line:          #E1E7E3;
+  --line-strong:   #CFD7D2;
+  --line-faint:    #EDF1EE;
+  --line-field:    #859089;
+  --accent:        #15803E;
+  --accent-hover:  #116330;
+  --accent-press:  #0D4A25;
+  --accent-soft:   #F1F8F4;
+  --accent-soft-2: #E5EFE7;
+  --accent-text:   #116330;
+  --text-on-accent:#FFFFFF;
+  --focus:         #15803E;
+  --focus-halo:    rgba(23,162,74,.26);
 
   position: relative;
   min-height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: #061A0F;
+  background: var(--bg);
   color: var(--text);
   overflow: hidden;
 }
@@ -41,9 +42,11 @@
 /* The contour field sits under everything, never over content. */
 .brand-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .auth::after {
-  /* Settle the field toward the left so the panel always has a quiet ground. */
+  /* Hold the middle of the canvas quiet so the panel always has clean ground,
+     and let the field read out toward the edges. */
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(100deg, #061A0F 26%, rgba(6,26,15,.72) 48%, rgba(6,26,15,0) 78%);
+  background: radial-gradient(118% 78% at 50% 44%,
+    var(--bg) 26%, rgba(238,245,240,.86) 48%, rgba(238,245,240,0) 82%);
 }
 /* Name the children explicitly: a `.auth > *` rule here would also catch the
    scene and knock it out of absolute positioning, turning it into a grid row. */
@@ -55,7 +58,8 @@
 .auth-bar {
   display: flex; align-items: center; gap: var(--s-4);
   padding: 18px var(--s-7);
-  border-bottom: 1px solid rgba(255,255,255,.07);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
 }
 .auth-mark { display: flex; align-items: center; gap: 10px; }
 .auth-mark .brand-mark {
@@ -74,13 +78,13 @@
    composition has a direction instead of a seam down the middle. */
 .auth-stage {
   display: grid;
-  grid-template-columns: minmax(var(--s-6), 0.5fr) minmax(0, 456px) minmax(0, 384px) minmax(0, 1.1fr);
-  /* Columns share a top edge, and the block as a whole is centred between
-     the bar and the footer. */
+  /* Symmetric gutters: the pair sits centred on the canvas, and shares a
+     top edge so it reads as one block rather than two floating cards. */
+  grid-template-columns: minmax(var(--s-6), 1fr) minmax(0, 440px) minmax(0, 360px) minmax(var(--s-6), 1fr);
   align-items: start;
-  align-content: start;
+  align-content: center;
   gap: var(--s-6);
-  padding: clamp(var(--s-6), 5vh, var(--s-9)) 0 var(--s-7);
+  padding: var(--s-7) 0;
   min-height: 0;
 }
 .auth-panel { grid-column: 2; }
@@ -89,10 +93,9 @@
 /* -------------------------------------------------------------------- panel */
 .auth-panel {
   position: relative;
-  background: rgba(18,33,26,.82);
-  backdrop-filter: blur(14px);
+  background: var(--surface);
   border-radius: var(--r-lg);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.09), 0 24px 60px rgba(0,0,0,.34);
+  box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(20,26,23,.05), 0 18px 44px rgba(20,26,23,.08);
   padding: var(--s-6) var(--s-6) var(--s-7);
   overflow: hidden;
 }
@@ -100,7 +103,7 @@
    floating free of it. */
 .auth-panel::before {
   content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-  background: linear-gradient(to bottom, var(--accent), rgba(41,164,89,.22));
+  background: linear-gradient(to bottom, var(--accent), rgba(23,162,74,.20));
 }
 .auth-panel h1 {
   font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
@@ -137,9 +140,6 @@
 }
 .auth-back:hover { color: var(--text); }
 .auth-remember { align-items: flex-start; }
-
-.auth-demo { font-size: var(--fs-2xs); color: var(--text-subtle); text-align: center; }
-.auth-demo b { color: var(--text-muted); }
 
 .or-rule { display: flex; align-items: center; gap: var(--s-3); color: var(--text-subtle); }
 .or-rule::before, .or-rule::after { content: ""; height: 1px; flex: 1; background: var(--line); }
@@ -195,14 +195,13 @@
 /* Status dots here carry real state, which is the only reason they exist. */
 .sys-board {
   border-radius: var(--r-md);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.09);
-  background: rgba(18,33,26,.60);
-  backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--surface);
   overflow: hidden;
 }
 .sys-head { display: flex; align-items: baseline; justify-content: space-between;
   padding: 12px 14px 9px; border-bottom: 1px solid var(--line-faint); }
-.sys-head .t-2xs { color: var(--text-subtle); }
+.auth-meta { font-size: var(--fs-2xs); color: var(--text-subtle); }
 .sys-row {
   display: grid; grid-template-columns: 7px 1fr auto; align-items: center; gap: 10px;
   padding: 9px 14px; border-bottom: 1px solid var(--line-faint);
@@ -214,16 +213,38 @@
 .sys-row b { font-size: var(--fs-xs); font-weight: var(--fw-semi); }
 .sys-row span { font-size: var(--fs-2xs); color: var(--text-subtle); font-family: var(--font-mono); }
 
+/* Test accounts: real rows you can click to fill the form, not a hint line. */
+.acct-board {
+  border-radius: var(--r-md);
+  box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--surface);
+  overflow: hidden;
+}
+.acct-board .sys-head .auth-meta { font-size: var(--fs-xs); color: var(--accent-text); font-weight: var(--fw-bold); }
+.acct-row {
+  display: grid; grid-template-columns: 82px 1fr; gap: 2px 10px; width: 100%; text-align: left;
+  padding: 9px 14px; border-bottom: 1px solid var(--line-faint);
+  background: none; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; color: var(--text);
+  transition: background var(--dur-1) var(--ease);
+}
+.acct-row:last-child { border-bottom: 0; }
+.acct-row:hover { background: var(--surface-3); }
+.acct-row > .t-mono { grid-row: 1 / span 2; align-self: center; font-size: var(--fs-2xs);
+  color: var(--accent-text); font-weight: var(--fw-bold); }
+.acct-row b { font-size: var(--fs-xs); font-weight: var(--fw-semi); }
+.acct-row .a-job { font-size: var(--fs-2xs); color: var(--text-subtle); }
+.acct-row.is-on { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+
 .auth-notice {
   border-radius: var(--r-md); padding: 13px 15px;
-  background: rgba(224,176,99,.10);
-  box-shadow: inset 0 0 0 1px rgba(224,176,99,.28);
+  background: var(--warn-bg);
+  box-shadow: inset 0 0 0 1px var(--warn-line);
 }
 .auth-notice b { display: flex; align-items: center; gap: 7px; font-size: var(--fs-xs);
-  font-weight: var(--fw-bold); color: #E9C47E; }
+  font-weight: var(--fw-bold); color: var(--warn-fg); }
 .auth-notice p { margin-top: 5px; font-size: var(--fs-2xs); line-height: var(--lh-base); color: var(--text-muted); }
 .auth-notice a { display: inline-block; margin-top: 8px; font-size: var(--fs-2xs);
-  font-weight: var(--fw-bold); color: #E9C47E; }
+  font-weight: var(--fw-bold); color: var(--warn-fg); }
 
 /* Step three: the canvas answers with where you are about to be. */
 .aside-practice { padding-top: 2px; }
@@ -242,10 +263,11 @@
 .auth-foot {
   display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap;
   padding: 14px var(--s-7);
-  border-top: 1px solid rgba(255,255,255,.07);
+  background: var(--bg);
+  border-top: 1px solid var(--line);
   font-size: var(--fs-2xs); color: var(--text-subtle);
 }
-.auth-foot p { max-width: 70ch; }
+.auth-foot p { max-width: 74ch; }
 .auth-foot a { color: var(--text-muted); font-weight: var(--fw-semi); }
 .auth-foot a:hover { color: var(--text); }
 
@@ -259,8 +281,8 @@
     padding: var(--s-6) var(--s-5);
     gap: var(--s-5);
   }
-  .auth-panel, .auth-aside { grid-column: 1; max-width: 456px; width: 100%; }
-  .auth::after { background: linear-gradient(to bottom, #061A0F 30%, rgba(6,26,15,.86)); }
+  .auth-panel, .auth-aside { grid-column: 1; max-width: 456px; width: 100%; margin-inline: auto; }
+  .auth::after { background: linear-gradient(to bottom, var(--bg) 34%, rgba(238,245,240,.88)); }
 }
 @media (max-width: 560px) {
   .auth-bar, .auth-foot { padding-inline: var(--s-5); }

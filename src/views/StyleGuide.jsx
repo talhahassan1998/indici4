@@ -185,7 +185,7 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="type" title="Typography"
-        lede="IBM Plex Sans for the interface, Plex Serif for mastheads and letter bodies, Plex Mono for every number a clinic reads at a glance: times, money, NHI, claim numbers.">
+        lede="The Roboto superfamily. Roboto for the interface, Roboto Slab for mastheads and letter bodies, Roboto Mono for every number a clinic reads at a glance: times, money, NHI, claim numbers.">
         <div className="sg-block">
           {[['t-display / 34', 'Kia ora, Dr Fenwick', 't-display'],
             ['t-h1 / 28', 'Today’s clinic', 't-h1'],

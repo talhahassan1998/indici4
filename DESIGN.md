@@ -114,17 +114,17 @@ dark. A new pairing ships only after it is measured.
 
 ## 3. Typography Rules
 
-**IBM Plex superfamily**, self-hosted as woff2. Never a CDN — the app must
+**Roboto superfamily**, self-hosted as woff2. Never a CDN — the app must
 render identically offline in a clinic with bad internet.
 
 | Family | Token | Used for |
 |---|---|---|
-| Plex Serif | `--font-display` | Page titles, mastheads, letter bodies |
-| Plex Sans | `--font-sans` | The entire interface |
-| Plex Mono | `--font-mono` | Every identifier and figure: NHI, chart no., claim no., money, times |
+| Roboto Slab | `--font-display` | Page titles, mastheads, letter bodies |
+| Roboto | `--font-sans` | The entire interface |
+| Roboto Mono | `--font-mono` | Every identifier and figure: NHI, chart no., claim no., money, times |
 
-The serif is a **masthead layer only** — `h1` and `h2`. Card headings, table
-headers and all data are sans. A serif on a data table is wrong.
+Roboto Slab is a **masthead layer only** — `h1` and `h2`. Card headings, table
+headers and all data are Roboto. A slab on a data table is wrong.
 
 ### App scale (dense, 14px base, 1.200 minor third)
 
@@ -350,15 +350,15 @@ warm secondary  #B87848
 ok / warn / bad #146B35 / #8A5A12 / #A33528
 radius          3 / 5 / 7 / 10 px, by density
 spacing         4 8 12 16 20 24 32 40 48 64
-type            Plex Serif (h1,h2) · Plex Sans (UI) · Plex Mono (numbers, IDs)
+type            Roboto Slab (h1,h2) · Roboto (UI) · Roboto Mono (numbers, IDs)
 ```
 
 ### Ready-to-use prompts
 
 > Build a `<screen>` for Kora Health following DESIGN.md. Deep green `#15803E`
 > carries every primary action; clay `#B87848` marks emphasis. Hairline borders,
-> no shadows on cards. Plex Sans for the interface, Plex Mono for every NHI,
-> claim number, time and dollar figure, Plex Serif for the page title only.
+> no shadows on cards. Roboto for the interface, Roboto Mono for every NHI,
+> claim number, time and dollar figure, Roboto Slab for the page title only.
 > Status chips are tinted pills with a label and no dot.
 
 > Review this screen against DESIGN.md section 7. Report every em-dash, every

@@ -44,7 +44,7 @@ you can click one to fill the form.
 | **Accent** | Pounamu `#15803E`, with `#17A24A` one step brighter; carries every primary action |
 | **Secondary** | Clay `#B87848`, the warm earth tone green needs opposite it |
 | **Neutrals** | Near-neutral greys with a faint green cast, on a `#F6F9F7` ground |
-| **Type** | IBM Plex superfamily: Serif for headings, Sans for the interface, Mono for every identifier and figure |
+| **Type** | Roboto superfamily: Slab for headings, Roboto for the interface, Mono for every identifier and figure |
 | **Shape** | 3px chips, 5px controls, 7px cards, 10px overlays; radius scales with density |
 | **Elevation** | Flat. A hairline separates; a shadow means the thing genuinely floats, so only overlays get one |
 
@@ -132,8 +132,9 @@ Verified rather than asserted (see *Verification* below):
 
 ## Type, icons and 3D
 
-Typefaces are IBM Plex (OFL), bundled as woff2 in `src/fonts` and imported
-through CSS — no CDN, so the app renders identically offline.
+Typefaces are Roboto, Roboto Slab and Roboto Mono (Apache 2.0), bundled as
+woff2 in `src/fonts` and imported through CSS — no CDN, so the app renders
+identically offline.
 
 Icons are [Lucide](https://lucide.dev) (ISC licence) via `lucide-react`: real
 vectors on one 24px grid with a 1.75 stroke and rounded terminals, tree-shaken
@@ -174,7 +175,7 @@ src/
                         invoices, ACC queue, billing codes, recalls)
   views/                one module per screen, plus StyleGuide.jsx
   styles/               tokens, base, components, app, auth, fonts
-  fonts/                the bundled IBM Plex woff2 files
+  fonts/                the bundled Roboto woff2 files
 ```
 
 State is in-memory only — a reload resets the prototype. Theme, role and sidebar

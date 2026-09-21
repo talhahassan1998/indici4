@@ -285,21 +285,19 @@ export default function Login({ onDone }) {
         </a>
 
         <div className="brand-body">
-          <div className="brand-card">
+          <ClinicIllustration />
+          <div className="brand-note">
             <h2>The whole clinic day, in one place</h2>
             <p>Bookings, the patient record, letters and billing all sit together,
                so nothing has to be typed twice.</p>
-            <ClinicIllustration />
-          </div>
-
-          <div className="brand-note">
-            <h2>Authenticator app required from 29 April</h2>
-            <p>A username and password alone will not be enough. Set yours up now so
-               you are not locked out on the day.</p>
-            <a href="#" onClick={e => { e.preventDefault(); toast('Set up two-factor', 'Your administrator can walk you through it.', 'info'); }}>
-              Set up two-factor</a>
           </div>
         </div>
+
+        <p className="brand-strip">
+          <TriangleAlert size={18} />
+          <span>Authenticator app required from 29 April.
+            {' '}<a href="#" onClick={e => { e.preventDefault(); toast('Set up two-factor', 'Your administrator can walk you through it.', 'info'); }}>Set it up</a></span>
+        </p>
       </aside>
     </main>
   );

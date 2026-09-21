@@ -72,7 +72,8 @@
 }
 .auth-form > *,
 .auth-brand > .brand-help,
-.auth-brand > .brand-body { width: min(var(--a-col), 100%); margin-inline: auto; }
+.auth-brand > .brand-body,
+.auth-brand > .brand-strip { width: min(var(--a-col), 100%); margin-inline: auto; }
 
 /* The header sits at the top of both panels at exactly the same height, so
    the wordmark and the support link share a baseline across the seam. */
@@ -81,9 +82,8 @@
 
 /* Centred by auto margins rather than alignment, so a tall step scrolls
    instead of losing its heading off the top. */
-.auth-body,
-.brand-body { margin-block: var(--a-pad) auto; }
-.auth-body { margin-top: var(--a-pad); }
+.auth-body { margin-block: var(--a-pad) auto; }
+.brand-body { margin-block: auto; }
 
 /* ------------------------------------------------------------- left: form */
 .auth-form { background: var(--bg); overflow-y: auto; }
@@ -249,7 +249,8 @@
   background: radial-gradient(86% 58% at 74% 8%, rgba(23,162,74,.30), rgba(13,74,37,0) 70%);
 }
 .auth-brand > .brand-help,
-.auth-brand > .brand-body { position: relative; z-index: 2; }
+.auth-brand > .brand-body,
+.auth-brand > .brand-strip { position: relative; z-index: 2; }
 
 .brand-help {
   justify-content: flex-end; gap: 9px;
@@ -258,29 +259,30 @@
 }
 .brand-help:hover { text-decoration: underline; }
 
-.brand-body { display: flex; flex-direction: column; gap: var(--a-pad); }
+.brand-body { display: flex; flex-direction: column; gap: 36px; }
 
-.brand-card {
-  background: var(--surface); color: var(--text);
-  border-radius: 18px; padding: 26px;
-  box-shadow: 0 20px 48px rgba(0,0,0,.22);
+/* The illustration leads the panel. Its white cards carry their own lift, so
+   there is no wrapper card around it. */
+.clinic-illo {
+  display: block; width: 100%; height: auto;
+  filter: drop-shadow(0 18px 38px rgba(0,0,0,.26));
 }
-.brand-card h2 {
-  font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 700;
-  line-height: 1.2; letter-spacing: -0.015em;
-}
-.brand-card p { margin-top: 10px; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-muted); }
-.clinic-illo { display: block; width: 100%; height: auto; margin-top: 20px; }
 
 .brand-note h2 {
   font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
   line-height: 1.2; letter-spacing: -0.02em;
 }
 .brand-note p { margin-top: 12px; font-size: var(--fs-md); line-height: 1.6; color: rgba(255,255,255,.88); }
-.brand-note a {
-  display: inline-block; margin-top: 16px; font-size: var(--fs-sm); font-weight: var(--fw-bold);
-  color: #FFFFFF; text-decoration: underline;
+/* One quiet line at the foot of the panel for the notice that has a date on
+   it, so it is read without competing with the illustration. */
+.brand-strip {
+  padding-top: 24px;
+  display: flex; align-items: flex-start; gap: 12px;
+  border-top: 1px solid rgba(255,255,255,.18);
+  font-size: var(--fs-sm); line-height: 1.5; color: rgba(255,255,255,.88);
 }
+.brand-strip svg { flex: none; margin-top: 1px; color: #E9C47E; }
+.brand-strip a { color: #FFFFFF; font-weight: var(--fw-bold); text-decoration: underline; }
 
 /* ---------------------------------------------------------------- narrower */
 @media (max-width: 1100px) {

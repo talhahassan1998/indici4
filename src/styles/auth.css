@@ -1,25 +1,26 @@
 /* ==========================================================================
    Kora Health - sign-in
 
-   A light canvas with the composition centred, the contour field reading as
-   fine green topography behind it. The surface pins the light token values so
-   the brand surface stays light whichever theme the app is set to, and every
-   shared component (input, button, switch) renders correctly on it without a
-   single component override.
+   Two panels: the form on a light ground, the brand on green. Most of the
+   people signing in are over fifty, so this surface runs its own larger type
+   scale and taller controls rather than the app's dense one, and everything
+   sits on one spacing rhythm so nothing is a pixel out.
    ========================================================================== */
 
 .auth {
-  --bg:            #EEF5F0;
+  /* --- palette: the project's own, pinned light so the form panel stays
+         light whichever theme the app is set to --- */
+  --bg:            #FFFFFF;
   --surface:       #FFFFFF;
   --surface-2:     #F7FAF8;
   --surface-3:     #EDF2EE;
   --text:          #141A17;
-  --text-muted:    #4E5852;
-  --text-subtle:   #5E6862;
-  --line:          #E1E7E3;
-  --line-strong:   #CFD7D2;
+  --text-muted:    #3F4945;
+  --text-subtle:   #4E5852;
+  --line:          #DCE7E0;
+  --line-strong:   #C4D3CA;
   --line-faint:    #EDF1EE;
-  --line-field:    #859089;
+  --line-field:    #7C8881;
   --accent:        #15803E;
   --accent-hover:  #116330;
   --accent-press:  #0D4A25;
@@ -28,265 +29,270 @@
   --accent-text:   #116330;
   --text-on-accent:#FFFFFF;
   --focus:         #15803E;
-  --focus-halo:    rgba(23,162,74,.26);
+  --focus-halo:    rgba(23,162,74,.28);
+  --brand-deep:    #0D4A25;
 
-  position: relative;
+  /* --- type, one step up from the app's density --- */
+  --fs-2xs: 12px;
+  --fs-xs:  14px;
+  --fs-sm:  15px;
+  --fs-md:  16px;
+  --fs-lg:  18px;
+  --fs-xl:  21px;
+  --fs-2xl: 26px;
+  --fs-3xl: 32px;
+  --fs-4xl: 38px;
+
+  /* --- one rhythm, used by both panels, so the two sides line up --- */
+  --a-pad:    clamp(28px, 3.4vw, 48px);  /* identical padding on both panels */
+  --a-col:    404px;                     /* identical content column */
+  --a-head:   44px;                      /* header row, so the wordmark and the
+                                            support link share a baseline */
+  --a-gap:    20px;                      /* between field groups */
+  --a-control: 52px;                     /* input and secondary button height */
+  --a-cta:    56px;                      /* primary button height */
+  --a-radius: 12px;
+
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr 1fr;
   background: var(--bg);
   color: var(--text);
-  overflow: hidden;
+  font-size: var(--fs-md);
 }
 
-/* The contour field sits under everything, never over content. */
-.brand-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.auth::after {
-  /* Hold the middle of the canvas quiet so the panel always has clean ground,
-     and let the field read out toward the edges. */
-  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(118% 78% at 50% 44%,
-    var(--bg) 26%, rgba(238,245,240,.86) 48%, rgba(238,245,240,0) 82%);
+/* Both panels share the same box: same padding, same header height, same
+   content column, centred. That is the whole alignment story. */
+.auth-form,
+.auth-brand {
+  display: flex; flex-direction: column;
+  padding: var(--a-pad);
+  min-width: 0; min-height: 0;
+  overflow-y: auto;
 }
-/* Name the children explicitly: a `.auth > *` rule here would also catch the
-   scene and knock it out of absolute positioning, turning it into a grid row. */
-.auth > .auth-bar,
-.auth > .auth-stage,
-.auth > .auth-foot { position: relative; z-index: 2; }
+.auth-form > *,
+.auth-brand > .brand-help,
+.auth-brand > .brand-body { width: min(var(--a-col), 100%); margin-inline: auto; }
 
-/* ------------------------------------------------------------------ top bar */
-.auth-bar {
-  display: flex; align-items: center; gap: var(--s-4);
-  padding: 18px var(--s-7);
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
-}
-.auth-mark { display: flex; align-items: center; gap: 10px; }
+/* The header sits at the top of both panels at exactly the same height, so
+   the wordmark and the support link share a baseline across the seam. */
+.auth-mark,
+.brand-help { height: var(--a-head); flex: none; display: flex; align-items: center; }
+
+/* Centred by auto margins rather than alignment, so a tall step scrolls
+   instead of losing its heading off the top. */
+.auth-body,
+.brand-body { margin-block: var(--a-pad) auto; }
+.auth-body { margin-top: var(--a-pad); }
+
+/* ------------------------------------------------------------- left: form */
+.auth-form { background: var(--bg); overflow-y: auto; }
+
+.auth-mark { gap: 12px; }
 .auth-mark .brand-mark {
-  width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
-  display: grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 10px; background: var(--accent);
+  display: grid; place-items: center; flex: none;
 }
-.auth-mark .brand-mark svg { width: 17px; height: 17px; }
-.auth-mark b { font-family: var(--font-display); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.01em; }
-.auth-when { margin-left: auto; display: flex; align-items: baseline; gap: 12px; }
-.auth-when b { font-size: var(--fs-xs); font-weight: var(--fw-semi); letter-spacing: .07em;
-  text-transform: uppercase; color: var(--text-muted); }
-.auth-when .t-mono { font-size: var(--fs-sm); color: var(--text); font-variant-numeric: tabular-nums; }
+.auth-mark .brand-mark svg { width: 21px; height: 21px; }
+.auth-mark b {
+  font-family: var(--font-display); font-size: var(--fs-xl);
+  font-weight: 700; letter-spacing: -0.015em;
+}
 
-/* -------------------------------------------------------------------- stage */
-/* Deliberately not 50/50. Small left gutter, a large open right, so the
-   composition has a direction instead of a seam down the middle. */
-.auth-stage {
-  display: grid;
-  /* Symmetric gutters: the pair sits centred on the canvas, and shares a
-     top edge so it reads as one block rather than two floating cards. */
-  grid-template-columns: minmax(var(--s-6), 1fr) minmax(0, 440px) minmax(0, 360px) minmax(var(--s-6), 1fr);
-  align-items: start;
-  align-content: center;
-  gap: var(--s-6);
-  padding: var(--s-7) 0;
-  min-height: 0;
-}
-.auth-panel { grid-column: 2; }
-.auth-aside { grid-column: 3; }
+.auth-body { display: flex; flex-direction: column; gap: var(--a-gap); }
+.auth-body > * { margin: 0; }
 
-/* -------------------------------------------------------------------- panel */
-.auth-panel {
-  position: relative;
-  background: var(--surface);
-  border-radius: var(--r-lg);
-  box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(20,26,23,.05), 0 18px 44px rgba(20,26,23,.08);
-  padding: var(--s-6) var(--s-6) var(--s-7);
-  overflow: hidden;
-}
-/* The one structural signature: the panel is anchored to the brand, not
-   floating free of it. */
-.auth-panel::before {
-  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-  background: linear-gradient(to bottom, var(--accent), rgba(23,162,74,.20));
-}
 .auth-panel h1 {
-  font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
-  letter-spacing: -0.02em; line-height: 1.15;
+  font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.12;
 }
-.auth-sub { margin-top: 6px; font-size: var(--fs-sm); color: var(--text-muted); max-width: 44ch; }
+.auth-sub { margin-top: 10px; font-size: var(--fs-md); line-height: 1.55; color: var(--text-muted); }
+.auth-sub a { color: var(--accent-text); font-weight: var(--fw-bold); text-decoration: underline;
+  text-underline-offset: 3px; }
 
-/* Numbered, labelled steps. Three unlabelled dots tell nobody anything. */
+/* Numbered, named steps. Three unlabelled dots tell nobody anything, and at
+   this size they are legible across a reception desk. */
 .auth-steps {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  list-style: none; margin-bottom: var(--s-6);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; list-style: none;
 }
 .auth-steps li {
-  display: flex; align-items: center; gap: 7px;
-  padding-top: 9px; border-top: 2px solid var(--line-strong);
-  font-size: var(--fs-2xs); letter-spacing: .09em; text-transform: uppercase;
-  color: var(--text-subtle); font-weight: var(--fw-bold);
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 11px; border-top: 3px solid var(--line-strong);
+  font-size: var(--fs-xs); font-weight: var(--fw-bold);
+  letter-spacing: .04em; text-transform: uppercase; color: var(--text-subtle);
 }
 .auth-steps .s-n {
-  display: inline-grid; place-items: center; min-width: 16px; height: 16px;
-  border-radius: var(--r-xs); font-family: var(--font-mono); font-size: 9.5px;
+  display: inline-grid; place-items: center; width: 20px; height: 20px; flex: none;
+  border-radius: 6px; font-family: var(--font-mono); font-size: 11px;
   background: var(--surface-3); color: var(--text-subtle);
 }
 .auth-steps li[data-state="now"] { border-top-color: var(--accent); color: var(--text); }
 .auth-steps li[data-state="now"] .s-n { background: var(--accent); color: var(--text-on-accent); }
-.auth-steps li[data-state="done"] { border-top-color: var(--accent-text); color: var(--accent-text); }
-.auth-steps li[data-state="done"] .s-n { background: transparent; color: var(--accent-text);
-  box-shadow: inset 0 0 0 1px var(--accent-text); }
-
-.auth-back {
-  display: inline-flex; align-items: center; gap: 4px; margin-bottom: 10px;
-  font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted);
-  background: none; border: 0; cursor: pointer; padding: 2px 0;
+.auth-steps li[data-state="done"] { border-top-color: var(--accent); color: var(--accent-text); }
+.auth-steps li[data-state="done"] .s-n {
+  background: var(--accent-soft-2); color: var(--accent-text);
 }
-.auth-back:hover { color: var(--text); }
-.auth-remember { align-items: flex-start; }
 
-.or-rule { display: flex; align-items: center; gap: var(--s-3); color: var(--text-subtle); }
-.or-rule::before, .or-rule::after { content: ""; height: 1px; flex: 1; background: var(--line); }
-.or-rule span { font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase; font-weight: var(--fw-bold); }
+/* Controls, sized for the hands that use them */
+.auth .field { display: flex; flex-direction: column; gap: 8px; }
+.auth .label { font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--text); }
+.auth .input {
+  min-height: var(--a-control); padding: 12px 14px;
+  font-size: var(--fs-md); border-radius: var(--a-radius);
+  border-color: var(--line-field);
+}
+.auth .input-group .input { padding-left: 42px; }
+.auth .input-group .ic-lead { left: 15px; color: var(--text-subtle); }
+.auth .hint, .auth .err { font-size: var(--fs-xs); line-height: 1.45; }
+.auth .btn { border-radius: var(--a-radius); font-size: var(--fs-md); }
+.auth .btn-lg { height: var(--a-cta); font-size: var(--fs-lg); font-weight: var(--fw-bold); }
+.auth .btn-secondary { height: var(--a-control); font-size: var(--fs-md); }
+.auth a { text-underline-offset: 3px; }
 
-.btn-sso { justify-content: center; gap: 10px; }
-.ms-tile { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; width: 15px; height: 15px; }
-.ms-tile i { display: block; border-radius: 1px; }
+.auth-fields { display: flex; flex-direction: column; gap: var(--a-gap); }
 
 .pw-wrap { position: relative; }
-.pw-wrap .input { padding-right: 38px; }
+.pw-wrap .input { padding-right: 52px; }
 .pw-toggle {
-  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
-  width: 28px; height: 28px; display: grid; place-items: center;
-  border: 0; background: none; color: var(--text-subtle); cursor: pointer; border-radius: var(--r-sm);
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; display: grid; place-items: center;
+  border: 0; background: none; color: var(--text-subtle); cursor: pointer; border-radius: 8px;
 }
 .pw-toggle:hover { color: var(--text); background: var(--surface-3); }
 
+.auth-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  font-size: var(--fs-sm);
+}
+.auth-row label { display: flex; align-items: center; gap: 12px; cursor: pointer; font-weight: var(--fw-medium); }
+.auth-row a { color: var(--accent-text); font-weight: var(--fw-bold); text-decoration: underline; }
+
+.or-rule { display: flex; align-items: center; gap: var(--s-4); color: var(--text-subtle); }
+.or-rule::before, .or-rule::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+.or-rule span { font-size: var(--fs-2xs); letter-spacing: .14em; text-transform: uppercase; font-weight: var(--fw-bold); }
+
+.btn-sso { justify-content: center; gap: 12px; }
+.ms-tile { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; flex: none; }
+.ms-tile i { display: block; border-radius: 1px; }
+
 /* Verification code */
-.code-row { display: flex; gap: 9px; }
+.code-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .code-row input {
-  width: 46px; height: 54px; text-align: center;
-  font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: var(--fw-semi);
-  color: var(--text); background: var(--surface-2);
-  border: 0; border-radius: var(--r-sm);
-  box-shadow: inset 0 0 0 1px var(--line-field);
+  width: 100%; height: 62px; text-align: center; padding: 0;
+  font-family: var(--font-mono); font-size: var(--fs-2xl); font-weight: var(--fw-semi);
+  color: var(--text); background: var(--surface);
+  border: 1px solid var(--line-field); border-radius: var(--a-radius);
 }
 .code-row input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.code-row input.filled { box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.code-row input.filled { border-color: var(--accent); background: var(--accent-soft); }
 
 /* Practice and location choices */
 .ctx-option {
-  display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
-  padding: 11px 12px; border-radius: var(--r-sm); background: var(--surface-2);
-  box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; color: var(--text);
-  transition: background var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  padding: 14px 16px; border-radius: var(--a-radius); background: var(--surface);
+  border: 1px solid var(--line); cursor: pointer; color: var(--text);
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
 }
-.ctx-option:hover { background: var(--surface-3); }
-.ctx-option .co-ic { display: grid; place-items: center; width: 28px; height: 28px; flex: none;
-  border-radius: var(--r-xs); background: var(--surface-3); color: var(--text-subtle); }
+.ctx-option + .ctx-option { margin-top: 10px; }
+.ctx-option:hover { background: var(--surface-2); }
+.ctx-option .co-ic {
+  display: grid; place-items: center; width: 36px; height: 36px; flex: none;
+  border-radius: 9px; background: var(--surface-3); color: var(--text-subtle);
+}
 .ctx-option .co-main { flex: 1; min-width: 0; }
-.ctx-option .co-main b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.ctx-option .co-main span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle);
+.ctx-option .co-main b { display: block; font-size: var(--fs-md); font-weight: var(--fw-semi); }
+.ctx-option .co-main span { display: block; margin-top: 2px; font-size: var(--fs-xs); color: var(--text-subtle);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ctx-option .co-tick { opacity: 0; color: var(--accent-text); flex: none; }
-.ctx-option[aria-checked="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.ctx-option .co-tick { opacity: 0; color: var(--accent); flex: none; }
+.ctx-option[aria-checked="true"] { background: var(--accent-soft); border-color: var(--accent); }
 .ctx-option[aria-checked="true"] .co-ic { background: var(--accent); color: var(--text-on-accent); }
 .ctx-option[aria-checked="true"] .co-tick { opacity: 1; }
 
-/* -------------------------------------------------------------------- aside */
-.auth-aside { display: flex; flex-direction: column; gap: var(--s-4); }
+.auth-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--text-muted);
+  background: none; border: 0; cursor: pointer; padding: 4px 0; margin-bottom: 4px;
+}
+.auth-back:hover { color: var(--text); }
 
-/* Status dots here carry real state, which is the only reason they exist. */
-.sys-board {
-  border-radius: var(--r-md);
-  box-shadow: inset 0 0 0 1px var(--line);
-  background: var(--surface);
-  overflow: hidden;
+/* Test accounts, at the bottom of the panel they are used in */
+.acct-board { border: 1px solid var(--line); border-radius: var(--a-radius); overflow: hidden; }
+.acct-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3);
+  padding: 10px 16px; background: var(--surface-2); border-bottom: 1px solid var(--line);
 }
-.sys-head { display: flex; align-items: baseline; justify-content: space-between;
-  padding: 12px 14px 9px; border-bottom: 1px solid var(--line-faint); }
-.auth-meta { font-size: var(--fs-2xs); color: var(--text-subtle); }
-.sys-row {
-  display: grid; grid-template-columns: 7px 1fr auto; align-items: center; gap: 10px;
-  padding: 9px 14px; border-bottom: 1px solid var(--line-faint);
-}
-.sys-row:last-child { border-bottom: 0; }
-.sys-row i { width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
-.sys-row[data-state="slow"] i { background: var(--warn-fg); }
-.sys-row[data-state="down"] i { background: var(--bad-fg); }
-.sys-row b { font-size: var(--fs-xs); font-weight: var(--fw-semi); }
-.sys-row span { font-size: var(--fs-2xs); color: var(--text-subtle); font-family: var(--font-mono); }
-
-/* Test accounts: real rows you can click to fill the form, not a hint line. */
-.acct-board {
-  border-radius: var(--r-md);
-  box-shadow: inset 0 0 0 1px var(--line);
-  background: var(--surface);
-  overflow: hidden;
-}
-.acct-board .sys-head .auth-meta { font-size: var(--fs-xs); color: var(--accent-text); font-weight: var(--fw-bold); }
+.acct-head b { font-size: var(--fs-xs); font-weight: var(--fw-bold);
+  letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.acct-head span { font-size: var(--fs-sm); font-family: var(--font-mono);
+  font-weight: var(--fw-bold); color: var(--accent-text); }
 .acct-row {
-  display: grid; grid-template-columns: 82px 1fr; gap: 2px 10px; width: 100%; text-align: left;
-  padding: 9px 14px; border-bottom: 1px solid var(--line-faint);
-  background: none; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; color: var(--text);
-  transition: background var(--dur-1) var(--ease);
+  display: flex; align-items: baseline; gap: 12px; width: 100%; text-align: left;
+  padding: 9px 16px; border: 0; border-top: 1px solid var(--line-faint);
+  background: none; cursor: pointer; color: var(--text); font-size: var(--fs-sm);
 }
-.acct-row:last-child { border-bottom: 0; }
-.acct-row:hover { background: var(--surface-3); }
-.acct-row > .t-mono { grid-row: 1 / span 2; align-self: center; font-size: var(--fs-2xs);
-  color: var(--accent-text); font-weight: var(--fw-bold); }
-.acct-row b { font-size: var(--fs-xs); font-weight: var(--fw-semi); }
-.acct-row .a-job { font-size: var(--fs-2xs); color: var(--text-subtle); }
-.acct-row.is-on { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.acct-row:first-of-type { border-top: 0; }
+.acct-row:hover { background: var(--surface-2); }
+.acct-row .a-u { font-family: var(--font-mono); font-weight: var(--fw-bold);
+  color: var(--accent-text); width: 98px; flex: none; }
+.acct-row .a-job { margin-left: auto; color: var(--text-subtle); font-size: var(--fs-xs); }
+.acct-row.is-on { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
 
-.auth-notice {
-  border-radius: var(--r-md); padding: 13px 15px;
-  background: var(--warn-bg);
-  box-shadow: inset 0 0 0 1px var(--warn-line);
+/* ----------------------------------------------------------- right: brand */
+.auth-brand {
+  position: relative; overflow: hidden;
+  background: var(--brand-deep);
+  color: #FFFFFF;
 }
-.auth-notice b { display: flex; align-items: center; gap: 7px; font-size: var(--fs-xs);
-  font-weight: var(--fw-bold); color: var(--warn-fg); }
-.auth-notice p { margin-top: 5px; font-size: var(--fs-2xs); line-height: var(--lh-base); color: var(--text-muted); }
-.auth-notice a { display: inline-block; margin-top: 8px; font-size: var(--fs-2xs);
-  font-weight: var(--fw-bold); color: var(--warn-fg); }
+.brand-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.auth-brand::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(86% 58% at 74% 8%, rgba(23,162,74,.30), rgba(13,74,37,0) 70%);
+}
+.auth-brand > .brand-help,
+.auth-brand > .brand-body { position: relative; z-index: 2; }
 
-/* Step three: the canvas answers with where you are about to be. */
-.aside-practice { padding-top: 2px; }
-.aside-practice h2 { font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 700;
-  letter-spacing: -0.025em; line-height: 1.05; margin-top: 6px; }
-.aside-practice > .t-mono { color: var(--text-subtle); margin-top: 6px; display: block; }
-.aside-locs { margin-top: var(--s-5); display: flex; flex-direction: column; }
-.aside-loc { padding: 11px 0 11px 13px; border-left: 2px solid var(--line-strong); }
-.aside-loc b { display: block; font-size: var(--fs-sm); color: var(--text-subtle); }
-.aside-loc span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
-.aside-loc.is-on { border-left-color: var(--accent); }
-.aside-loc.is-on b { color: var(--text); }
-.aside-loc.is-on span { color: var(--text-muted); }
+.brand-help {
+  justify-content: flex-end; gap: 9px;
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: #FFFFFF;
+  text-decoration: none; padding: 8px 4px;
+}
+.brand-help:hover { text-decoration: underline; }
 
-/* ------------------------------------------------------------------- footer */
-.auth-foot {
-  display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap;
-  padding: 14px var(--s-7);
-  background: var(--bg);
-  border-top: 1px solid var(--line);
-  font-size: var(--fs-2xs); color: var(--text-subtle);
-}
-.auth-foot p { max-width: 74ch; }
-.auth-foot a { color: var(--text-muted); font-weight: var(--fw-semi); }
-.auth-foot a:hover { color: var(--text); }
+.brand-body { display: flex; flex-direction: column; gap: var(--a-pad); }
 
-/* ------------------------------------------------------------------ narrower */
-@media (max-width: 1180px) {
-  .auth-stage { grid-template-columns: minmax(var(--s-5), 1fr) minmax(0, 456px) minmax(0, 360px) minmax(var(--s-5), 1fr); }
+.brand-card {
+  background: var(--surface); color: var(--text);
+  border-radius: 18px; padding: 26px;
+  box-shadow: 0 20px 48px rgba(0,0,0,.22);
 }
-@media (max-width: 940px) {
-  .auth-stage {
-    grid-template-columns: minmax(0, 1fr);
-    padding: var(--s-6) var(--s-5);
-    gap: var(--s-5);
-  }
-  .auth-panel, .auth-aside { grid-column: 1; max-width: 456px; width: 100%; margin-inline: auto; }
-  .auth::after { background: linear-gradient(to bottom, var(--bg) 34%, rgba(238,245,240,.88)); }
+.brand-card h2 {
+  font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 700;
+  line-height: 1.2; letter-spacing: -0.015em;
 }
-@media (max-width: 560px) {
-  .auth-bar, .auth-foot { padding-inline: var(--s-5); }
-  .auth-panel { padding: var(--s-5); }
-  .code-row input { width: 100%; height: 48px; }
-  .auth-when b { display: none; }
+.brand-card p { margin-top: 10px; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-muted); }
+.clinic-illo { display: block; width: 100%; height: auto; margin-top: 20px; }
+
+.brand-note h2 {
+  font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
+  line-height: 1.2; letter-spacing: -0.02em;
+}
+.brand-note p { margin-top: 12px; font-size: var(--fs-md); line-height: 1.6; color: rgba(255,255,255,.88); }
+.brand-note a {
+  display: inline-block; margin-top: 16px; font-size: var(--fs-sm); font-weight: var(--fw-bold);
+  color: #FFFFFF; text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- narrower */
+@media (max-width: 1100px) {
+  .auth { --a-col: 380px; }
+}
+@media (max-width: 900px) {
+  .auth { grid-template-columns: 1fr; }
+  .auth-brand { display: none; }
+  .auth-form { min-height: 100dvh; }
+}
+@media (max-width: 480px) {
+  .auth { --a-pad: 22px; }
+  .code-row { gap: 7px; }
+  .code-row input { height: 56px; font-size: var(--fs-xl); }
 }

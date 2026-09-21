@@ -27,8 +27,8 @@ export default function BrandScene() {
       const camera = new THREE.PerspectiveCamera(46, el.clientWidth / el.clientHeight, 0.1, 200);
       // Looking down the field rather than along it, so the contours spread
       // across the frame instead of bunching at the horizon.
-      camera.position.set(3, 11.5, 19);
-      camera.lookAt(0, -0.5, -5);
+      camera.position.set(0, 12, 17);
+      camera.lookAt(0, -1, -6);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
@@ -56,17 +56,16 @@ export default function BrandScene() {
 
       const uniforms = {
         uTime:  { value: 0 },
-        uNear:  { value: new THREE.Color('#15803E') },
-        uFar:   { value: new THREE.Color('#8FC6A6') },
+        uNear:  { value: new THREE.Color('#6FDBA0') },
+        uFar:   { value: new THREE.Color('#166B3C') },
       };
 
       const mat = new THREE.ShaderMaterial({
         uniforms,
         transparent: true,
         depthWrite: false,
-        // Normal blending, not additive: on a light canvas additive washes
-        // straight out to white.
-        blending: THREE.NormalBlending,
+        // Additive: the field sits on the deep green brand panel.
+        blending: THREE.AdditiveBlending,
         vertexShader: `
           uniform float uTime;
           attribute float aRow;
@@ -94,7 +93,7 @@ export default function BrandScene() {
           varying float vEdge;
           void main() {
             vec3 c = mix(uFar, uNear, pow(vRow, 1.6));
-            float a = (0.12 + pow(vRow, 1.25) * 0.62) * vEdge;
+            float a = (0.10 + pow(vRow, 1.30) * 0.46) * vEdge;
             gl_FragColor = vec4(c, a);
           }`,
       });

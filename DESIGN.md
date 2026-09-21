@@ -256,6 +256,22 @@ Two rules keep that honest:
   sidebar, so a four-column grid kept overflowing at widths the breakpoint
   thought were roomy.
 
+### Panels in a row
+
+**A card header is one height**, `--h-sm + 17px`, whether or not it carries a
+button. `min-height` is on the border box, so 44px of button plus 8px of
+padding each side plus the 1px rule is 61, not 60 — and a header a pixel
+taller than the one beside it puts the first row of each table on a different
+line, which is the most visible misalignment a report page can have.
+
+**`.dash-grid.equal`** makes every panel in a row the same height, so two
+tables side by side finish together instead of one ending in mid-air. The
+panel that runs short fills with something useful — a total the rows add up
+to — rather than with air.
+
+A chart fills the height its row gives it, and **carries its numbers**: a bar
+chart you have to hover to read is a decoration.
+
 ### Sections, and the few real cards
 
 A block of related content is a **section**: an `h2`, a rule, and its rows,

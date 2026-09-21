@@ -237,8 +237,8 @@ The prototype was checked in headless Chromium:
 - **Sideways overflow** — every route at 1440px and 1280px, asserting nothing
   pushes the shell wider than the window and drags the sidebar off-screen
 - **Consistency** — one tab design across every track in the product, nothing
-  scrolled out of a tab row, and every two-line cell leading with the heavier,
-  larger line
+  scrolled out of a tab row, every two-line cell leading with the heavier,
+  larger line, and card headers side by side agreeing to the pixel
 - **Row actions** — drawn as vectors with no border or fill, one icon size,
   44px targets, an accessible name and a tooltip each, evenly spaced and
   aligned in columns down both grids

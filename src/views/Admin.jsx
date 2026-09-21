@@ -255,13 +255,20 @@ export default function Admin() {
         <div className="page-title"><h1>Admin</h1><span className="page-sub">Practice configuration for Kora Health, Newmarket</span></div>
         <div className="page-actions"><Link className="btn btn-secondary btn-sm" to="/styleguide"><Sparkles size={14} /> Design system</Link></div>
       </div>
+      {/* A row, not a tile. Stacked, each card was about 170px tall for two
+          lines of text; laid out across, the same content is 76px and twice
+          as many fit on screen. */}
       <div className="settings-grid mb-6">{CARDS.map(c => (
         <button className="card card-link setting-card" key={c.id} data-card={c.id}
           onClick={() => ['users', 'types', 'codes', 'rooms', 'tpl', 'brand'].includes(c.id)
             ? nav(`/admin/${c.id}`) : toast(c.title, 'This settings area would open here.', 'info')}>
-          <span className="sc-ic"><c.Icon size={18} /></span>
-          <span><b className="t-h4" style={{ display: 'block' }}>{c.title}</b><span className="t-sm muted">{c.sub}</span></span>
-          <span className="row between mt-2"><span className="chip">{c.meta}</span><ChevronRight size={15} className="subtle" /></span>
+          <span className="sc-ic"><c.Icon size={20} /></span>
+          {/* The count leads the second line instead of sitting in a chip of
+              its own column: a chip as wide as "12 SESSIONS/WEEK" was pushing
+              the titles onto two lines and no two cards were the same height. */}
+          <span className="sc-body"><b>{c.title}</b>
+            <span><em className="sc-meta">{c.meta}</em> · {c.sub}</span></span>
+          <ChevronRight size={18} className="subtle sc-go" />
         </button>
       ))}</div>
       <h2 className="t-h3 mb-3 mt-6">Integrations</h2>

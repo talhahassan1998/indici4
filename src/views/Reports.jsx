@@ -1,7 +1,7 @@
 import { DollarSign, CalendarDays, X, Mail, ChevronRight, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import K from '../data/sample.js';
-import { money, invoiceTotals } from '../lib/format.js';
+import { money, money0, invoiceTotals } from '../lib/format.js';
 import { Avatar } from '../components/Primitives.jsx';
 
 const WEEKS = [
@@ -26,27 +26,38 @@ export default function Reports() {
           <button className="btn btn-secondary btn-sm"><Download size={14} /> Export CSV</button>
         </div>
       </div>
-      <div className="dash-grid">
-        {[{ l: 'Revenue', v: money(WEEKS.reduce((s, w) => s + w.rev, 0)), s: '+12% on prior 6 weeks', tone: 'ok', Icon: DollarSign },
-          { l: 'Appointments', v: '412', s: '68 per week average', tone: '', Icon: CalendarDays },
-          { l: 'DNA rate', v: '5.6%', s: '23 missed appointments', tone: 'warn', Icon: X },
-          { l: 'Letter turnaround', v: '4.2h', s: 'Target under 6 hours', tone: 'ok', Icon: Mail },
-        ].map(s => (
-          <div className="col-3" key={s.l}><div className="card stat">
-            <div className="stat-top"><span className={`stat-ic ${s.tone}`}><s.Icon size={15} /></span>
-              <span className="stat-label">{s.l}</span></div>
-            <span className="stat-value">{s.v}</span><span className="stat-sub">{s.s}</span></div></div>
+      {/* The same divided line of figures the rest of the product uses, not
+          four matching tiles. */}
+      <div className="fig-row mb-5">
+        {[{ l: 'Revenue', v: money(WEEKS.reduce((s, w) => s + w.rev, 0)), s: '+12% on prior 6 weeks', tone: '' },
+          { l: 'Appointments', v: '412', s: '68 per week average', tone: '' },
+          { l: 'DNA rate', v: '5.6%', s: '23 missed appointments', tone: 'is-warn' },
+          { l: 'Letter turnaround', v: '4.2h', s: 'Target under 6 hours', tone: 'is-ok' },
+        ].map(f => (
+          <div className={`fig ${f.tone}`} key={f.l}>
+            <b>{f.v}</b><span>{f.l}</span><small>{f.s}</small>
+          </div>
         ))}
+      </div>
 
+      <div className="dash-grid equal">
         <div className="col-8"><section className="card">
-          <div className="card-hd"><h3>Revenue by week</h3></div>
-          <div className="card-bd">
+          <div className="card-hd"><h3>Revenue by week</h3><span className="spacer" />
+            <span className="t-sm muted">W38 is the week in progress</span></div>
+          {/* One column per week: the figure, the bar, the label. A bar chart
+              you have to hover to read is a decoration. */}
+          <div className="card-bd bars-bd">
             <div className="bars">{WEEKS.map((w, i) => (
-              <div className={`bar ${i === WEEKS.length - 1 ? 'alt' : ''}`} key={w.l}
-                style={{ height: `${Math.round(w.rev / max * 100)}%` }}
-                title={`${w.l}: ${money(w.rev)}`} aria-label={`${w.l} ${money(w.rev)}`} />
+              <div className="bar-col" key={w.l}>
+                <span className="bar-v">{money0(w.rev)}</span>
+                <span className="bar-wrap">
+                  <span className={`bar ${i === WEEKS.length - 1 ? 'alt' : ''}`}
+                    style={{ height: `${Math.round(w.rev / max * 100)}%` }}
+                    aria-label={`${w.l}: ${money(w.rev)}`} />
+                </span>
+                <span className="bar-l">{w.l}</span>
+              </div>
             ))}</div>
-            <div className="bar-labels">{WEEKS.map(w => <span key={w.l}>{w.l}</span>)}</div>
           </div>
         </section></div>
 
@@ -93,6 +104,13 @@ export default function Reports() {
                     background: tone === 'bad' ? 'var(--bad-fg)' : tone === 'warn' ? 'var(--warn-fg)' : 'var(--accent)' }} /></div></td>
               </tr>
             ))}</tbody></table></div>
+          {/* The brackets are only useful against the total they add up to. */}
+          <div className="grid-foot">
+            <span className="t-sm muted">11 outstanding</span>
+            <span className="spacer" />
+            <span className="gf-fig is-lead"><span>Total owed</span><b className="num">{money(5193)}</b></span>
+            <span className="gf-fig is-bad"><span>Over 30 days</span><b className="num">{money(2196.5)}</b></span>
+          </div>
         </section></div>
       </div>
     </div>

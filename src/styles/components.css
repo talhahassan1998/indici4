@@ -206,9 +206,15 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 .card-flat { box-shadow: inset 0 0 0 1px var(--line-faint); background: var(--surface-2); }
 .card-raised { box-shadow: inset 0 0 0 1px var(--line-strong); }
 .card-pad { padding: var(--s-5); }
+/* One height, whether or not the header carries a button. Two cards side by
+   side with headers of different heights put their first rows on different
+   lines, which is the single most visible misalignment on a report page. */
 .card-hd {
-  display: flex; align-items: center; gap: var(--s-3);
-  padding: 11px var(--s-4);
+  display: flex; align-items: center; gap: var(--s-3); flex: none;
+  /* The button is 44px, the padding 8px each side and the bottom rule 1px,
+     and min-height is on the border box: 61, not 60, or a header with a
+     button in it is a pixel taller than one without. */
+  min-height: calc(var(--h-sm) + 17px); padding: 8px var(--s-4);
   border-bottom: 1px solid var(--line-faint);
 }
 .card-hd h3 { font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: 0.1em;

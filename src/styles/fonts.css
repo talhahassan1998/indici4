@@ -1,8 +1,10 @@
 /* ==========================================================================
    Kora Health - typefaces, served locally (Roboto, Apache 2.0).
-   The Roboto superfamily rather than one sans everywhere: Slab carries
-   headings and gives the product a voice, Roboto does the interface work,
-   Mono holds every identifier and figure so columns line up.
+
+   One face for text. Headings are Roboto set heavier and tighter, not a
+   second family: a display face gives a product a voice, and it also gives a
+   reader over fifty a second set of letterforms to decode. Roboto Mono stays,
+   because a column of figures has to line up.
 
    Self-hosted, never a CDN, so the app renders identically in a clinic with
    bad internet.
@@ -20,11 +22,6 @@
   src:url('../fonts/roboto-latin-700-normal.woff2') format('woff2'); }
 @font-face { font-family:'Kora Sans'; font-style:normal; font-weight:800; font-display:swap;
   src:url('../fonts/roboto-latin-800-normal.woff2') format('woff2'); }
-
-@font-face { font-family:'Kora Display'; font-style:normal; font-weight:600; font-display:swap;
-  src:url('../fonts/roboto-slab-latin-600-normal.woff2') format('woff2'); }
-@font-face { font-family:'Kora Display'; font-style:normal; font-weight:700; font-display:swap;
-  src:url('../fonts/roboto-slab-latin-700-normal.woff2') format('woff2'); }
 
 @font-face { font-family:'Kora Mono'; font-style:normal; font-weight:400; font-display:swap;
   src:url('../fonts/roboto-mono-latin-400-normal.woff2') format('woff2'); }

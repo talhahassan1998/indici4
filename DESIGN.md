@@ -256,6 +256,25 @@ Two rules keep that honest:
   sidebar, so a four-column grid kept overflowing at widths the breakpoint
   thought were roomy.
 
+### Full-height shells
+
+A screen built around one long-running task — the consult, the inbox, the
+letter editor, the patient grid — is a **frame, not a page**: a header that
+stays, a body that fills what is left, an action bar at the foot, and scroll
+that belongs to the panes rather than to the document.
+
+The consult scrolled as a page, so its sticky action bar sat on top of the
+note and cut the function rail in half. It is `.consult-shell` now:
+`height: calc(100vh - var(--topbar-h))`, three columns that start on the same
+line, are the same height, and each scroll on their own.
+
+Below 1120px the frame gives up and the page scrolls normally. Reflowing a
+column into a second row inside a frame that cannot grow only hides it.
+
+A computed value that sits in a row of fields takes a field's box
+(`.readout`): same height, same radius, plainly not something you type into.
+An unbordered value among bordered inputs is the cell that looks broken.
+
 ### Panels in a row
 
 **A card header is one height**, `--h-sm + 17px`, whether or not it carries a

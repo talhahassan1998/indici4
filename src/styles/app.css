@@ -811,17 +811,27 @@
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
   padding: 9px var(--s-6); border-top: 1px solid var(--line-faint); background: var(--surface-2);
 }
-.cb-ctl { display: flex; align-items: center; gap: 7px; }
+.cb-ctl { display: flex; align-items: center; gap: var(--s-2); }
+.cb-ctl > .label { white-space: nowrap; color: var(--text-muted); }
 .cb-ctl .select { max-width: 168px; }
 
-.consult-body {
-  display: grid; grid-template-columns: 216px minmax(0, 1fr) minmax(300px, 380px);
-  gap: var(--s-5); align-items: start;
-  padding: var(--s-5) var(--s-6) var(--s-9);
-  max-width: var(--content-max); margin: 0 auto;
+/* Banner, body, action bar: the first and last stay put, the middle scrolls,
+   and each of its three columns scrolls on its own. */
+.consult-shell {
+  display: flex; flex-direction: column;
+  height: calc(100vh - var(--topbar-h)); min-height: 0;
 }
+.consult-body {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: 224px minmax(0, 1fr) minmax(320px, 400px);
+  gap: var(--s-5); align-items: stretch;
+  padding: var(--s-4) var(--page-gutter);
+}
+.consult-main { min-width: 0; overflow-y: auto; padding-bottom: var(--s-6); }
+.consult-side { min-width: 0; overflow-y: auto; padding-bottom: var(--s-6); }
+.consult-side > .card { display: flex; flex-direction: column; }
 
-.fn-rail { position: sticky; top: calc(var(--topbar-h) + 8px); display: flex; flex-direction: column; gap: var(--s-4); }
+.fn-rail { overflow-y: auto; display: flex; flex-direction: column; gap: var(--s-4); padding-bottom: var(--s-6); }
 .fn-group { display: flex; flex-direction: column; gap: 1px; }
 .fn-item {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
@@ -838,21 +848,28 @@
 .soap-field .textarea { min-height: 96px; }
 
 .consult-foot {
-  position: sticky; bottom: 0; z-index: 25;
+  flex: none; z-index: 25;
   border-top: 1px solid var(--line); border-bottom: 0;
   background: var(--surface);
 }
 
-@media (max-width: 1280px) {
-  .consult-body { grid-template-columns: 200px minmax(0, 1fr); }
-  .consult-body > div:last-child { grid-column: 1 / -1; }
+@media (max-width: 1360px) {
+  .consult-body { grid-template-columns: 200px minmax(0, 1fr) minmax(300px, 340px); gap: var(--s-4); }
 }
-@media (max-width: 900px) {
-  .consult-body { grid-template-columns: 1fr; }
-  .fn-rail { position: static; flex-direction: row; overflow-x: auto; gap: var(--s-3); padding-bottom: var(--s-2); }
+/* Below this the three panes cannot all earn their width, so the shell stops
+   being a fixed-height frame and the page scrolls normally. Reflowing a
+   column into a second row inside a frame that does not grow only hides it. */
+@media (max-width: 1120px) {
+  .consult-shell { height: auto; }
+  .consult-body { grid-template-columns: 1fr; overflow: visible; }
+  .fn-rail, .consult-main, .consult-side { overflow: visible; }
+  .fn-rail { flex-direction: row; flex-wrap: wrap; overflow-x: auto; gap: var(--s-3); padding-bottom: var(--s-2); }
   .fn-group { flex-direction: row; gap: 2px; }
   .fn-group .nav-group-label { display: none; }
   .fn-item { white-space: nowrap; }
+  .consult-foot { position: sticky; bottom: 0; }
+}
+@media (max-width: 900px) {
   .cb-alerts { align-items: flex-start; max-width: none; flex-direction: row; flex-wrap: wrap; }
 }
 

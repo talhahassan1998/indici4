@@ -103,6 +103,16 @@
 .input-group .affix { position: absolute; right: 10px; color: var(--text-subtle); font-size: var(--fs-xs); }
 .input-money { font-variant-numeric: tabular-nums; }
 
+/* A computed value shown where a field would be: same height, same radius,
+   same rhythm, but plainly not something you type into. */
+.readout {
+  display: flex; align-items: center; gap: var(--s-2);
+  height: var(--h-md); padding: 0 13px;
+  background: var(--surface-3); border: 1px solid var(--line);
+  border-radius: var(--r-sm); font-size: var(--fs-md);
+}
+.readout b { font-weight: var(--fw-bold); }
+
 /* The label is what gets pressed, so it carries the target size, not the
    toggle graphic. */
 label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: center; }

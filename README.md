@@ -238,7 +238,9 @@ The prototype was checked in headless Chromium:
   pushes the shell wider than the window and drags the sidebar off-screen
 - **Consistency** — one tab design across every track in the product, nothing
   scrolled out of a tab row, every two-line cell leading with the heavier,
-  larger line, and card headers side by side agreeing to the pixel
+  larger line, card headers side by side agreeing to the pixel, and the
+  consult's three panes starting on one line, the same height, with the page
+  itself not scrolling
 - **Row actions** — drawn as vectors with no border or fill, one icon size,
   44px targets, an accessible name and a tooltip each, evenly spaced and
   aligned in columns down both grids

@@ -214,12 +214,16 @@ export default function Consult() {
             <span className="hint">{u}</span>
           </div>
         ))}
+        {/* A readout, but it sits in the same grid as the fields around it, so
+            it takes the same box: an unbordered value in a row of bordered
+            inputs is the cell that looks broken. */}
         <div className="field">
           <span className="label">BMI</span>
-          <div className="row g-2" id="bmiOut" style={{ height: 'var(--h-md)', alignItems: 'center' }}>
-            {b ? <><b className="t-h4 num">{b}</b><span className={`chip ${band[1]}`}>{band[0]}</span></>
-               : <span className="t-sm subtle">Weight and height</span>}
+          <div className="readout" id="bmiOut">
+            {b ? <><b className="num">{b}</b><span className={`chip ${band[1]}`}>{band[0]}</span></>
+               : <span className="subtle">Not yet</span>}
           </div>
+          <span className="hint">From weight and height</span>
         </div>
       </div>
     </section>
@@ -248,8 +252,12 @@ export default function Consult() {
     </section>
   );
 
+  /* A fixed-height shell, like the inbox and the letter editor: the banner and
+     the action bar stay put and each of the three columns scrolls on its own.
+     Before this the whole page scrolled, so the sticky footer sat on top of
+     the note and the function rail was cut in half by it. */
   return (
-    <>
+    <div className="consult-shell">
       <div className="consult-banner">
         <div className="cb-row">
           <Avatar id={p.id} size="lg" />
@@ -278,11 +286,11 @@ export default function Consult() {
           </div>
         </div>
         <div className="cb-strip">
-          <label className="cb-ctl"><span className="t-eyebrow">Consult type</span>
+          <label className="cb-ctl"><span className="label">Consult type</span>
             <select className="select" value={type} onChange={e => { setType(e.target.value); bump(); }}>
               {K.consultTypes.map(t => <option key={t}>{t}</option>)}
             </select></label>
-          <label className="cb-ctl"><span className="t-eyebrow">Consult</span>
+          <label className="cb-ctl"><span className="label">Consult</span>
             <select className="select" defaultValue="Consult 1"><option>Consult 1</option><option>Consult 2</option></select></label>
           <span className={`chip ${running ? 'chip-ok' : ''}`}><i className="dot" />
             <span className="t-mono" id="timerText">{mm}:{ss}</span></span>
@@ -313,14 +321,14 @@ export default function Consult() {
           ))}
         </nav>
 
-        <div className="col g-7" style={{ minWidth: 0 }}>
+        <div className="consult-main col g-7">
           {fn === 'meas' ? <>{MeasCard}{NoteCard}</>
             : fn === 'coding' ? <>{CodingCard}{NoteCard}</>
             : <>{NoteCard}{MeasCard}{CodingCard}</>}
         </div>
 
-        <div style={{ minWidth: 0 }}>
-          <section className="card" style={{ position: 'sticky', top: 'calc(var(--topbar-h) + 8px)' }}>
+        <div className="consult-side">
+          <section className="card">
             <nav className="tabs" role="tablist">
               {PANELS.map(t => (
                 <button role="tab" key={t} aria-selected={panel === t} data-panel={t} onClick={() => setPanel(t)}>{t}</button>
@@ -346,7 +354,7 @@ export default function Consult() {
         <button className="btn btn-primary btn-sm" onClick={() => sign(true)}><Mail size={14} /> Sign and write letter</button>
       </div>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
-    </>
+    </div>
   );
 }
 

@@ -9,5 +9,5 @@
    internet should still get a working sign-in screen. The stage falls back to
    the SVG on its own if the host is unreachable, so a dead link costs a look,
    not a login. */
-export const WALK_VIDEO = '/walking.mp4';
+export const WALK_VIDEO = './walking.mp4';
 export const WALK_POSTER = null;

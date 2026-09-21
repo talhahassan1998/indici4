@@ -860,15 +860,6 @@
 /* A grid bar inside a card sits flush with the card's edge. */
 .card > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
 
-/* A one-line note under a page header. Not a banner: a banner is for something
-   that has changed, and this has not changed since the account was set up. */
-.page-note {
-  display: flex; align-items: flex-start; gap: 9px;
-  margin: var(--s-4) 0 var(--s-6); max-width: 92ch;
-  font-size: var(--fs-sm); line-height: 1.5; color: var(--text-muted);
-}
-.page-note svg { flex: none; margin-top: 2px; color: var(--accent-text); }
-
 /* The foot of a grid: what the filter is showing, added up. */
 .grid-foot {
   flex: none; display: flex; align-items: center; gap: var(--s-5); flex-wrap: wrap;
@@ -980,40 +971,13 @@
 .pager button[aria-current="true"] { background: var(--accent); color: var(--text-on-accent); }
 .pager button:disabled { opacity: .35; cursor: not-allowed; }
 
-/* Name and Actions stay pinned while the middle columns scroll horizontally —
-   otherwise the most-used column is the one furthest off-screen. */
-.ps-grid thead th:first-child,
-.ps-grid tbody td:first-child { position: sticky; left: 0; z-index: 2; background: var(--surface); }
-/* Two columns ride the left edge now — the checkbox and the name — so the
-   second one starts where the first one ends and the shadow moves with it. */
-.ps-grid thead th:nth-child(2),
-.ps-grid tbody td:nth-child(2) { position: sticky; left: 46px; z-index: 2; background: var(--surface); }
-.ps-grid thead th:nth-child(2) { z-index: 5; background: var(--th-bg); }
+/* No pinned columns. Only the header row sticks. Pinning the name and the
+   actions kept them on screen, but it also cut the columns that scrolled
+   underneath mid-word with no way to see what was behind, and the two frozen
+   edges made the grid feel like three tables instead of one. The whole row
+   scrolls together now. */
 .ps-grid th.sel-cell, .ps-grid td.sel-cell {
   width: 46px; min-width: 46px; padding-left: var(--s-4); padding-right: 0;
 }
 .ps-grid td.sel-cell { cursor: default; }
 .ps-grid tbody tr[data-selected] > td { background: var(--accent-soft); }
-.ps-grid thead th:last-child,
-.ps-grid tbody td:last-child  { position: sticky; right: 0; z-index: 2; background: var(--surface); }
-.ps-grid thead th:first-child,
-.ps-grid thead th:last-child  { z-index: 5; background: var(--th-bg); }
-
-/* A soft edge, not just a hairline: it has to read as floating over the
-   columns that scroll underneath, or the row looks like it simply ends. */
-.ps-grid tbody td:nth-child(2) { box-shadow: 6px 0 7px -6px rgba(13,35,26,.22), 1px 0 0 var(--line-faint); }
-.ps-grid tbody td:last-child  { box-shadow: -6px 0 7px -6px rgba(13,35,26,.22), -1px 0 0 var(--line-faint); }
-.ps-grid thead th:nth-child(2) { box-shadow: 6px 0 7px -6px rgba(13,35,26,.22), 1px 0 0 var(--line); }
-.ps-grid thead th:last-child  { box-shadow: -6px 0 7px -6px rgba(13,35,26,.22), -1px 0 0 var(--line); }
-:root[data-theme="dark"] .ps-grid tbody td:nth-child(2),
-:root[data-theme="dark"] .ps-grid thead th:nth-child(2) { box-shadow: 6px 0 8px -6px rgba(0,0,0,.6), 1px 0 0 var(--line); }
-:root[data-theme="dark"] .ps-grid tbody td:last-child,
-:root[data-theme="dark"] .ps-grid thead th:last-child  { box-shadow: -6px 0 8px -6px rgba(0,0,0,.6), -1px 0 0 var(--line); }
-
-/* Pinned cells paint their own background, so the row hover has to be repeated. */
-.ps-grid tbody tr:hover td:first-child,
-.ps-grid tbody tr:hover td:nth-child(2),
-.ps-grid tbody tr:hover td:last-child { background: var(--surface-2); }
-.ps-grid tbody tr:focus-visible td:first-child,
-.ps-grid tbody tr:focus-visible td:nth-child(2),
-.ps-grid tbody tr:focus-visible td:last-child { background: var(--accent-soft); }

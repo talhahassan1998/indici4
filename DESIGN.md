@@ -268,7 +268,12 @@ need to wrap opt in with `.wrap-cell`.
 
 **Selection** is a 46px first column carrying a `.check`, with a select-all in
 the header. A selected row says so with a tint, not only with a ticked box in
-the corner of the eye. The patient grid pins that column and the name beside it.
+the corner of the eye.
+
+**No frozen columns.** Only the header row sticks. Pinning the name and the
+actions kept them on screen, but it cut the columns scrolling underneath
+mid-word with no way to see what was behind, and the two frozen edges made one
+grid feel like three tables. The whole row scrolls together.
 
 **The bar over the grid** (`.grid-bar`) carries what you have, what you have
 selected, the bulk action that selection unlocks, and the pages. It sits
@@ -433,7 +438,7 @@ a courtesy.
 | ≥ 1400px | Full shell, sidebar expanded, grids at full column count |
 | 1100–1400px | Content columns narrow; sidebar unchanged |
 | 900–1100px | Sign-in drops its brand panel; app sidebar collapses to the 68px rail |
-| < 900px | Single column; grids scroll horizontally with pinned first and last columns |
+| < 900px | Single column; grids scroll horizontally, the header row alone stays put |
 | < 480px | Sign-in padding drops to 22px; code inputs shrink but stay ≥ 56px tall |
 
 **Touch targets ≥ 44×44px** everywhere, and ≥ 52px on the sign-in surface. The

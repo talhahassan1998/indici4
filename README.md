@@ -229,9 +229,9 @@ The prototype was checked in headless Chromium:
   search with NHI check-digit validation, and the consult screen end to end:
   SOAP autosave, BMI, templates, dot phrases, the confidential flag, the
   function rail, services for invoicing, and sign-and-file
-- **Patient grid** — 494 records, full-width layout, pinned selection, Name and
-  Actions columns, sticky header, sorting, paging, live filtering, row
-  selection and the bulk action it unlocks
+- **Patient grid** — 494 records, full-width layout, sticky header, no frozen
+  columns, sorting, paging, live filtering, row selection and the bulk action
+  it unlocks
 - **Rows of controls** — every `.input`, `.select` and `.btn` sharing a line is
   measured across 13 routes and must agree to the pixel
 - **Sideways overflow** — every route at 1440px and 1280px, asserting nothing

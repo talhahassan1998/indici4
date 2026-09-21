@@ -36,11 +36,6 @@ export default function Billing() {
   const toggleOne = id => setSel(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const toggleAll = () => setSel(allSelected ? new Set() : new Set(list.map(i => i.id)));
 
-  const sum = s => K.invoices.filter(i => !s || i.status === s).reduce((a, i) => a + invoiceTotals(i).incl, 0);
-  const count = s => K.invoices.filter(i => i.status === s).length;
-  const todayInv = K.invoices.filter(i => i.date === '2026-09-17');
-  const todayTotal = todayInv.reduce((a, i) => a + invoiceTotals(i).incl, 0);
-
   const openCreate = apptId => open(close =>
     <CreateInvoice close={close} apptId={apptId} toast={toast} onDone={() => force(n => n + 1)} />);
 
@@ -74,30 +69,11 @@ export default function Billing() {
         </div>
       </div>
 
-      {/* One divided line of figures rather than four matching tiles. The
-          numbers are what the page is about, so they are the only thing set
-          large; the colour says which one you have to do something about. */}
-      <div className="fig-row mb-5">
-        {[{ l: 'Invoiced today', v: money(todayTotal), s: `${todayInv.length} invoices`, tone: '' },
-          { l: 'Paid', v: money(sum('paid')), s: `${count('paid')} settled`, tone: 'is-ok' },
-          { l: 'Awaiting payment', v: money(sum('sent')), s: `${count('sent')} sent`, tone: 'is-warn' },
-          { l: 'Overdue', v: money(sum('overdue')), s: `${count('overdue')} past due`, tone: 'is-bad' },
-        ].map(f => (
-          <div className={`fig ${f.tone}`} key={f.l}>
-            <b>{f.v}</b><span>{f.l}</span><small>{f.s}</small>
-          </div>
-        ))}
-      </div>
-
-      {/* This used to be a full banner on every visit. It is true, it is
-          useful once, and it is not news on the four hundredth load, so it is
-          a line under the figures now. */}
-      <p className="page-note">
-        <RefreshCw size={15} /> Codes and prices are mastered in Xero. An invoice is marked paid
-        here automatically once the payment is matched in the bank feed.
-      </p>
-
-      <div className="filter-bar mt-4">
+      {/* The summary strip and the Xero note are gone. Every figure they
+          carried is a filter away in the grid's own footer, which totals what
+          you are actually looking at rather than a fixed four numbers, and
+          the room they took goes to rows. */}
+      <div className="filter-bar">
         <div className="field">
           <label className="label" htmlFor="invQ">What are you looking for?</label>
           <div className="input-group">

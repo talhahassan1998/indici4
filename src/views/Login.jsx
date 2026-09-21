@@ -7,11 +7,28 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   User, Eye, Lock, ChevronLeft, TriangleAlert, Check, Building2, MapPin, LifeBuoy,
+  Mail, ReceiptText, ShieldCheck,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import ClinicIllustration from '../components/ClinicIllustration.jsx';
+import StageScene from '../components/StageScene.jsx';
+import ClinicHero from '../components/ClinicHero.jsx';
 import { Switch } from '../components/Primitives.jsx';
 import { useUi } from '../lib/ui.jsx';
+
+/* Three frames around one form. The form, its three steps and every rule in
+   them are identical in all of them; only what surrounds it changes, so a
+   choice of look never becomes a choice of behaviour. */
+const DESIGNS = [
+  { id: 'split', label: 'Split' },
+  { id: 'stage', label: 'Stage' },
+  { id: 'hero',  label: 'Hero' },
+];
+const DESIGN_KEY = 'kora.auth.design';
+const readDesign = () => {
+  try { const v = localStorage.getItem(DESIGN_KEY); return DESIGNS.some(d => d.id === v) ? v : 'split'; }
+  catch { return 'split'; }
+};
 
 /* Test accounts. One per role, so the prototype can be opened as any of the
    four people the app is designed around, and the role follows you in. */
@@ -47,7 +64,13 @@ export default function Login({ onDone }) {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [ctx, setCtx] = useState({ practice: 'prac-1', location: 'c1' });
   const [acct, setAcct] = useState(ACCOUNTS[0]);
+  const [design, setDesign] = useState(readDesign);
   const boxes = useRef([]);
+
+  const pickDesign = id => {
+    setDesign(id);
+    try { localStorage.setItem(DESIGN_KEY, id); } catch { /* private mode */ }
+  };
 
   const prac = PRACTICES.find(x => x.id === ctx.practice);
   const stepIndex = STEPS.findIndex(s => s.id === step);
@@ -104,18 +127,33 @@ export default function Login({ onDone }) {
     setTimeout(() => onDone({ role: acct.role, practice: prac.name, location: loc.short }), 620);
   };
 
-  return (
-    <main className="auth" id="view" tabIndex={-1}>
-      {/* ------------------------------------------------------ left: form */}
-      <div className="auth-form">
-        <span className="auth-mark">
-          <span className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M7 4v16M7 12l7.5-8M7 12l7.5 8" /></svg>
-          </span>
-          <b>Kora Health</b>
-        </span>
+  const mark = (
+    <span className="auth-mark">
+      <span className="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 4v16M7 12l7.5-8M7 12l7.5 8" /></svg>
+      </span>
+      <b>Kora Health</b>
+    </span>
+  );
 
+  /* The switcher is a prototype control, not a product one: it is here so the
+     three candidate designs can be compared on a real screen rather than in a
+     screenshot. */
+  const switcher = (
+    <div className="auth-switch">
+      <span className="as-label">Design</span>
+      <div className="tabs" role="tablist" aria-label="Sign-in design">
+        {DESIGNS.map(d => (
+          <button key={d.id} role="tab" data-design={d.id} aria-selected={design === d.id}
+            onClick={() => pickDesign(d.id)}>{d.label}</button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const form = (
+    <>
         <div className="auth-body auth-panel">
           <ol className="auth-steps">
             {STEPS.map((s, i) => (
@@ -273,6 +311,75 @@ export default function Login({ onDone }) {
             </form>
           )}
         </div>
+    </>
+  );
+
+  /* ------------------------------------------------------- 2 · Stage ---- */
+  if (design === 'stage') return (
+    <main className="auth auth-stage" id="view" tabIndex={-1}>
+      <section className="stg-panel">
+        <StageScene />
+        <div className="stg-card stg-card-a">
+          <b>Letters approved</b><span>Last week</span>
+          <i className="stg-spark" aria-hidden="true">
+            <svg viewBox="0 0 120 44" preserveAspectRatio="none">
+              <polyline points="4,36 24,30 44,33 64,20 84,24 104,8" fill="none"
+                stroke="#15803E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="104" cy="8" r="4.5" fill="#15803E" />
+            </svg>
+          </i>
+          <span className="stg-n">146 <em>+8.2%</em></span>
+        </div>
+        <div className="stg-card stg-card-b">
+          <b>Invoices paid</b><span>This month</span>
+          <i className="stg-bars" aria-hidden="true">
+            {[38, 56, 30, 70, 48, 86, 64].map((h, n) => <u key={n} style={{ height: `${h}%` }} />)}
+          </i>
+          <span className="stg-n">$41,280 <em>+12.6%</em></span>
+        </div>
+        <ul className="stg-facts">
+          <li><Mail size={17} /> Letters out on Healthlink, signed and filed in one step</li>
+          <li><ReceiptText size={17} /> ACC and Southern Cross billing reconciled in Xero</li>
+          <li><ShieldCheck size={17} /> NHI validated against the national index as you type</li>
+        </ul>
+      </section>
+
+      <div className="auth-form">
+        {mark}
+        {form}
+      </div>
+      {switcher}
+    </main>
+  );
+
+  /* -------------------------------------------------------- 3 · Hero ---- */
+  if (design === 'hero') return (
+    <main className="auth auth-hero" id="view" tabIndex={-1}>
+      <div className="hero-sheet">
+        <figure className="hero-pane">
+          <ClinicHero />
+          <figcaption>
+            <span>Kora Health</span>
+            <b>The whole clinic day, in one place</b>
+          </figcaption>
+        </figure>
+
+        <div className="auth-form hero-form">
+          {mark}
+          {form}
+        </div>
+      </div>
+      {switcher}
+    </main>
+  );
+
+  /* ------------------------------------------------------- 1 · Split ---- */
+  return (
+    <main className="auth" id="view" tabIndex={-1}>
+      {/* ------------------------------------------------------ left: form */}
+      <div className="auth-form">
+        {mark}
+        {form}
       </div>
 
       {/* ----------------------------------------------------- right: brand */}
@@ -296,6 +403,7 @@ export default function Login({ onDone }) {
             {' '}<a href="#" onClick={e => { e.preventDefault(); toast('Set up two-factor', 'Your administrator can walk you through it.', 'info'); }}>Set it up</a></span>
         </p>
       </aside>
+      {switcher}
     </main>
   );
 }

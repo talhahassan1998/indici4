@@ -212,6 +212,9 @@ The prototype was checked in headless Chromium:
   routes, focus ring on 25 tabbed elements, focus trapping in dialogs
 - **Keyboard** — every `g`-then-letter jump, and that a lone `g` or a `g` typed
   into a field never navigates
+- **Sign-in designs** — three frames around one form: the rendered field list,
+  button list, step count and test accounts must be identical in all three,
+  and none may push the page sideways
 - **Sign-in** — its own pass over every visible pairing across all three steps,
   accessible names, and a focus ring on each control
 - **Sign-in alignment** — identical padding on both panels, a shared header

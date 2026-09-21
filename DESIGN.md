@@ -256,6 +256,33 @@ Two rules keep that honest:
   sidebar, so a four-column grid kept overflowing at widths the breakpoint
   thought were roomy.
 
+### Sign-in: three frames, one form
+
+The sign-in carries three candidate designs, switched from a control in the
+corner and remembered per browser:
+
+| id | What it is |
+|---|---|
+| `split` | The default. Form on a light ground, brand panel on green. |
+| `stage` | A light stage with a walking figure and two cards of real numbers, form on the right. After a dark dashboard template, rebuilt light and green. |
+| `hero` | One sheet: a full-bleed consulting room, the form card lifted over its right edge. |
+
+**The form is the same object in all three.** Same fields, same order, same
+labels, same three steps, same test accounts. Only the frame changes, so a
+choice of look never becomes a choice of behaviour — asserted by comparing
+the rendered field list, button list, step count and account count across all
+three.
+
+The figure on `stage` is **SVG, not a rendered video**: it walks, breathes and
+drifts at a few kilobytes, it is sharp at any size, and it still works on a
+clinic PC with no network. The rig only holds together if the bob is on the
+whole figure — put it on the torso alone and the legs stay behind. Every
+animation on that screen stops under `prefers-reduced-motion`.
+
+Both new frames use a soft background wash, so the 50+ audit reports two
+gradients it did not before. They sit behind no text that has to be read, and
+the default frame has none; the audit records them rather than excusing them.
+
 ### Full-height shells
 
 A screen built around one long-running task — the consult, the inbox, the

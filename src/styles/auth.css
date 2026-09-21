@@ -143,7 +143,7 @@
 .pw-wrap .input { padding-right: 52px; }
 .pw-toggle {
   position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  width: 40px; height: 40px; display: grid; place-items: center;
+  width: var(--h-md); height: var(--h-md); display: grid; place-items: center;
   border: 0; background: none; color: var(--text-subtle); cursor: pointer; border-radius: var(--r-sm);
 }
 .pw-toggle:hover { color: var(--text); background: var(--surface-3); }
@@ -215,7 +215,7 @@
   font-weight: var(--fw-bold); color: var(--accent-text); }
 .acct-row {
   display: flex; align-items: baseline; gap: 12px; width: 100%; text-align: left;
-  padding: 9px 16px; border: 0; border-top: 1px solid var(--line-faint);
+  padding: 9px 16px; min-height: var(--h-md); border: 0; border-top: 1px solid var(--line-faint);
   background: none; cursor: pointer; color: var(--text); font-size: var(--fs-sm);
 }
 .acct-row:first-of-type { border-top: 0; }
@@ -279,4 +279,168 @@
   .auth { --a-pad: 22px; }
   .code-row { gap: 7px; }
   .code-row input { height: 52px; font-size: var(--fs-xl); }
+}
+
+/* ==========================================================================
+   Sign-in, designs 2 and 3
+
+   One form, three frames. Everything below is the frame: the fields, their
+   labels, their errors and the three steps are shared, so picking a look
+   never picks different behaviour.
+   ========================================================================== */
+
+/* The prototype's design switcher. It sits in a corner, out of the tab order
+   of the form itself until you reach it, and it is the only control on these
+   screens that is not part of signing in. */
+.auth-switch {
+  position: fixed; right: var(--s-4); bottom: var(--s-4); z-index: 40;
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: 6px 6px 6px 14px; border-radius: 30px;
+  background: var(--surface); box-shadow: var(--sh-2), inset 0 0 0 1px var(--line);
+}
+.auth-switch .as-label {
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text-muted);
+}
+.auth-switch .tabs { box-shadow: none; background: transparent; padding: 0; }
+
+/* --------------------------------------------------------- 2 · Stage ---- */
+/* A light stage on the left with the figure and two live-looking cards, the
+   form on the right. The reference for this one is a dark purple dashboard
+   template; the layout is the borrowed part, the colour is ours. */
+.auth-stage { grid-template-columns: 1.15fr 1fr; background: var(--bg); }
+.auth-stage .auth-form { order: 2; }
+
+.stg-panel {
+  order: 1; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  margin: var(--s-4); border-radius: var(--r-lg);
+  background:
+    radial-gradient(120% 90% at 30% 20%, #FFFFFF 0%, #F1F8F4 45%, #E5EFE7 100%);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.stage-scene { width: min(86%, 470px); }
+.stage-art { width: 100%; height: auto; display: block; }
+
+/* ---- The walk. Four loops on one 1.6s clock: the legs and arms swing in
+   opposite pairs, the body rises on each stride, and the whole figure drifts
+   a few pixels so it reads as moving through the scene rather than marching
+   on the spot. ---- */
+/* The bob is on the whole figure. Put it on the torso alone and the legs stay
+   behind, which is exactly how a walk cycle comes apart. */
+.stg-figure { animation: stg-bob .9s ease-in-out infinite; transform-origin: 210px 460px; }
+.stg-body   { animation: stg-lean .9s ease-in-out infinite; transform-origin: 210px 322px; }
+.stg-head   { animation: stg-nod .9s ease-in-out infinite; transform-origin: 210px 186px; }
+.stg-leg-f  { animation: stg-swing 1.8s ease-in-out infinite; transform-origin: 222px 322px; }
+.stg-leg-b  { animation: stg-swing 1.8s ease-in-out infinite reverse; transform-origin: 200px 322px; }
+.stg-arm-f  { animation: stg-swing-arm 1.8s ease-in-out infinite reverse; transform-origin: 238px 214px; }
+.stg-arm-b  { animation: stg-swing-arm 1.8s ease-in-out infinite; transform-origin: 182px 214px; }
+.stg-shadow { animation: stg-shadow 1.8s ease-in-out infinite; transform-origin: 210px 470px; }
+.stg-ring   { animation: stg-turn 30s linear infinite; transform-origin: 210px 236px; }
+.stg-tablet { animation: stg-tablet .9s ease-in-out infinite; transform-origin: 245px 282px; }
+
+@keyframes stg-bob    { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+@keyframes stg-lean   { 0%,100% { transform: rotate(-.9deg) } 50% { transform: rotate(.9deg) } }
+@keyframes stg-nod    { 0%,100% { transform: rotate(1.2deg) } 50% { transform: rotate(-1.2deg) } }
+@keyframes stg-swing  { 0%,100% { transform: rotate(14deg) } 50% { transform: rotate(-14deg) } }
+@keyframes stg-swing-arm { 0%,100% { transform: rotate(11deg) } 50% { transform: rotate(-11deg) } }
+@keyframes stg-shadow { 0%,100% { transform: scaleX(1); opacity: .14 } 50% { transform: scaleX(.88); opacity: .09 } }
+@keyframes stg-turn   { to { transform: rotate(360deg) } }
+@keyframes stg-tablet { 0%,100% { transform: rotate(-3deg) } 50% { transform: rotate(3deg) } }
+
+/* The cards are HTML over the art, so the numbers are text: selectable,
+   translatable and sharp at any zoom. */
+.stg-card {
+  position: absolute; width: 208px; padding: var(--s-4);
+  border-radius: var(--r-md); background: var(--surface);
+  box-shadow: var(--sh-3), inset 0 0 0 1px var(--line);
+  display: flex; flex-direction: column; gap: 2px;
+  animation: stg-float 7s var(--ease) infinite;
+}
+.stg-card-a { left: 4%;  top: 16%; }
+.stg-card-b { right: 3%; top: 44%; animation-delay: -3.5s; }
+.stg-card b { font-size: var(--fs-md); font-weight: var(--fw-semi); }
+.stg-card > span:first-of-type { font-size: var(--fs-sm); color: var(--text-muted); }
+.stg-card .stg-n {
+  margin-top: var(--s-3); font-family: var(--font-mono); font-size: var(--fs-xl);
+  font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  display: flex; align-items: baseline; gap: var(--s-2);
+}
+.stg-card .stg-n em {
+  font-style: normal; font-family: var(--font-sans);
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--ok-fg);
+}
+.stg-spark { display: block; height: 44px; margin-top: var(--s-3); }
+.stg-spark svg { width: 100%; height: 100%; }
+.stg-bars { display: flex; align-items: flex-end; gap: 5px; height: 44px; margin-top: var(--s-3); }
+.stg-bars u { flex: 1; border-radius: 3px 3px 1px 1px; background: var(--accent); opacity: .85; }
+.stg-bars u:nth-child(even) { background: var(--pou-300); }
+@keyframes stg-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
+
+.stg-facts {
+  position: absolute; left: var(--s-6); right: var(--s-6); bottom: var(--s-6);
+  list-style: none; display: flex; flex-direction: column; gap: 10px;
+}
+.stg-facts li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: var(--fs-sm); color: var(--accent-text); font-weight: var(--fw-medium);
+}
+.stg-facts svg { flex: none; }
+
+/* ---------------------------------------------------------- 3 · Hero ---- */
+/* One sheet on a tinted ground: a picture that fills its half, and the form
+   card lifted over it, the way the reference puts the panel across the photo. */
+/* `.auth` is a two-column grid; without resetting the template the sheet lands
+   in the first column and stops at half the window. */
+.auth-hero {
+  display: grid; grid-template-columns: minmax(0, 1fr); place-items: center;
+  overflow: hidden;
+  background: radial-gradient(90% 70% at 50% 0%, var(--pou-50) 0%, var(--bg-sunken) 100%);
+  padding: var(--s-5) var(--s-4);
+}
+/* The sheet is bounded by the window, and the form scrolls inside it. Left to
+   grow, it pushed the picture's caption off the bottom of the screen. */
+.hero-sheet {
+  position: relative; display: grid; grid-template-columns: 1fr minmax(400px, 500px);
+  gap: 0; align-items: stretch;
+  width: min(1280px, 100%); height: min(860px, calc(100vh - var(--s-8)));
+  background: var(--surface); border-radius: var(--r-xl);
+  box-shadow: var(--sh-4), inset 0 0 0 1px var(--line);
+  padding: var(--s-4); overflow: hidden;
+}
+.hero-pane {
+  position: relative; margin: 0; overflow: hidden;
+  border-radius: var(--r-lg); background: #0B2A1A;
+}
+.hero-art { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-pane figcaption {
+  position: absolute; left: var(--s-6); bottom: var(--s-6); right: var(--s-6);
+  display: flex; flex-direction: column; gap: 4px;
+  padding: var(--s-4) var(--s-5); border-radius: var(--r-md);
+  background: rgba(8, 30, 19, .72); color: #FFFFFF;
+}
+.hero-pane figcaption span {
+  font-size: var(--fs-sm); font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-caps); text-transform: uppercase; color: #8FDBB0;
+}
+.hero-pane figcaption b { font-size: var(--fs-xl); font-weight: var(--fw-bold); line-height: 1.25; }
+
+/* The form card sits over the picture's right edge, as the reference does. */
+.hero-form {
+  position: relative; z-index: 2; margin: var(--s-6) 0 var(--s-6) calc(var(--s-8) * -1);
+  border-radius: var(--r-lg); background: var(--surface);
+  box-shadow: var(--sh-4), inset 0 0 0 1px var(--line);
+  padding: var(--s-6); min-height: 0; overflow-y: auto;
+}
+.auth-hero .auth-mark { margin-bottom: var(--s-5); }
+
+@media (max-width: 1100px) {
+  .auth-stage { grid-template-columns: 1fr; }
+  .stg-panel { display: none; }
+  .hero-sheet { grid-template-columns: 1fr; grid-template-rows: 240px minmax(0, 1fr); height: calc(100vh - var(--s-6)); }
+  .hero-form { margin: calc(var(--s-6) * -1) var(--s-3) 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stg-figure, .stg-body, .stg-head, .stg-leg-f, .stg-leg-b, .stg-arm-f, .stg-arm-b,
+  .stg-shadow, .stg-ring, .stg-tablet, .stg-card { animation: none !important; }
 }

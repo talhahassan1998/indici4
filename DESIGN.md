@@ -275,6 +275,23 @@ selected, the bulk action that selection unlocks, and the pages. It sits
 directly above the rows, because a pager only reachable by scrolling past four
 hundred rows is a pager nobody uses.
 
+**The foot of the grid** (`.grid-foot`) totals what the filter is showing. A
+list of money that does not add itself up makes people reach for a calculator.
+
+**Row actions are named and they sit in fixed cells.** Named because three
+unlabelled glyphs per row is the patient grid's old problem in a smaller
+table. Fixed cells because a row that offers two actions and a row that offers
+three otherwise slide past each other, and the right-hand side of the list
+frays. A cell that has nothing to put in it stays empty rather than closing up.
+
+**A grid should fit the panel it is in.** When it does not, take a column out
+rather than leaving a scrollbar: the invoice list lost its per-row *Excl GST*,
+which is Total minus GST and is still in the footer and the invoice drawer.
+The column it took is worth more to the three buttons at the end of the row.
+
+**Air between a filter block and the grid below it**, and one hairline, not
+two. Flush, they read as a single slab with a seam.
+
 ### Empty values
 
 An em-dash reads as content and has no accessible name. Use the `Nil` token:

@@ -838,8 +838,9 @@
   padding: var(--s-4) var(--page-gutter) var(--s-4); flex: none;
 }
 .ps-filters {
-  flex: none; padding: 0 var(--page-gutter) var(--s-4);
-  border-bottom: 1px solid var(--line);
+  /* No bottom rule: the panel below has its own border, and two hairlines a
+     few pixels apart is a seam, not a separator. */
+  flex: none; padding: 0 var(--page-gutter) var(--s-2);
 }
 .ps-filter-grid { gap: var(--s-3);
   /* Flex, not a fixed grid. A breakpoint is written against the window, but
@@ -859,18 +860,48 @@
 /* A grid bar inside a card sits flush with the card's edge. */
 .card > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
 
+/* A one-line note under a page header. Not a banner: a banner is for something
+   that has changed, and this has not changed since the account was set up. */
+.page-note {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: var(--s-4) 0 var(--s-6); max-width: 92ch;
+  font-size: var(--fs-sm); line-height: 1.5; color: var(--text-muted);
+}
+.page-note svg { flex: none; margin-top: 2px; color: var(--accent-text); }
+
+/* The foot of a grid: what the filter is showing, added up. */
+.grid-foot {
+  flex: none; display: flex; align-items: center; gap: var(--s-5); flex-wrap: wrap;
+  padding: var(--s-3) var(--page-gutter);
+  border-top: 1px solid var(--line); background: var(--surface-2);
+}
+.gf-fig { display: flex; align-items: baseline; gap: 9px; }
+.gf-fig > span { font-size: var(--fs-sm); color: var(--text-muted); }
+.gf-fig > b { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 500;
+              letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.gf-fig.is-lead > b { font-size: var(--fs-lg); font-weight: 600; }
+.gf-fig.is-bad  > b { color: var(--bad-fg); }
+
 /* The grid, its bar and its footer are one panel: a white card with a hairline
    and a radius, inset from the window by the page gutter and nothing more.
    Full width is the point; a border is what stops it bleeding off the edge. */
 .grid-panel {
   flex: 1 1 auto; min-height: 0;
   display: flex; flex-direction: column; overflow: hidden;
-  margin: 0 var(--page-gutter) var(--page-gutter);
+  /* Air above it. Flush against the filters it read as one continuous slab
+     with a double hairline where the two borders met. */
+  margin: var(--s-4) var(--page-gutter) var(--page-gutter);
   background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--r-md);
 }
 .grid-panel > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
-.grid-panel > .ps-foot  { border-radius: 0 0 var(--r-md) var(--r-md); }
+.grid-panel > .ps-foot,
+.grid-panel > .grid-foot { border-radius: 0 0 var(--r-md) var(--r-md); }
+/* Inside an ordinary padded page the panel supplies its own edge and takes no
+   margin: the page gutter is already there. */
+.grid-panel.is-page { margin: 0; flex: 0 1 auto; }
+.grid-panel.is-page .grid-bar,
+.grid-panel.is-page .grid-foot { padding-inline: var(--s-4); }
 
 /* ---- The bar over a grid.
 

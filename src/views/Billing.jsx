@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Search, Plus, RefreshCw, Check, TriangleAlert, ReceiptText, Send, CreditCard,
-  EllipsisVertical, Download, Trash2, Printer, Copy, Eye, Pencil,
+  EllipsisVertical, Download, Trash2, Printer, Copy, Eye, Pencil, ChevronDown,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { money, fmtDate, fmtDateShort, fmtClock, invoiceTotals, daysOverdue } from '../lib/format.js';
@@ -24,6 +24,13 @@ export default function Billing() {
     (f.cl === 'all' || i.cl === f.cl) &&
     (!f.q || `${i.id} ${K.ptName(i.pt)}`.toLowerCase().includes(f.q.toLowerCase()))
   ), [f, K.invoices.length]);
+
+  const shown = useMemo(() => list.reduce((a, i) => {
+    const t = invoiceTotals(i);
+    a.excl += t.excl; a.gst += t.gst; a.incl += t.incl;
+    if (i.status !== 'paid') a.unpaid += t.incl;
+    return a;
+  }, { excl: 0, gst: 0, incl: 0, unpaid: 0 }), [list]);
 
   const allSelected = list.length > 0 && list.every(i => sel.has(i.id));
   const toggleOne = id => setSel(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -82,11 +89,13 @@ export default function Billing() {
         ))}
       </div>
 
-      <Banner icon={<RefreshCw size={16} />}>
-        <b>Reconcile in Xero only</b><br />
-        <span className="t-sm">Billing codes and prices are mastered in Xero and synced into Kora. When a payment
-        lands in the bank and is matched in Xero, the invoice is marked paid here automatically.</span>
-      </Banner>
+      {/* This used to be a full banner on every visit. It is true, it is
+          useful once, and it is not news on the four hundredth load, so it is
+          a line under the figures now. */}
+      <p className="page-note">
+        <RefreshCw size={15} /> Codes and prices are mastered in Xero. An invoice is marked paid
+        here automatically once the payment is matched in the bank feed.
+      </p>
 
       <div className="filter-bar mt-4">
         <div className="field">
@@ -120,7 +129,7 @@ export default function Billing() {
         </div>
       </div>
 
-      <section className="card">
+      <section className="grid-panel is-page">
         <div className="grid-bar">
           <span className="gb-count"><b className="num">{list.length}</b> invoices</span>
           {sel.size > 0 && (
@@ -143,9 +152,12 @@ export default function Billing() {
                 onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleAll(); } }}>
                 <Check size={13} /></span>
             </th>
-            <th>Invoice</th><th>Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
-            <th className="num-cell">Excl GST</th><th className="num-cell">GST</th><th className="num-cell">Total</th>
-            <th>Status</th><th /></tr></thead>
+            {/* Excl GST left the row and stayed in the footer and the invoice
+                drawer: it is Total minus GST, and the column it took is worth
+                more to the three buttons at the end of the row. */}
+            <th>Invoice</th><th className="grow-cell">Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
+            <th className="num-cell">GST</th><th className="num-cell">Total</th>
+            <th>Status</th><th className="act-col">Actions</th></tr></thead>
           <tbody>{list.map(i => {
             const t = invoiceTotals(i), p = K.pt(i.pt);
             const od = i.status === 'overdue' ? daysOverdue(i.due) : 0;
@@ -162,27 +174,33 @@ export default function Billing() {
                     <Check size={13} /></span>
                 </td>
                 <td className="t-mono t-sm"><b>{i.id}</b></td>
-                <td><span className="row g-2"><Avatar id={p.id} size="xs" />
+                <td className="grow-cell"><span className="row g-2"><Avatar id={p.id} size="xs" />
                   <span className="t-sm">{p.first} {p.last}</span></span></td>
                 <td className="t-sm">{fmtDateShort(i.date)}{od > 0 && <><br /><span className="t-xs bad-t">{od} days late</span></>}</td>
                 <td><FunderChip funder={i.payer} /></td>
                 <td className="t-sm">{K.st(i.cl).name}</td>
-                <td className="num-cell">{money(t.excl)}</td>
                 <td className="num-cell subtle">{money(t.gst)}</td>
                 <td className="num-cell"><b>{money(t.incl)}</b></td>
                 <td><Chip status={i.status} />
                   {i.reconciled && <><br /><span className="t-xs subtle">matched in Xero</span></>}</td>
-                <td><span className="row-actions">
-                  {i.status !== 'paid' && (
-                    <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="Record payment" data-pay
-                      aria-label={`Record payment for ${i.id}`}
-                      onClick={() => open(close => <PayModal close={close} inv={i} toast={toast} onDone={() => force(n => n + 1)} />)}>
-                      <CreditCard size={14} /></button>
-                  )}
-                  <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="Send" aria-label={`Send ${i.id}`}
+                {/* Named, like the patient grid. Three unlabelled glyphs per row
+                    is the same problem in a smaller table. */}
+                <td className="act-col"><span className="row-actions">
+                  {/* The Pay cell is always here, empty on a settled invoice,
+                      so Send and More stay in a column down the list instead
+                      of sliding left and right row by row. */}
+                  <span>
+                    {i.status !== 'paid' && (
+                      <button className="btn btn-secondary btn-sm" data-pay
+                        aria-label={`Record payment for ${i.id}`}
+                        onClick={() => open(close => <PayModal close={close} inv={i} toast={toast} onDone={() => force(n => n + 1)} />)}>
+                        <CreditCard size={16} /> Pay</button>
+                    )}
+                  </span>
+                  <button className="btn btn-secondary btn-sm" aria-label={`Send ${i.id}`}
                     onClick={() => { if (i.status === 'draft') i.status = 'sent'; force(n => n + 1); toast('Invoice sent', i.id, 'ok'); }}>
-                    <Send size={14} /></button>
-                  <button className="btn btn-ghost btn-icon btn-sm" aria-label={`More for ${i.id}`}
+                    <Send size={16} /> Send</button>
+                  <button className="btn btn-ghost btn-sm" aria-label={`More actions for ${i.id}`}
                     onClick={e => setMenu({ anchor: e.currentTarget, items: [
                       { heading: i.id },
                       { icon: <Eye size={15} />, label: 'View invoice', action: () => openInvoice(i) },
@@ -190,13 +208,26 @@ export default function Billing() {
                       { icon: <Printer size={15} />, label: 'Print receipt', action: () => toast('Receipt', 'Sent to the printer.', 'ok') },
                       '-',
                       { icon: <Trash2 size={15} />, label: 'Void invoice', danger: true, action: () => toast('Void', 'Voiding needs a reason and manager approval.', 'warn') },
-                    ]})}><EllipsisVertical size={14} /></button>
+                    ]})}>More <ChevronDown size={15} /></button>
                 </span></td>
               </tr>
             );
           })}</tbody></table></div>
           : <Empty icon={<ReceiptText size={22} />} title="No invoices match"
               body="Try clearing a filter, or raise a new invoice from a completed appointment." />}
+
+        {/* What the filter is actually showing, added up. A list of money that
+            does not total itself makes people reach for a calculator. */}
+        {list.length > 0 && (
+          <div className="grid-foot">
+            <span className="t-sm muted">Total of the {list.length} invoices shown</span>
+            <span className="spacer" />
+            <span className="gf-fig"><span>Excl GST</span><b className="num">{money(shown.excl)}</b></span>
+            <span className="gf-fig"><span>GST</span><b className="num">{money(shown.gst)}</b></span>
+            <span className="gf-fig is-lead"><span>Total</span><b className="num">{money(shown.incl)}</b></span>
+            <span className="gf-fig is-bad"><span>Unpaid</span><b className="num">{money(shown.unpaid)}</b></span>
+          </div>
+        )}
       </section>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
     </div>

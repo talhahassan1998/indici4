@@ -292,7 +292,7 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
    brand green, not with a grey that reads as a disabled row. */
 .tbl thead th {
   position: sticky; top: 0; z-index: 2;
-  text-align: left; padding: 11px 10px;
+  text-align: left; padding: 11px 9px;
   background: var(--th-bg);
   font-size: var(--fs-2xs); font-weight: var(--fw-bold);
   letter-spacing: var(--tracking-caps); text-transform: uppercase;
@@ -305,7 +305,7 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 .tbl thead th.sortable { cursor: pointer; user-select: none; }
 .tbl thead th.sortable:hover { color: var(--accent); background: var(--accent-soft-2); }
 .tbl tbody td {
-  padding: 10px 10px;
+  padding: 10px 9px;
   border-bottom: 1px solid var(--line-faint);
   vertical-align: middle;
   /* Rows stay one line. A wrapped invoice number reads as two invoice numbers,
@@ -321,8 +321,18 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 .tbl tbody tr.row-link:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 .tbl tbody tr:last-child td { border-bottom: 0; }
 .tbl .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
-.tbl .row-actions { opacity: 0; display: flex; gap: 4px; justify-content: flex-end; transition: opacity var(--dur-1) var(--ease); }
-.tbl tbody tr:hover .row-actions, .tbl tbody tr:focus-within .row-actions { opacity: 1; }
+/* Always visible, never revealed on hover. Someone who cannot see them cannot
+   find them, and on a touch screen there is no hover at all. */
+/* Fixed cells, like the dashboard's clinic list: the buttons read as columns
+   down the table instead of shuffling with whatever each row happens to
+   offer. */
+.tbl .row-actions { display: grid; grid-template-columns: 70px 82px 88px; gap: 6px; align-items: center; }
+.tbl .row-actions > * { justify-self: stretch; }
+.tbl .row-actions .btn { padding: 0 10px; white-space: nowrap; width: 100%; }
+/* The trailing action column takes a fixed width so the slack goes to a column
+   that can use it, instead of pooling as dead space on the right. */
+.tbl th.act-col, .tbl td.act-col { width: 1%; white-space: nowrap; text-align: right; padding-right: var(--s-4); }
+.tbl th.grow-cell, .tbl td.grow-cell { width: 100%; }
 .tbl tr.row-err { background: color-mix(in srgb, var(--bad-bg) 45%, transparent); }
 .tbl tr.row-err:hover { background: color-mix(in srgb, var(--bad-bg) 70%, transparent); }
 .tbl-compact tbody td { padding: 7px var(--s-3); }

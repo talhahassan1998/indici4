@@ -9,7 +9,6 @@ import {
   User, Eye, Lock, ChevronLeft, TriangleAlert, Check, Building2, MapPin, LifeBuoy,
 } from 'lucide-react';
 import K from '../data/sample.js';
-import BrandScene from '../components/BrandScene.jsx';
 import ClinicIllustration from '../components/ClinicIllustration.jsx';
 import { Switch } from '../components/Primitives.jsx';
 import { useUi } from '../lib/ui.jsx';
@@ -278,8 +277,6 @@ export default function Login({ onDone }) {
 
       {/* ----------------------------------------------------- right: brand */}
       <aside className="auth-brand">
-        <BrandScene />
-
         <a className="brand-help" href="#" onClick={e => { e.preventDefault(); toast('IT support', 'Weekdays 7am to 6pm · 0800 567 200', 'info'); }}>
           <LifeBuoy size={18} /> Support
         </a>

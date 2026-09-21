@@ -127,7 +127,7 @@ export default function Appointments() {
                   return (
                     <div className="appt" key={a.id} draggable data-appt={a.id} data-type={t.type} tabIndex={0}
                       role="button" aria-label={`${p.first} ${p.last}, ${fmtTime(a.start)}, ${t.name}`}
-                      style={{ top: top(a.start), height: Math.max(24, t.mins - 3),
+                      style={{ top: top(a.start), height: Math.max(34, t.mins - 3),
                         opacity: a.status === 'dna' ? .65 : a.status === 'done' ? .8 : 1 }}
                       onDragStart={e => { dragId.current = a.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.id); }}
                       onClick={() => openAppt(a)}

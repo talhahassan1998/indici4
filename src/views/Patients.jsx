@@ -4,7 +4,7 @@ import {
   Search, Filter, Plus, Link2, Download, Check, TriangleAlert, User, Pencil, FilePen,
   SquareCheckBig, DollarSign, CalendarDays, Bell, Syringe, House, UserPlus, UserCheck,
   Printer, IdCard, EllipsisVertical, ChevronLeft, ChevronRight, Mail, Pill, FlaskConical,
-  ReceiptText, Copy,
+  ReceiptText, Copy, ChevronDown,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, age, money } from '../lib/format.js';
@@ -32,24 +32,32 @@ const COLS = [
   { k: null,       label: 'Actions' },
 ];
 
-/* Same affordances as the current product, on one icon grid and each with a name. */
-const ACTIONS = [
-  { id: 'open',    Icon: User,           label: 'Open patient record' },
+/* The two things someone actually does from a search result. Everything else
+   the old toolbar carried is still here, in a named menu, one press away. */
+const PRIMARY = [
+  { id: 'open',    Icon: User,         label: 'Open' },
+  { id: 'book',    Icon: CalendarDays, label: 'Book' },
+];
+
+const MORE = [
   { id: 'edit',    Icon: Pencil,         label: 'Edit demographics' },
   { id: 'notes',   Icon: FilePen,        label: 'Clinical notes' },
-  { id: 'tasks',   Icon: SquareCheckBig, label: 'Tasks' },
   { id: 'account', Icon: DollarSign,     label: 'Account and invoices' },
-  { id: 'book',    Icon: CalendarDays,   label: 'Book appointment' },
+  { id: 'tasks',   Icon: SquareCheckBig, label: 'Tasks' },
   { id: 'recall',  Icon: Bell,           label: 'Recalls' },
-  { sep: true },
+  '-',
   { id: 'cir',     Icon: Syringe,        label: 'Immunisations (CIR)' },
   { id: 'family',  Icon: House,          label: 'Family and household' },
   { id: 'relate',  Icon: UserPlus,       label: 'Add relationship' },
   { id: 'enrol',   Icon: UserCheck,      label: 'Enrolment' },
-  { sep: true },
+  '-',
+  { id: 'letter',  Icon: Mail,           label: 'Write letter' },
+  { id: 'rx',      Icon: Pill,           label: 'Prescribe' },
+  { id: 'tests',   Icon: FlaskConical,   label: 'Request tests' },
+  '-',
   { id: 'print',   Icon: Printer,        label: 'Print summary' },
   { id: 'label',   Icon: IdCard,         label: 'Patient label' },
-  { id: 'more',    Icon: EllipsisVertical, label: 'More actions' },
+  { id: 'copy',    Icon: Copy,           label: 'Copy NHI' },
 ];
 
 const digits = v => String(v).replace(/\D/g, '');
@@ -117,6 +125,10 @@ export default function Patients() {
       case 'enrol': say('Enrolment', `${K.ENROL_STATUS[p.status].label} · ${p.payGrp}`); break;
       case 'print': toast('Printing summary', `${p.first} ${p.last}`, 'ok'); break;
       case 'label': toast('Patient label', p.nhi, 'ok'); break;
+      case 'letter': nav(`/letter/new?pt=${pid}`); break;
+      case 'rx': nav(`/patient/${pid}/rx`); break;
+      case 'tests': nav(`/patient/${pid}/tests`); break;
+      case 'copy': navigator.clipboard?.writeText(p.nhi); toast('NHI copied', p.nhi, 'ok'); break;
       case 'more': setMenu({ anchor, items: [
         { heading: K.displayName(p) },
         { icon: <Mail size={15} />, label: 'Write letter', action: () => nav(`/letter/new?pt=${pid}`) },
@@ -244,13 +256,23 @@ export default function Patients() {
                   <td className="t-xs">{p.gms}</td>
                   <td className={`num-cell ${bal > 0 ? 'bad-t' : 'subtle'}`}>{bal > 0 ? <b>{money(bal)}</b> : '$0.00'}</td>
                   <td><span className="p-actions">
-                    {ACTIONS.map((a, i) => a.sep ? <span className="pa-sep" key={i} /> : (
-                      <button className="pa tip" key={a.id} data-tip={a.label}
-                        aria-label={`${a.label}, ${p.first} ${p.last}`}
+                    {PRIMARY.map(a => (
+                      <button className="btn btn-secondary btn-sm" key={a.id}
                         onClick={e => { e.stopPropagation(); act(a.id, p.id, e.currentTarget); }}>
-                        <a.Icon size={15} />
+                        <a.Icon size={16} /> {a.label}
                       </button>
                     ))}
+                    <button className="btn btn-ghost btn-sm" aria-label={`More actions for ${p.first} ${p.last}`}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setMenu({ anchor: e.currentTarget, items: [
+                          { heading: K.displayName(p) },
+                          ...MORE.map(m => m === '-' ? '-' : ({
+                            icon: <m.Icon size={17} />, label: m.label,
+                            action: () => act(m.id, p.id, e.currentTarget),
+                          })),
+                        ]});
+                      }}>More <ChevronDown size={15} /></button>
                   </span></td>
                 </tr>
               );

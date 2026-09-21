@@ -123,11 +123,11 @@
 
   /* ---- Radii. Scaled to the density of the thing: dense controls stay
          nearly square, only true overlays get a soft corner. ---- */
-  --r-xs: 3px;   /* chips, tags, swatches */
-  --r-sm: 5px;   /* buttons, inputs, menu items */
-  --r-md: 7px;   /* cards, panels */
-  --r-lg: 10px;  /* modals, drawers */
-  --r-xl: 14px;
+  --r-xs: 2px;   /* chips, tags, swatches */
+  --r-sm: 4px;   /* buttons, inputs, menu items */
+  --r-md: 6px;   /* sections, panels */
+  --r-lg: 8px;   /* modals, drawers */
+  --r-xl: 10px;
   --r-pill: 999px;  /* avatars and genuinely circular things only */
 
   /* ---- Elevation: soft, warm-tinted, never harsh ---- */
@@ -143,19 +143,22 @@
   /* ---- Type scale (1.200 minor third, 14px base for density) ---- */
   --font-sans:    "Kora Sans", Roboto, -apple-system, BlinkMacSystemFont,
                   "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Kora Display", "Roboto Slab", Georgia, serif;
+  /* Roboto throughout. Headings are the same face, set heavier and tighter. */
+  --font-display: var(--font-sans);
   --font-mono:    "Kora Mono", "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --fs-2xs: 10.5px;
-  --fs-xs:  11.5px;
-  --fs-sm:  13px;
-  --fs-md:  14px;
-  --fs-lg:  16px;
-  --fs-xl:  19px;
-  --fs-2xl: 23px;
+  /* 17px body. The top of the scale is deliberately compressed: hierarchy
+     comes from weight and colour, not from oversized headings. */
+  --fs-2xs: 13px;   /* floor. Nothing in the product is smaller */
+  --fs-xs:  14px;
+  --fs-sm:  15px;
+  --fs-md:  17px;   /* body */
+  --fs-lg:  19px;
+  --fs-xl:  21px;
+  --fs-2xl: 24px;
   --fs-3xl: 28px;
-  --fs-4xl: 34px;
-  --fs-5xl: 44px;
+  --fs-4xl: 32px;
+  --fs-5xl: 38px;
 
   --lh-tight: 1.15;
   --lh-snug:  1.32;
@@ -172,6 +175,11 @@
   --tracking-flat:  0;
   --tracking-wide:  0.02em;
   --tracking-caps:  0.07em;
+
+  /* ---- Control sizes. 44px is the floor for anything you press. ---- */
+  --h-sm: 44px;   /* compact padding, never a compact target */
+  --h-md: 44px;   /* default button, input, select */
+  --h-lg: 52px;   /* primary action */
 
   /* ---- Spacing (4px base) ---- */
   --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 20px;

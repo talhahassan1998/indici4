@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ChevronRight, Clock, Stethoscope, FileText, Mail, FlaskConical, SquareCheckBig,
-  TriangleAlert, Check, RefreshCw, ReceiptText, Phone, CalendarDays, ShieldCheck,
-  EllipsisVertical, X, Sparkles, Plus,
+  ChevronRight, Clock, Stethoscope, FileText, Mail, TriangleAlert, Check,
+  RefreshCw, ReceiptText, CalendarDays, ShieldCheck, EllipsisVertical, X,
+  Sparkles, Plus,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtLongDate, fmtTime, age, money0, money, invoiceTotals, daysOverdue } from '../lib/format.js';
@@ -99,10 +99,10 @@ function NextPatient({ appt, onArrive }) {
 
 function ClinicList({ list, showClinician, onArrive, onMenu }) {
   return (
-    <section className="card">
-      <div className="card-hd">
-        <h3>{showClinician ? 'All clinics today' : 'My clinic today'}</h3>
-        <span className="chip">{list.length} appointments</span>
+    <section className="sect sect-lead">
+      <div className="sect-hd">
+        <h2>{showClinician ? 'All clinics today' : 'My clinic today'}</h2>
+        <span className="sect-meta">{list.length} appointments</span>
         <span className="spacer" />
         <Link className="btn btn-ghost btn-sm" to="/appointments">Open calendar <ChevronRight size={14} /></Link>
       </div>
@@ -118,18 +118,25 @@ function ClinicList({ list, showClinician, onArrive, onMenu }) {
                 <b>{p.first} {p.last}</b>
                 <span>{p.nhi} · {a.note || t.name}{showClinician ? ` · ${K.st(a.cl).name}` : ''}</span>
               </span>
-              <span className="row g-2">
-                {p.alerts.length > 0 && (
-                  <span className="tip" data-tip={p.alerts.join(', ')} style={{ color: 'var(--bad-fg)', display: 'inline-flex' }}>
-                    <TriangleAlert size={15} />
-                  </span>
-                )}
+              {/* Four fixed cells, so the alert flags, the statuses and the
+                  Arrived buttons each read as a column down the list rather
+                  than shuffling left and right row by row. */}
+              <span className="tl-actions">
+                <span className="tl-flag">
+                  {p.alerts.length > 0 && (
+                    <span className="tip" data-tip={p.alerts.join(', ')} style={{ color: 'var(--bad-fg)', display: 'inline-flex' }}>
+                      <TriangleAlert size={16} />
+                    </span>
+                  )}
+                </span>
                 <Chip status={a.status} />
-                {a.status === 'booked' && (
-                  <button className="btn btn-soft btn-sm" data-arrive={a.id} onClick={() => onArrive(a)}><Check size={13} /> Arrived</button>
-                )}
+                <span>
+                  {a.status === 'booked' && (
+                    <button className="btn btn-soft btn-sm" data-arrive={a.id} onClick={() => onArrive(a)}><Check size={14} /> Arrived</button>
+                  )}
+                </span>
                 <button className="btn btn-ghost btn-icon btn-sm" onClick={e => onMenu(e.currentTarget, a)}
-                  aria-label={`More actions for ${p.first} ${p.last}`}><EllipsisVertical size={15} /></button>
+                  aria-label={`More actions for ${p.first} ${p.last}`}><EllipsisVertical size={16} /></button>
               </span>
             </div>
           );
@@ -140,20 +147,24 @@ function ClinicList({ list, showClinician, onArrive, onMenu }) {
   );
 }
 
-function WorkCard({ title, sub, rows }) {
+/* A queue of things waiting on you: count, what it is, and where it goes.
+   No box around it and no icon beside it — the numbers down the left are
+   what you read, and they only read as a column if nothing sits in front. */
+function WorkList({ title, sub, rows }) {
   return (
-    <section className="card">
-      <div className="card-hd"><h3>{title}</h3>{sub && <span className="t-xs subtle">{sub}</span>}</div>
-      <div className="list-rows">
+    <section className="sect">
+      <div className="sect-hd"><h2>{title}</h2>{sub && <span className="sect-meta">{sub}</span>}</div>
+      <ul className="work-list">
         {rows.map(r => (
-          <Link className="work-row" to={r.to} key={r.label}>
-            <span className="work-ic" style={{ background: r.bg, color: r.fg }}>{r.icon}</span>
-            <span className="grow"><b>{r.label}</b><span>{r.sub}</span></span>
-            <span className="work-n" style={r.n > 0 && r.urgent ? { color: 'var(--bad-fg)' } : undefined}>{r.n}</span>
-            <ChevronRight size={15} className="subtle" />
-          </Link>
+          <li key={r.label}>
+            <Link className="work-row" to={r.to}>
+              <span className={`work-n ${r.urgent && r.n > 0 ? 'is-urgent' : ''}`}>{r.n}</span>
+              <span className="grow"><b>{r.label}</b><span>{r.sub}</span></span>
+              <ChevronRight size={18} className="subtle" />
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
@@ -162,37 +173,36 @@ function BillingSnapshot({ s }) {
   const paidToday = s.todayInv.filter(i => i.status === 'paid').reduce((a, i) => a + i.paid, 0);
   const pct = Math.round((paidToday / Math.max(s.todayTotal, 1)) * 100);
   return (
-    <section className="card">
-      <div className="card-hd"><h3>Billing snapshot</h3><span className="spacer" />
-        <span className="sync-pill"><RefreshCw size={13} /> Xero connected</span></div>
-      <div className="card-bd col g-5">
-        <div className="grid" style={{ gridTemplateColumns: 'repeat(3,1fr)', gap: 'var(--s-4)' }}>
-          <div className="col g-1"><span className="t-eyebrow">Invoiced today</span>
-            <span className="t-metric">{money0(s.todayTotal)}</span>
-            <span className="t-xs subtle">{s.todayInv.length} invoices · incl GST</span></div>
-          <div className="col g-1"><span className="t-eyebrow">Unpaid</span>
-            <span className="t-metric" style={{ color: 'var(--warn-fg)' }}>{money0(s.unpaid)}</span>
-            <span className="t-xs subtle">{s.overdueInv.length} overdue</span></div>
-          <div className="col g-1"><span className="t-eyebrow">ACC errors</span>
-            <span className="t-metric" style={{ color: s.accErr ? 'var(--bad-fg)' : 'var(--ok-fg)' }}>{s.accErr}</span>
-            <span className="t-xs subtle">{s.accReady} ready to submit</span></div>
-        </div>
-        <div className="col g-2">
-          <div className="row between t-xs muted"><span>Collected today</span><span className="num">{pct}% of {money0(s.todayTotal)}</span></div>
-          <div className="meter"><span className="meter-track" style={{ width: `${pct}%` }} />
-            <span style={{ width: `${100 - pct}%`, background: 'var(--warn-bg)' }} /></div>
-        </div>
-        {s.accErr > 0 && (
-          <Banner tone="bad" icon={<TriangleAlert size={16} />}>
-            <b>{s.accErr} ACC submissions need attention</b><br />
-            <span className="t-xs">Missing claim number or injury date will be rejected by ACC.</span>
-          </Banner>
-        )}
+    <section className="sect">
+      <div className="sect-hd"><h2>Billing today</h2><span className="spacer" />
+        <span className="sync-pill"><RefreshCw size={13} /> Xero synced 9:42am</span></div>
+
+      <div className="fig-row">
+        <div className="fig"><b>{money0(s.todayTotal)}</b>
+          <span>Invoiced</span><small>{s.todayInv.length} invoices, incl GST</small></div>
+        <div className="fig is-warn"><b>{money0(s.unpaid)}</b>
+          <span>Unpaid</span><small>{s.overdueInv.length} overdue</small></div>
+        <div className={`fig ${s.accErr ? 'is-bad' : 'is-ok'}`}><b>{s.accErr}</b>
+          <span>ACC errors</span><small>{s.accReady} ready to submit</small></div>
       </div>
-      <div className="card-ft row g-2">
+
+      <div className="col g-2 mt-2">
+        <div className="row between t-sm muted"><span>Collected today</span>
+          <span className="num">{pct}% of {money0(s.todayTotal)}</span></div>
+        <div className="meter"><span className="meter-track" style={{ width: `${pct}%` }} />
+          <span style={{ width: `${100 - pct}%`, background: 'var(--warn-bg)' }} /></div>
+      </div>
+
+      {s.accErr > 0 && (
+        <Banner tone="bad" icon={<TriangleAlert size={16} />}>
+          <b>{s.accErr} ACC submissions need attention</b><br />
+          <span className="t-sm">Missing claim number or injury date will be rejected by ACC.</span>
+        </Banner>
+      )}
+
+      <div className="row g-2 mt-2">
         <Link className="btn btn-secondary btn-sm" to="/billing"><ReceiptText size={14} /> All invoices</Link>
         <Link className="btn btn-ghost btn-sm" to="/acc"><ShieldCheck size={14} /> ACC queue</Link>
-        <span className="spacer" /><span className="t-xs subtle">Last Xero sync 9:42am</span>
       </div>
     </section>
   );
@@ -254,8 +264,9 @@ export default function Dashboard({ role, userId }) {
         {role === 'typist' ? (
           <>
             <div className="col-8">
-              <section className="card">
-                <div className="card-hd"><h3>Typing queue</h3></div>
+              <section className="sect sect-lead">
+                <div className="sect-hd"><h2>Typing queue</h2>
+                  <span className="sect-meta">Oldest dictation first</span></div>
                 <div className="list-rows">
                   {K.letters.filter(l => l.status === 'draft' || l.status === 'pending').map(l => {
                     const p = K.pt(l.pt);
@@ -272,9 +283,9 @@ export default function Dashboard({ role, userId }) {
               </section>
             </div>
             <div className="col-4">
-              <WorkCard title="Your work" sub="Oldest first" rows={[
-                { icon: <Mail size={16} />, label: 'New dictations', sub: 'Uploaded since 8am', n: 5, to: '/letters', bg: 'var(--bad-bg)', fg: 'var(--bad-fg)', urgent: true },
-                { icon: <Mail size={16} />, label: 'Returned for edits', sub: 'Clinician requested changes', n: 2, to: '/letters', bg: 'var(--warn-bg)', fg: 'var(--warn-fg)' },
+              <WorkList title="Your work" sub="Oldest first" rows={[
+                { label: 'New dictations', sub: 'Uploaded since 8am', n: 5, to: '/letters', urgent: true },
+                { label: 'Returned for edits', sub: 'Clinician requested changes', n: 2, to: '/letters' },
               ]} />
             </div>
           </>
@@ -284,24 +295,24 @@ export default function Dashboard({ role, userId }) {
               <ClinicList list={role === 'reception' || role === 'manager' ? all : mine}
                 showClinician={role === 'reception' || role === 'manager'} onArrive={arrive} onMenu={openMenu} />
             </div>
-            <div className="col-5 col g-4">
+            <div className="col-5 col g-6">
               {role === 'clinician' && <NextPatient appt={next} onArrive={arrive} />}
-              <WorkCard title={role === 'manager' ? 'Exceptions' : 'Needs your attention'} sub={role === 'manager' ? 'Money and compliance first' : 'Sorted by urgency'}
+              <WorkList title={role === 'manager' ? 'Exceptions' : 'Needs your attention'} sub={role === 'manager' ? 'Money and compliance first' : 'Sorted by urgency'}
                 rows={role === 'manager' ? [
-                  { icon: <ShieldCheck size={16} />, label: 'ACC submissions failing', sub: 'Will be rejected as-is', n: s.accErr, to: '/acc', bg: 'var(--bad-bg)', fg: 'var(--bad-fg)', urgent: true },
-                  { icon: <ReceiptText size={16} />, label: 'Overdue invoices', sub: 'More than 14 days', n: s.overdueInv.length, to: '/billing', bg: 'var(--bad-bg)', fg: 'var(--bad-fg)', urgent: true },
-                  { icon: <ReceiptText size={16} />, label: 'Uninvoiced appointments', sub: 'Revenue not captured', n: s.uninvoiced, to: '/billing', bg: 'var(--warn-bg)', fg: 'var(--warn-fg)' },
-                  { icon: <Mail size={16} />, label: 'Letters awaiting sign-off', sub: 'Ageing over 24 hours', n: s.pending, to: '/letters', bg: 'var(--accent-soft)', fg: 'var(--accent-text)' },
+                  { label: 'ACC submissions failing', sub: 'Will be rejected as-is', n: s.accErr, to: '/acc', urgent: true },
+                  { label: 'Overdue invoices', sub: 'More than 14 days', n: s.overdueInv.length, to: '/billing', urgent: true },
+                  { label: 'Uninvoiced appointments', sub: 'Revenue not captured', n: s.uninvoiced, to: '/billing' },
+                  { label: 'Letters awaiting sign-off', sub: 'Ageing over 24 hours', n: s.pending, to: '/letters' },
                 ] : role === 'reception' ? [
-                  { icon: <ReceiptText size={16} />, label: 'Uninvoiced appointments', sub: 'Consults finished, not billed', n: s.uninvoiced, to: '/billing', bg: 'var(--warn-bg)', fg: 'var(--warn-fg)', urgent: true },
-                  { icon: <Phone size={16} />, label: 'Phone messages', sub: 'Callbacks to action', n: 3, to: '/inbox', bg: 'var(--accent-soft)', fg: 'var(--accent-text)' },
-                  { icon: <CalendarDays size={16} />, label: 'Unconfirmed tomorrow', sub: 'Send reminder texts', n: 7, to: '/appointments', bg: 'var(--info-bg)', fg: 'var(--info-fg)' },
-                  { icon: <SquareCheckBig size={16} />, label: 'Overdue tasks', sub: 'Reception queue', n: s.overdueT, to: '/tasks', bg: 'var(--bad-bg)', fg: 'var(--bad-fg)', urgent: true },
+                  { label: 'Uninvoiced appointments', sub: 'Consults finished, not billed', n: s.uninvoiced, to: '/billing', urgent: true },
+                  { label: 'Phone messages', sub: 'Callbacks to action', n: 3, to: '/inbox' },
+                  { label: 'Unconfirmed tomorrow', sub: 'Send reminder texts', n: 7, to: '/appointments' },
+                  { label: 'Overdue tasks', sub: 'Reception queue', n: s.overdueT, to: '/tasks', urgent: true },
                 ] : [
-                  { icon: <FileText size={16} />, label: 'Unsigned notes', sub: 'Waiting for your signature', n: s.unsigned, to: '/patients', bg: 'var(--warn-bg)', fg: 'var(--warn-fg)', urgent: true },
-                  { icon: <Mail size={16} />, label: 'Letters to approve', sub: 'Typed and ready to send', n: s.pending, to: '/inbox', bg: 'var(--accent-soft)', fg: 'var(--accent-text)' },
-                  { icon: <FlaskConical size={16} />, label: 'Results to review', sub: '2 flagged abnormal', n: 4, to: '/inbox', bg: 'var(--info-bg)', fg: 'var(--info-fg)' },
-                  { icon: <SquareCheckBig size={16} />, label: 'Overdue tasks', sub: 'Assigned to you or your team', n: s.overdueT, to: '/tasks', bg: 'var(--bad-bg)', fg: 'var(--bad-fg)', urgent: true },
+                  { label: 'Unsigned notes', sub: 'Waiting for your signature', n: s.unsigned, to: '/patients', urgent: true },
+                  { label: 'Letters to approve', sub: 'Typed and ready to send', n: s.pending, to: '/inbox' },
+                  { label: 'Results to review', sub: '2 flagged abnormal', n: 4, to: '/inbox' },
+                  { label: 'Overdue tasks', sub: 'Assigned to you or your team', n: s.overdueT, to: '/tasks', urgent: true },
                 ]} />
               <BillingSnapshot s={s} />
             </div>

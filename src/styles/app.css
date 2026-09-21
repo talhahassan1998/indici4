@@ -84,8 +84,7 @@
   position: sticky; top: 0; z-index: 35;
   display: flex; align-items: center; gap: var(--s-3);
   height: var(--topbar-h); padding: 0 var(--s-5); flex: none;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px);
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 .global-search {
@@ -147,7 +146,7 @@
 }
 
 /* ------------------------------------------------------------- Command palette */
-.cmdk-scrim { position: fixed; inset: 0; z-index: 110; background: var(--overlay); backdrop-filter: blur(4px); animation: fade var(--dur-2) var(--ease); }
+.cmdk-scrim { position: fixed; inset: 0; z-index: 110; background: var(--overlay); animation: fade var(--dur-2) var(--ease); }
 .cmdk {
   /* Horizontally centred with auto margins, leaving `transform` to the animation. */
   position: fixed; z-index: 111; left: 0; right: 0; margin-inline: auto; top: 13vh;
@@ -213,6 +212,65 @@
 .stat-strip .ss span { font-size: var(--fs-xs); color: var(--text-muted); }
 .stat-strip .ss.is-flag b { color: var(--bad-fg); }
 
+/* ---- Sections, not cards.
+
+   A block of related content on this page is a heading, a rule and its rows,
+   sitting on the page itself. Boxing each one gave every block the same
+   weight and the same border, and nested the real content two surfaces deep.
+   The one block that still gets a surface is the patient you are about to
+   see, because that is the exception the page is built around. ---- */
+.sect { display: flex; flex-direction: column; gap: var(--s-3); }
+.sect-hd { display: flex; align-items: baseline; gap: var(--s-3); padding-bottom: 8px; }
+.sect-hd h2 {
+  font-size: var(--fs-xl); font-weight: var(--fw-semi);
+  letter-spacing: -0.012em; line-height: var(--lh-snug);
+}
+.sect-meta { font-size: var(--fs-sm); color: var(--text-muted); }
+.sect-hd .btn { align-self: center; }
+
+/* The lead section of the page carries a heavier rule. Everything after it
+   gets a hairline, so the order of the page is legible before you read a
+   word of it. */
+.sect > .sect-hd      { border-bottom: 1px solid var(--line); }
+.sect-lead > .sect-hd { border-bottom: 2px solid var(--text); }
+
+/* Rows sit flush with the heading above them; only the hover state and the
+   in-progress highlight run wider, which is what the inset margin buys. */
+.sect .tl-row,
+.sect .work-row { padding-inline: var(--s-3); margin-inline: calc(var(--s-3) * -1); }
+
+/* A figure and its label, repeated along a divided line. The figure leads;
+   the label underneath says what it counts. */
+.fig-row { display: flex; flex-wrap: wrap; gap: var(--s-5); }
+.fig { display: flex; flex-direction: column; gap: 2px; min-width: 112px;
+       padding-right: var(--s-5); border-right: 1px solid var(--line-faint); }
+.fig:last-child { border-right: 0; padding-right: 0; }
+.fig b { font-family: var(--font-mono); font-size: var(--fs-2xl); font-weight: 500;
+         letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fig span { font-size: var(--fs-sm); color: var(--text-muted); }
+.fig small { font-size: var(--fs-xs); color: var(--text-subtle); }
+.fig.is-bad b { color: var(--bad-fg); } .fig.is-warn b { color: var(--warn-fg); }
+.fig.is-ok  b { color: var(--ok-fg); }
+
+/* A short list with nothing but rules between the entries. */
+.plain-rows { display: flex; flex-direction: column; }
+.plain-rows > * { padding-block: 10px; }
+.plain-rows > * + * { border-top: 1px solid var(--line-faint); }
+
+/* Recalls in the consult side panel. The left edge carries the urgency, so
+   the rows stay a list instead of becoming a stack of tiles. */
+.recall-list { display: flex; flex-direction: column; }
+.recall { display: flex; flex-direction: column; gap: 6px;
+  padding: var(--s-3) 0 var(--s-4) var(--s-3); border-left: 3px solid var(--line); }
+.recall + .recall { border-top: 1px solid var(--line-faint); }
+.recall.is-overdue { border-left-color: var(--bad-fg); }
+.recall.is-due     { border-left-color: var(--warn-fg); }
+
+/* Every measurement the same width, on one grid. Hand-set widths meant the
+   last two fields wrapped onto a line of their own and sat out of step. */
+.meas-grid { display: grid; gap: var(--s-4) var(--s-5);
+  grid-template-columns: repeat(auto-fill, minmax(146px, 1fr)); align-items: start; }
+
 /* Next patient card */
 .next-patient {
   height: 100%;
@@ -234,7 +292,7 @@
 /* Timeline of today's appointments */
 .tl { display: flex; flex-direction: column; }
 .tl-row {
-  display: grid; grid-template-columns: 62px 22px 1fr auto;
+  display: grid; grid-template-columns: 74px 22px 1fr auto;
   gap: var(--s-3); align-items: center;
   padding: 10px var(--s-5); border-bottom: 1px solid var(--line-faint);
   transition: background var(--dur-1) var(--ease);
@@ -244,8 +302,8 @@
 .tl-row:hover { background: var(--surface-2); }
 .tl-row.is-now { background: var(--accent-soft); }
 .tl-row.is-now::before { content: ""; position: absolute; }
-.tl-time { font-size: var(--fs-sm); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-.tl-time small { display: block; font-size: var(--fs-2xs); font-weight: var(--fw-medium); color: var(--text-subtle); }
+.tl-time { font-size: var(--fs-md); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.tl-time small { display: block; font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--text-subtle); }
 .tl-spine { position: relative; height: 100%; display: grid; place-items: center; }
 .tl-spine::before { content: ""; position: absolute; top: -12px; bottom: -12px; width: 2px; background: var(--line); }
 .tl-node { position: relative; width: 11px; height: 11px; border-radius: 50%; background: var(--surface); box-shadow: 0 0 0 2px var(--line-strong); z-index: 1; }
@@ -253,26 +311,54 @@
 .tl-row[data-status="consult"] .tl-node { background: var(--info-fg); box-shadow: 0 0 0 2px var(--info-line); }
 .tl-row[data-status="done"]    .tl-node { background: var(--text-subtle); box-shadow: 0 0 0 2px var(--line-strong); }
 .tl-row[data-status="dna"]     .tl-node { background: var(--bad-fg); box-shadow: 0 0 0 2px var(--bad-line); }
-/* Name and metadata were inline siblings with no separation, so they ran
-   together as one word. Baseline-aligned flex gives the gap and keeps the row
-   to a single line. */
-.tl-patient { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
-.tl-patient b { font-size: var(--fs-sm); font-weight: var(--fw-semi); flex: none; }
-.tl-patient span { font-size: var(--fs-xs); color: var(--text-subtle);
+/* Two lines, not one. On one line the reason for the visit was the part that
+   got truncated — "Right kne…" — which is the part you are scanning for.
+   Stacked, the name is read at body size and the reason survives whole. */
+.tl-patient { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tl-patient b { font-size: var(--fs-md); font-weight: var(--fw-semi); line-height: 1.3; }
+.tl-patient span { font-size: var(--fs-sm); color: var(--text-muted); line-height: 1.35;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Fixed cells: the flag, the status, the one action, the menu. Auto widths
+   let each row set its own, and the right-hand side of the list frayed. */
+.tl-actions { display: grid; grid-template-columns: 20px 100px 108px 40px;
+  align-items: center; gap: var(--s-2); justify-items: start; }
+.tl-actions > :last-child { justify-self: end; }
+.tl-flag { display: inline-flex; }
 
-/* Work queue widget rows */
+/* ---- Work queue rows.
+
+   The count is the reason the row exists, so it leads, in a fixed column so
+   the numbers stack into a readable list. The coloured icon tile that used to
+   sit here said nothing the label did not: four pastel squares in a column is
+   decoration, and it pushed the count to the far edge, furthest from the
+   words it belongs to. ---- */
+.work-list { display: flex; flex-direction: column; list-style: none; }
+.work-list > li + li { border-top: 1px solid var(--line-faint); }
 .work-row {
-  display: flex; align-items: center; gap: var(--s-3); width: 100%;
-  padding: 11px var(--s-5); border-bottom: 1px solid var(--line-faint); text-align: left;
+  display: flex; align-items: center; gap: var(--s-4); width: 100%;
+  min-height: 56px; padding-block: 10px; text-align: left;
+  color: inherit; text-decoration: none;
   transition: background var(--dur-1) var(--ease);
 }
-.work-row:last-child { border-bottom: 0; }
 .work-row:hover { background: var(--surface-2); }
+.work-row:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.work-n {
+  flex: none; width: 46px; text-align: right;
+  font-family: var(--font-mono); font-size: var(--fs-2xl); font-weight: 500;
+  line-height: 1.1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.work-n.is-urgent { color: var(--bad-fg); }
+.work-row b { font-size: var(--fs-md); font-weight: var(--fw-semi); display: block; }
+.work-row span:not(.work-n) { font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* The same row inside a bordered list elsewhere in the product: it keeps the
+   padding and the divider the surface around it needs, and the leading glyph
+   it uses to distinguish one kind of item from another. */
+.list-rows > .work-row,
+.list-rows > * > .work-row { padding-inline: var(--s-5); border-bottom: 1px solid var(--line-faint); }
+.list-rows > .work-row:last-child { border-bottom: 0; }
 .work-ic { width: 32px; height: 32px; border-radius: var(--r-sm); display: grid; place-items: center; flex: none; }
-.work-row b { font-size: var(--fs-sm); font-weight: var(--fw-semi); display: block; }
-.work-row span { font-size: var(--fs-xs); color: var(--text-subtle); }
-.work-row .work-n { font-size: var(--fs-xl); font-weight: var(--fw-x); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
 /* ------------------------------------------------------------- Calendar */
 .cal-shell { display: grid; grid-template-columns: 1fr; gap: 0; height: calc(100vh - var(--topbar-h)); }
@@ -329,6 +415,8 @@
 
 .blocked {
   position: absolute; left: 0; right: 0; z-index: 2; border-radius: 4px;
+  /* Hatching is the established way to say "not available", so this
+     gradient carries meaning rather than decoration. */
   background-image: repeating-linear-gradient(135deg,
     var(--line) 0 6px, transparent 6px 12px);
   background-color: var(--surface-2);
@@ -341,8 +429,7 @@
 /* ------------------------------------------------------------- Patient workspace */
 .pt-header {
   position: sticky; top: var(--topbar-h); z-index: 30;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   padding: var(--s-4) var(--s-6) 0;
 }
@@ -413,10 +500,10 @@
 }
 .pdf-page .pdf-brand { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #15803E; padding-bottom: 14px; margin-bottom: 26px; }
 .pdf-page .pdf-brand h3 { font-size: 17px; font-weight: 800; color: #116330; letter-spacing: -0.02em; }
-.pdf-page .pdf-brand .pdf-org { font-size: 10px; color: #5D584E; line-height: 1.5; text-align: right; }
+.pdf-page .pdf-brand .pdf-org { font-size: 11.5px; color: #4A463E; line-height: 1.5; text-align: right; }
 .pdf-page .pdf-sig { margin-top: 34px; }
 .pdf-page .pdf-sig .sig-mark { font-family: "Segoe Script", "Bradley Hand", cursive; font-size: 24px; color: #116330; }
-.pdf-page .pdf-ft { margin-top: 42px; padding-top: 12px; border-top: 1px solid #DCD8D0; font-size: 9.5px; color: #7D766B; display: flex; justify-content: space-between; }
+.pdf-page .pdf-ft { margin-top: 42px; padding-top: 12px; border-top: 1px solid #DCD8D0; font-size: 11px; color: #5D584E; display: flex; justify-content: space-between; }
 
 /* AI scribe panel */
 .ai-panel { display: flex; flex-direction: column; background: var(--surface-2); border-left: 1px solid var(--line); overflow: hidden; }
@@ -464,12 +551,12 @@
 .split-bar .sb-a { background: var(--accent); color: var(--text-on-accent); }
 .split-bar .sb-b { background: var(--warm); color: #2B2823; }
 .split-bar > span { display: grid; place-items: center; font-size: var(--fs-xs); font-weight: var(--fw-bold); transition: width var(--dur-2) var(--ease); overflow: hidden; white-space: nowrap; }
-.range { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: none; cursor: pointer; }
+.range { -webkit-appearance: none; appearance: none; width: 100%; height: var(--h-md); background: none; cursor: pointer; }
 .range::-webkit-slider-runnable-track { height: 6px; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--accent) var(--pct,50%), var(--surface-3) var(--pct,50%)); }
-.range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 50%; background: var(--surface); box-shadow: var(--sh-2), inset 0 0 0 2px var(--accent); }
+.range::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -9px; border-radius: 50%; background: var(--surface); box-shadow: var(--sh-2), inset 0 0 0 2px var(--accent); }
 .range::-moz-range-track { height: 6px; border-radius: var(--r-pill); background: var(--surface-3); }
 .range::-moz-range-progress { height: 6px; border-radius: var(--r-pill); background: var(--accent); }
-.range::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: var(--surface); box-shadow: var(--sh-2), inset 0 0 0 2px var(--accent); }
+.range::-moz-range-thumb { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--surface); box-shadow: var(--sh-2), inset 0 0 0 2px var(--accent); }
 .range:focus-visible::-webkit-slider-thumb { box-shadow: var(--sh-focus), inset 0 0 0 2px var(--accent); }
 
 .sync-pill {
@@ -556,15 +643,15 @@
    ========================================================================== */
 .consult-banner {
   position: sticky; top: var(--topbar-h); z-index: 30;
-  background: color-mix(in srgb, var(--surface) 95%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 .cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
 .cb-id { min-width: 190px; }
 .cb-name {
   font-size: var(--fs-xl); font-weight: var(--fw-x); letter-spacing: -0.02em;
-  color: var(--text); text-decoration: none; line-height: 1.2; display: block;
+  color: var(--text); text-decoration: none; line-height: 1.2;
+  display: inline-flex; align-items: center; min-height: var(--h-md);
 }
 .cb-name:hover { color: var(--accent-text); }
 .cb-sub { display: flex; gap: 7px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
@@ -601,7 +688,7 @@
 .fn-group { display: flex; flex-direction: column; gap: 1px; }
 .fn-item {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
-  padding: 7px 10px; border-radius: var(--r-sm);
+  min-height: var(--h-md); padding: 8px 11px; border-radius: var(--r-sm);
   font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--text-muted);
   transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
@@ -616,8 +703,7 @@
 .consult-foot {
   position: sticky; bottom: 0; z-index: 25;
   border-top: 1px solid var(--line); border-bottom: 0;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: blur(10px);
+  background: var(--surface);
 }
 
 @media (max-width: 1280px) {
@@ -694,16 +780,10 @@
 .pname .p-pref { color: var(--text-subtle); font-weight: var(--fw-regular); }
 
 /* Action row: same affordances as before, drawn as one consistent icon set. */
-.p-actions { display: flex; align-items: center; gap: 1px; }
-.p-actions .pa {
-  width: 26px; height: 26px; border-radius: var(--r-xs);
-  display: grid; place-items: center; color: var(--text-subtle);
-  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
-}
-.p-actions .pa:hover { background: var(--accent-soft); color: var(--accent-text); }
-.p-actions .pa.danger:hover { background: var(--bad-bg); color: var(--bad-fg); }
-.p-actions .pa-sep { width: 1px; height: 16px; background: var(--line); margin: 0 3px; flex: none; }
-tbody tr:hover .p-actions .pa { color: var(--text-muted); }
+/* Always visible, never revealed on hover: someone who cannot see them
+   cannot find them. */
+.p-actions { display: flex; align-items: center; gap: 6px; }
+.p-actions .btn { white-space: nowrap; padding: 0 10px; }
 
 .ps-foot {
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; flex: none;
@@ -711,8 +791,8 @@ tbody tr:hover .p-actions .pa { color: var(--text-muted); }
 }
 .pager { display: inline-flex; align-items: center; gap: 2px; }
 .pager button {
-  min-width: 30px; height: 30px; padding: 0 8px; border-radius: var(--r-xs);
-  font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted);
+  min-width: var(--h-md); height: var(--h-md); padding: 0 10px; border-radius: var(--r-xs);
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 .pager button:hover:not(:disabled) { background: var(--surface-3); color: var(--text); }

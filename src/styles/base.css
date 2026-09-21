@@ -39,12 +39,12 @@ table { border-collapse: collapse; width: 100%; }
    Display sizes are set in the serif: it gives the product a voice and keeps
    headings from reading as just bigger interface text. Anything that has to
    be scanned or clicked stays in the sans. ---- */
-.t-display { font-family: var(--font-display); font-size: var(--fs-4xl); line-height: 1.08;
-             font-weight: 700; letter-spacing: -0.02em; }
-.t-h1  { font-family: var(--font-display); font-size: var(--fs-3xl); line-height: 1.12;
-         font-weight: 700; letter-spacing: -0.015em; }
-.t-h2  { font-family: var(--font-display); font-size: var(--fs-2xl); line-height: 1.18;
-         font-weight: 600; letter-spacing: -0.01em; }
+.t-display { font-size: var(--fs-4xl); line-height: 1.12;
+             font-weight: var(--fw-bold); letter-spacing: -0.02em; }
+.t-h1  { font-size: var(--fs-3xl); line-height: 1.18;
+         font-weight: var(--fw-bold); letter-spacing: -0.015em; }
+.t-h2  { font-size: var(--fs-2xl); line-height: 1.22;
+         font-weight: var(--fw-bold); letter-spacing: -0.01em; }
 .t-h3  { font-size: var(--fs-xl);  line-height: var(--lh-snug); font-weight: var(--fw-semi); letter-spacing: -0.01em; }
 .t-h4  { font-size: var(--fs-lg);  line-height: var(--lh-snug); font-weight: var(--fw-semi); }
 
@@ -86,11 +86,12 @@ table { border-collapse: collapse; width: 100%; }
 .between { justify-content: space-between; }
 .g-1 { gap: var(--s-1);} .g-2 { gap: var(--s-2);} .g-3 { gap: var(--s-3);}
 .g-4 { gap: var(--s-4);} .g-5 { gap: var(--s-5);} .g-6 { gap: var(--s-6);}
+.g-7 { gap: var(--s-7);}
 .grid { display: grid; gap: var(--s-4); }
 .stretch { align-self: stretch; }
 .mt-1{margin-top:var(--s-1)}.mt-2{margin-top:var(--s-2)}.mt-3{margin-top:var(--s-3)}
 .mt-4{margin-top:var(--s-4)}.mt-5{margin-top:var(--s-5)}.mt-6{margin-top:var(--s-6)}
-.mb-2{margin-bottom:var(--s-2)}.mb-3{margin-bottom:var(--s-3)}.mb-4{margin-bottom:var(--s-4)}
+.mb-2{margin-bottom:var(--s-2)}.mb-3{margin-bottom:var(--s-3)}.mb-4{margin-bottom:var(--s-4)}.mb-5{margin-bottom:var(--s-5)}.mb-6{margin-bottom:var(--s-6)}
 
 /* ---- Accessibility ---- */
 .sr-only {

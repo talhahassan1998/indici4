@@ -121,7 +121,7 @@ function Preview({ item, toast, nav, onClear }) {
               <div className="card card-flat" style={{ background: '#fff', color: '#151B18', padding: '26px 30px', fontSize: 13, lineHeight: 1.7 }}>
                 <div style={{ borderBottom: '2px solid #116330', paddingBottom: 10, marginBottom: 18, display: 'flex', justifyContent: 'space-between' }}>
                   <b style={{ color: '#116330', fontSize: 15 }}>Kora Health</b>
-                  <span style={{ fontSize: 10, color: '#4E5852' }}>{fmtDate(K.TODAY)}</span></div>
+                  <span style={{ fontSize: 13, color: '#4E5852' }}>{fmtDate(K.TODAY)}</span></div>
                 <p><b>Re: {p.first} {p.last}, NHI {p.nhi}</b></p>
                 <p style={{ marginTop: 10 }}>Dear {K.gp(l.to).name},</p>
                 <p style={{ marginTop: 10 }}>Thank you for referring {p.first}, whom I reviewed in clinic. The history,

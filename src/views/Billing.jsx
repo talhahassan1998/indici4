@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Search, Plus, RefreshCw, Check, TriangleAlert, ReceiptText, Clock, Send, CreditCard,
+  Search, Plus, RefreshCw, Check, TriangleAlert, ReceiptText, Send, CreditCard,
   EllipsisVertical, Download, Trash2, Printer, Copy, Eye, Pencil,
 } from 'lucide-react';
 import K from '../data/sample.js';
@@ -62,16 +62,18 @@ export default function Billing() {
         </div>
       </div>
 
-      <div className="dash-grid mb-4">
-        {[{ l: 'Invoiced today', v: money(todayTotal), s: `${todayInv.length} invoices`, Icon: ReceiptText, tone: '' },
-          { l: 'Paid', v: money(sum('paid')), s: `${count('paid')} settled`, Icon: Check, tone: 'ok' },
-          { l: 'Awaiting payment', v: money(sum('sent')), s: `${count('sent')} sent`, Icon: Clock, tone: 'warn' },
-          { l: 'Overdue', v: money(sum('overdue')), s: `${count('overdue')} past due`, Icon: TriangleAlert, tone: 'bad' },
-        ].map(s => (
-          <div className="col-3" key={s.l}><div className="card stat">
-            <div className="stat-top"><span className={`stat-ic ${s.tone}`}><s.Icon size={15} /></span>
-              <span className="stat-label">{s.l}</span></div>
-            <span className="stat-value">{s.v}</span><span className="stat-sub">{s.s}</span></div></div>
+      {/* One divided line of figures rather than four matching tiles. The
+          numbers are what the page is about, so they are the only thing set
+          large; the colour says which one you have to do something about. */}
+      <div className="fig-row mb-5">
+        {[{ l: 'Invoiced today', v: money(todayTotal), s: `${todayInv.length} invoices`, tone: '' },
+          { l: 'Paid', v: money(sum('paid')), s: `${count('paid')} settled`, tone: 'is-ok' },
+          { l: 'Awaiting payment', v: money(sum('sent')), s: `${count('sent')} sent`, tone: 'is-warn' },
+          { l: 'Overdue', v: money(sum('overdue')), s: `${count('overdue')} past due`, tone: 'is-bad' },
+        ].map(f => (
+          <div className={`fig ${f.tone}`} key={f.l}>
+            <b>{f.v}</b><span>{f.l}</span><small>{f.s}</small>
+          </div>
         ))}
       </div>
 

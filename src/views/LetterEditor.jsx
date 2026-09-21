@@ -163,7 +163,7 @@ export default function LetterEditor() {
           <article className="pdf-page" aria-label="Letter preview">
             <div className="pdf-brand">
               <div><h3>Kora Health</h3>
-                <div style={{ fontSize: 10, color: '#4E5852', letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700 }}>Specialist Clinic</div></div>
+                <div style={{ fontSize: 13, color: '#4E5852', letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700 }}>Specialist Clinic</div></div>
               <div className="pdf-org">{K.clinics[0].addr}<br />{K.org.phone} · {K.org.email}<br />GST {K.org.gst}</div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 22, fontSize: 11.5 }}>

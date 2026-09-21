@@ -114,41 +114,41 @@ dark. A new pairing ships only after it is measured.
 
 ## 3. Typography Rules
 
-**Roboto superfamily**, self-hosted as woff2. Never a CDN — the app must
-render identically offline in a clinic with bad internet.
+**Roboto**, self-hosted as woff2. Never a CDN — the app must render identically
+offline in a clinic with bad internet.
 
 | Family | Token | Used for |
 |---|---|---|
-| Roboto Slab | `--font-display` | Page titles, mastheads, letter bodies |
-| Roboto | `--font-sans` | The entire interface |
+| Roboto | `--font-sans`, `--font-display` | Everything that is read as words |
 | Roboto Mono | `--font-mono` | Every identifier and figure: NHI, chart no., claim no., money, times |
 
-Roboto Slab is a **masthead layer only** — `h1` and `h2`. Card headings, table
-headers and all data are Roboto. A slab on a data table is wrong.
+**One typeface for text.** Headings are the same face as body, set heavier and
+tighter. A second display face gives a product a voice; it also gives a reader
+over fifty a second set of letterforms to decode, and the mastheads it was
+carrying are not the part of this screen that matters. Roboto Mono stays,
+because a column of figures has to line up.
 
-### App scale (dense, 14px base, 1.200 minor third)
+### Scale — 17px body, compressed at the top
 
 | Token | Size | Use |
 |---|---|---|
-| `--fs-2xs` | 10.5px | Eyebrows, chip labels |
-| `--fs-xs` | 11.5px | Metadata, hints, timestamps |
-| `--fs-sm` | 13px | Table cells, secondary detail |
-| `--fs-md` | 14px | Body |
-| `--fs-lg` | 16px | Card headings |
-| `--fs-xl` | 19px | `h4` |
-| `--fs-2xl` | 23px | `h2` |
+| `--fs-2xs` | 13px | Floor. Uppercase labels only; nothing in the product is smaller |
+| `--fs-xs` | 14px | Hints, timestamps, units |
+| `--fs-sm` | 15px | Secondary detail under a label |
+| `--fs-md` | 17px | Body, table cells, inputs, buttons |
+| `--fs-lg` | 19px | `h4` |
+| `--fs-xl` | 21px | Section headings, `h3` |
+| `--fs-2xl` | 24px | Figures, `h2` |
 | `--fs-3xl` | 28px | `h1` |
-| `--fs-4xl` | 34px | Display |
+| `--fs-4xl` | 32px | Page masthead |
 
-### Sign-in scale — one step up, for the 50+ majority
+The top of the scale is deliberately compressed. **Hierarchy comes from weight,
+colour and the rule under a heading, not from size.** A 48px heading over 14px
+body is a landing page; it tells a clinician nothing about what to read next.
+17px body and a 21px heading, correctly spaced, tells them everything.
 
-The `.auth` surface redefines the same tokens rather than adding new ones:
-`--fs-xs 14px` · `--fs-sm 15px` · `--fs-md 16px` · `--fs-lg 18px` ·
-`--fs-xl 21px` · `--fs-2xl 26px` · `--fs-3xl 32px`.
-
-Nothing on a sign-in screen is below 14px. Nothing anywhere is below 10.5px,
-and 10.5px is reserved for all-caps labels where the letterforms are large
-relative to the point size.
+The same scale runs everywhere — the sign-in screen no longer steps up, because
+the rest of the product came up to meet it.
 
 Weights: `400 / 500 / 600 / 700 / 800`. Line heights:
 `1.15 tight · 1.32 snug · 1.55 base · 1.7 loose`.
@@ -191,11 +191,20 @@ Tinted pill, 19px tall, uppercase, `--fs-2xs`, radius `--r-xs`.
 four times. A dot is reserved for one thing: a genuinely live indicator, such
 as a running consultation timer.
 
-### Cards
+### Sections, and the few real cards
 
-Hairline border, no shadow. `--r-md` radius. Header row optional; when present
-it carries an `h3` and a right-aligned action. Numbers in a stat card are
-`--fs-4xl` because a practice manager reads them from across the desk.
+A block of related content is a **section**: an `h2`, a rule, and its rows,
+sitting on the page. `.sect` for a hairline rule, `.sect-lead` for the 2px rule
+that marks the one block a page is built around.
+
+A **card** — hairline border, no shadow, `--r-md` — is the exception, not the
+container of first resort, and a page is allowed roughly one. Use it when the
+content genuinely is a separate surface: a data table, a docked reference
+panel, the patient who is waiting for you right now. Boxing every block gives
+every block the same weight, and buries the content two surfaces deep.
+
+Figures go in a `.fig-row`: a divided line of numbers, each with its label
+underneath. Not four matching tiles. Colour on a figure means *do something*.
 
 ### Tables
 
@@ -228,11 +237,18 @@ Use the scale. A hand-typed `13px` gap is a bug.
 
 | Token | Size | Applies to |
 |---|---|---|
-| `--r-xs` | 3px | Chips, tags, swatches |
-| `--r-sm` | 5px | Buttons, inputs, menu items |
-| `--r-md` | 7px | Cards, panels |
-| `--r-lg` | 10px | Modals, drawers |
+| `--r-xs` | 2px | Chips, tags, swatches |
+| `--r-sm` | 4px | Buttons, inputs, menu items |
+| `--r-md` | 6px | Cards, panels |
+| `--r-lg` | 8px | Modals, drawers |
 | `--r-pill` | 999px | Avatars and genuinely circular things only |
+
+Small radii, used sparingly. A pill on every control reads as a consumer app;
+the only pills here are avatars and one sync indicator.
+
+**Control sizes.** `--h-sm` and `--h-md` are both **44px** — "small" changes the
+padding, never the target — and `--h-lg` is 52px for a primary action. Anything
+you press is at least 44px tall, including the label wrapping a switch.
 
 **Shell.** Sidebar `254px`, topbar `62px`, content max `1560px`.
 
@@ -301,10 +317,18 @@ These come from auditing the real product and finding each one in it.
 - **No fake-perfect numbers.** `47.2%` and `+64 21 445 1102`, never `99.9%`.
 - **No generic names.** NZ-realistic, including te reo Māori and Pasifika names.
 - **No hand-rolled icon SVGs.** Lucide, one family, one stroke weight.
-- **No three identical evenly-spaced cards** as a layout reflex.
-- **Don't reach for a 3D scene** because it is available. It is used in exactly
-  one place — the sign-in brand panel — dynamically imported, skipped under
-  `prefers-reduced-motion`, paused when hidden, and disposed on unmount.
+- **No three identical evenly-spaced cards** as a layout reflex. If a page has
+  more than one bordered surface, ask what the border is doing.
+- **No 3D scene, no gradients for their own sake, no glass, no drop shadows.**
+  A sign-in screen briefly had an animated contour field. It was removed with
+  its dependency: it was the most impressive thing on the screen and the least
+  useful, and a clinic workstation's GPU has better work to do. The two
+  gradients left in the product are load-bearing — 135° hatching for blocked
+  calendar time, and a range track that fills to its value.
+- **No unlabelled icon toolbars.** The patient grid once carried fourteen 26px
+  glyph buttons per row. Across a hundred rows that is fourteen hundred targets
+  a reader over fifty cannot name or reliably hit. Two labelled buttons and a
+  named menu do the same work.
 
 ---
 
@@ -348,18 +372,19 @@ text            #141A17
 text muted      #4E5852
 warm secondary  #B87848
 ok / warn / bad #146B35 / #8A5A12 / #A33528
-radius          3 / 5 / 7 / 10 px, by density
+radius          2 / 4 / 6 / 8 px, by density
 spacing         4 8 12 16 20 24 32 40 48 64
-type            Roboto Slab (h1,h2) · Roboto (UI) · Roboto Mono (numbers, IDs)
+type            Roboto 17px body · Roboto Mono (numbers, IDs)
+controls        44px minimum, 52px for a primary action
 ```
 
 ### Ready-to-use prompts
 
 > Build a `<screen>` for Kora Health following DESIGN.md. Deep green `#15803E`
 > carries every primary action; clay `#B87848` marks emphasis. Hairline borders,
-> no shadows on cards. Roboto for the interface, Roboto Mono for every NHI,
-> claim number, time and dollar figure, Roboto Slab for the page title only.
-> Status chips are tinted pills with a label and no dot.
+> no shadows, sections rather than boxes. Roboto throughout at a 17px body,
+> Roboto Mono for every NHI, claim number, time and dollar figure. Status chips
+> are tinted pills with a label and no dot. Nothing pressable under 44px.
 
 > Review this screen against DESIGN.md section 7. Report every em-dash, every
 > line with more than one middot used as glue, every decorative status dot,

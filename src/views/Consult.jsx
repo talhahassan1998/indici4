@@ -155,9 +155,9 @@ export default function Consult() {
   };
 
   const NoteCard = (
-    <section className="card">
-      <div className="card-hd">
-        <h3>Notes</h3><span className="spacer" />
+    <section className="sect sect-lead">
+      <div className="sect-hd">
+        <h2>Notes</h2><span className="spacer" />
         <select className="select" id="noteTpl" style={{ maxWidth: 210 }} aria-label="Notes template" defaultValue=""
           onChange={e => { const t = TEMPLATES[e.target.value]; if (t) { setNote({ ...t }); bump(); toast('Template applied', 'Edit the wording before signing.', 'ok'); } }}>
           <option value="">Select notes template…</option>
@@ -170,7 +170,7 @@ export default function Consult() {
           toast('Copied forward', 'Pasted into Subjective. Edit before signing.', 'ok');
         }}><Copy size={14} /> Copy last consult</button>
       </div>
-      <div className="card-bd-tight row g-4 wrap" style={{ borderBottom: '1px solid var(--line-faint)' }}>
+      <div className="row g-5 wrap">
         <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
           <span className="check" role="checkbox" aria-checked={confidential} data-flag="confidential"
             onClick={() => { setConfidential(c => !c); bump(); }}><Check size={11} /></span> Confidential</label>
@@ -179,7 +179,7 @@ export default function Consult() {
             onClick={() => { setHidePortal(c => !c); bump(); }}><Check size={11} /></span> Hide from patient portal</label>
         {confidential && <span className="chip chip-bad">Restricted to the care team</span>}
       </div>
-      <div className="card-bd col g-5">
+      <div className="col g-5">
         {SOAP.map(sx => (
           <div className="field soap-field" key={sx.k}>
             <div className="row between">
@@ -201,22 +201,22 @@ export default function Consult() {
   );
 
   const MeasCard = (
-    <section className="card">
-      <div className="card-hd"><h3>Measurements</h3><span className="spacer" />
-        <span className="t-xs subtle">Recorded this consult</span></div>
-      <div className="card-bd row g-4 wrap" style={{ alignItems: 'flex-end' }}>
-        {[['bp','Blood pressure','mmHg','128/82',112],['hr','Pulse','bpm','72',82],['temp','Temp','°C','36.8',86],
-          ['spo2','SpO₂','%','98',78],['wt','Weight','kg','78',86],['ht','Height','cm','168',86]].map(([k,l,u,ph,w]) => (
-          <div className="field" style={{ width: w }} key={k}>
+    <section className="sect">
+      <div className="sect-hd"><h2>Measurements</h2><span className="spacer" />
+        <span className="sect-meta">Recorded this consult</span></div>
+      <div className="meas-grid">
+        {[['bp','Blood pressure','mmHg','128/82'],['hr','Pulse','bpm','72'],['temp','Temperature','°C','36.8'],
+          ['spo2','SpO₂','%','98'],['wt','Weight','kg','78'],['ht','Height','cm','168']].map(([k,l,u,ph]) => (
+          <div className="field" key={k}>
             <label className="label" htmlFor={`v-${k}`}>{l}</label>
             <input className="input input-money" id={`v-${k}`} value={vitals[k]} placeholder={ph}
               inputMode="decimal" onChange={e => setVital(k, e.target.value)} />
             <span className="hint">{u}</span>
           </div>
         ))}
-        <div className="field" style={{ minWidth: 150 }}>
+        <div className="field">
           <span className="label">BMI</span>
-          <div className="row g-2" id="bmiOut" style={{ height: 36, alignItems: 'center' }}>
+          <div className="row g-2" id="bmiOut" style={{ height: 'var(--h-md)', alignItems: 'center' }}>
             {b ? <><b className="t-h4 num">{b}</b><span className={`chip ${band[1]}`}>{band[0]}</span></>
                : <span className="t-sm subtle">Weight and height</span>}
           </div>
@@ -226,10 +226,10 @@ export default function Consult() {
   );
 
   const CodingCard = (
-    <section className="card">
-      <div className="card-hd"><h3>Diagnosis / coding</h3><span className="spacer" />
-        <span className="t-xs subtle">SNOMED CT · drives recalls, reporting and ACC</span></div>
-      <div className="card-bd col g-3">
+    <section className="sect">
+      <div className="sect-hd"><h2>Diagnosis and coding</h2><span className="spacer" />
+        <span className="sect-meta">SNOMED CT · drives recalls, reporting and ACC</span></div>
+      <div className="col g-3">
         <div className="recip-chips">
           {codes.length ? codes.map(c => (
             <span className="chip chip-accent chip-lg chip-removable" key={c}>{c}
@@ -313,7 +313,7 @@ export default function Consult() {
           ))}
         </nav>
 
-        <div className="col g-4" style={{ minWidth: 0 }}>
+        <div className="col g-7" style={{ minWidth: 0 }}>
           {fn === 'meas' ? <>{MeasCard}{NoteCard}</>
             : fn === 'coding' ? <>{CodingCard}{NoteCard}</>
             : <>{NoteCard}{MeasCard}{CodingCard}</>}
@@ -358,27 +358,27 @@ function Prompts({ p, toast }) {
     <div className="col g-4">
       {overdue.length > 0 && (
         <Banner tone="bad" icon={<TriangleAlert size={15} />}>
-          <b>{overdue.length} overdue</b><br /><span className="t-xs">Raise these before the patient leaves.</span>
+          <b>{overdue.length} overdue</b><br /><span className="t-sm">Raise these before the patient leaves.</span>
         </Banner>
       )}
-      {rs.map(r => (
-        <div className="row-t g-3 card card-flat" style={{ padding: 11 }} key={r.text}>
-          <span className="work-ic" style={{ width: 28, height: 28,
-            background: r.status === 'overdue' ? 'var(--bad-bg)' : r.status === 'due' ? 'var(--warn-bg)' : 'var(--surface-3)',
-            color: r.status === 'overdue' ? 'var(--bad-fg)' : r.status === 'due' ? 'var(--warn-fg)' : 'var(--text-muted)' }}>
-            <Bell size={14} /></span>
-          <span className="grow" style={{ minWidth: 0 }}>
-            <b className="t-sm">{r.text}</b>
-            <span className="t-xs subtle" style={{ display: 'block' }}>{r.kind} · due {fmtDate(r.due)}</span>
-            <span className="row g-2 mt-2">
-              <button className="btn btn-soft btn-sm" onClick={() => toast('Recall actioned', r.text, 'ok')}><Check size={12} /> Action</button>
+      {/* Four boxed tiles in a narrow column read as four of the same thing.
+          Divided rows with a coloured edge say which one is late. */}
+      <div className="recall-list">
+        {rs.map(r => (
+          <div className={`recall is-${r.status}`} key={r.text}>
+            <div className="row between g-2">
+              <b className="t-body">{r.text}</b>
+              <Chip status={r.status === 'overdue' ? 'overdue' : r.status === 'due' ? 'pending' : 'draft'}
+                label={r.status === 'overdue' ? 'Overdue' : r.status === 'due' ? 'Due' : 'Future'} />
+            </div>
+            <span className="t-sm muted">{r.kind} · due {fmtDate(r.due)}</span>
+            <span className="row g-2">
+              <button className="btn btn-soft btn-sm" onClick={() => toast('Recall actioned', r.text, 'ok')}><Check size={14} /> Action</button>
               <button className="btn btn-ghost btn-sm" onClick={() => toast('Recall deferred', `${r.text}, pushed out three months.`, 'info')}>Defer</button>
             </span>
-          </span>
-          <Chip status={r.status === 'overdue' ? 'overdue' : r.status === 'due' ? 'pending' : 'draft'}
-            label={r.status === 'overdue' ? 'Overdue' : r.status === 'due' ? 'Due' : 'Future'} />
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -432,9 +432,9 @@ function ProblemsPanel({ p }) {
 function InboxPanel({ p }) {
   const items = K.inbox.filter(i => i.pt === p.id);
   if (!items.length) return <Empty icon={<Mail size={22} />} title="Nothing filed" body="No results or messages waiting." />;
-  return <div className="col g-3">{items.map(i => (
-    <div className="card card-flat" style={{ padding: 10 }} key={i.id}>
-      <b className="t-sm">{i.subj}</b><div className="t-xs subtle">{i.from}</div></div>
+  return <div className="plain-rows">{items.map(i => (
+    <div key={i.id}>
+      <b className="t-body">{i.subj}</b><div className="t-sm muted">{i.from}</div></div>
   ))}</div>;
 }
 

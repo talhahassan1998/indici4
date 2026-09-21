@@ -187,15 +187,15 @@ export default function StyleGuide() {
       <Section id="type" title="Typography"
         lede="The Roboto superfamily. Roboto for the interface, Roboto Slab for mastheads and letter bodies, Roboto Mono for every number a clinic reads at a glance: times, money, NHI, claim numbers.">
         <div className="sg-block">
-          {[['t-display / 34', 'Kia ora, Dr Fenwick', 't-display'],
+          {[['t-display / 32', 'Kia ora, Dr Fenwick', 't-display'],
             ['t-h1 / 28', 'Today’s clinic', 't-h1'],
-            ['t-h2 / 23', 'Patient workspace', 't-h2'],
-            ['t-h3 / 19', 'Billing snapshot', 't-h3'],
-            ['t-h4 / 16', 'Outstanding work', 't-h4'],
-            ['body / 14', 'Thank you for referring this patient, whom I saw in clinic today.', 't-body'],
-            ['t-sm / 13', 'Secondary detail and table cells.', 't-sm'],
-            ['t-xs / 11.5', 'Metadata, hints and timestamps.', 't-xs'],
-            ['t-eyebrow / 10.5', 'Section label', 't-eyebrow'],
+            ['t-h2 / 24', 'Patient workspace', 't-h2'],
+            ['t-h3 / 21', 'Billing snapshot', 't-h3'],
+            ['t-h4 / 19', 'Outstanding work', 't-h4'],
+            ['body / 17', 'Thank you for referring this patient, whom I saw in clinic today.', 't-body'],
+            ['t-sm / 15', 'Secondary detail under a label.', 't-sm'],
+            ['t-xs / 14', 'Hints, timestamps and units.', 't-xs'],
+            ['t-eyebrow / 13', 'Section label', 't-eyebrow'],
             ['t-metric', '$4,182.50', 't-metric'],
             ['t-mono', 'JKL8472 · ACC-2026-44817 · 09:45', 't-mono'],
           ].map(([tag, sample, cls]) => (
@@ -310,22 +310,28 @@ export default function StyleGuide() {
         </div>
       </Section>
 
-      <Section id="cards" title="Cards"
-        lede="A hairline border, a radius that varies with the job, and shadow only when something floats. Numbers are large because a practice manager reads them from across the desk.">
-        <div className="sg-block">
+      <Section id="cards" title="Sections and cards"
+        lede="A block of content is a heading, a rule and its rows, sitting on the page. A bordered card is the exception — a data table, a docked panel, the one thing a page is built around — and a page gets about one. Figures go on a divided line, never four matching tiles.">
+        <div className="sg-block col g-7">
+          <section className="sect sect-lead">
+            <div className="sect-hd"><h2>Lead section</h2>
+              <span className="sect-meta">2px rule, once per page</span></div>
+            <p className="t-body muted">The heaviest rule marks the block the page exists for. Everything
+              after it takes the hairline, so the order of the page is legible before a word is read.</p>
+          </section>
+          <section className="sect">
+            <div className="sect-hd"><h2>Ordinary section</h2><span className="sect-meta">Hairline rule</span></div>
+            <div className="fig-row">
+              <div className="fig"><b>$1,184</b><span>Invoiced today</span><small>5 invoices, incl GST</small></div>
+              <div className="fig is-warn"><b>$914</b><span>Awaiting payment</span><small>3 sent</small></div>
+              <div className="fig is-bad"><b>3</b><span>ACC errors</span><small>Will be rejected as-is</small></div>
+            </div>
+          </section>
           <div className="sg-auto">
-            <div className="card stat">
-              <div className="stat-top"><span className="stat-ic"><ReceiptText size={15} /></span>
-                <span className="stat-label">Invoiced today</span></div>
-              <span className="stat-value">$1,184</span><span className="stat-sub">5 invoices · incl GST</span></div>
-            <div className="card stat">
-              <div className="stat-top"><span className="stat-ic bad"><TriangleAlert size={15} /></span>
-                <span className="stat-label">ACC errors</span></div>
-              <span className="stat-value" style={{ color: 'var(--bad-fg)' }}>3</span>
-              <span className="stat-sub">Will be rejected as-is</span></div>
             <div className="card">
-              <div className="card-hd"><h3>With header</h3><span className="spacer" /><span className="chip">12</span></div>
-              <div className="card-bd"><p className="t-sm muted">Body content sits on the surface colour with a hairline divider above.</p></div>
+              <div className="card-hd"><h3>A real card</h3><span className="spacer" /><span className="chip">12</span></div>
+              <div className="card-bd"><p className="t-sm muted">Use one when the content genuinely is a
+                separate surface. If a page has more than one, ask what the border is doing.</p></div>
               <div className="card-ft row"><span className="t-xs subtle">Footer for metadata</span></div></div>
             <div className="card card-bd col g-3">
               <span className="t-eyebrow">Progress</span>

@@ -32,26 +32,15 @@
   --focus-halo:    rgba(23,162,74,.28);
   --brand-deep:    #0D4A25;
 
-  /* --- type, one step up from the app's density --- */
-  --fs-2xs: 12px;
-  --fs-xs:  14px;
-  --fs-sm:  15px;
-  --fs-md:  16px;
-  --fs-lg:  18px;
-  --fs-xl:  21px;
-  --fs-2xl: 26px;
-  --fs-3xl: 32px;
-  --fs-4xl: 38px;
-
   /* --- one rhythm, used by both panels, so the two sides line up --- */
   --a-pad:    clamp(28px, 3.4vw, 48px);  /* identical padding on both panels */
   --a-col:    404px;                     /* identical content column */
   --a-head:   44px;                      /* header row, so the wordmark and the
                                             support link share a baseline */
   --a-gap:    20px;                      /* between field groups */
-  --a-control: 52px;                     /* input and secondary button height */
-  --a-cta:    56px;                      /* primary button height */
-  --a-radius: 12px;
+  --a-control: var(--h-md);              /* input and secondary button height */
+  --a-cta:    var(--h-lg);               /* primary button height */
+  --a-radius: var(--r-sm);
 
   min-height: 100dvh;
   display: grid;
@@ -90,21 +79,20 @@
 
 .auth-mark { gap: 12px; }
 .auth-mark .brand-mark {
-  width: 36px; height: 36px; border-radius: 10px; background: var(--accent);
+  width: 38px; height: 38px; border-radius: var(--r-sm); background: var(--accent);
   display: grid; place-items: center; flex: none;
 }
 .auth-mark .brand-mark svg { width: 21px; height: 21px; }
 .auth-mark b {
-  font-family: var(--font-display); font-size: var(--fs-xl);
-  font-weight: 700; letter-spacing: -0.015em;
+  font-size: var(--fs-xl); font-weight: var(--fw-bold); letter-spacing: -0.015em;
 }
 
 .auth-body { display: flex; flex-direction: column; gap: var(--a-gap); }
 .auth-body > * { margin: 0; }
 
 .auth-panel h1 {
-  font-family: var(--font-display); font-size: var(--fs-3xl); font-weight: 700;
-  letter-spacing: -0.02em; line-height: 1.12;
+  font-size: var(--fs-3xl); font-weight: var(--fw-bold);
+  letter-spacing: -0.02em; line-height: 1.18;
 }
 .auth-sub { margin-top: 10px; font-size: var(--fs-md); line-height: 1.55; color: var(--text-muted); }
 .auth-sub a { color: var(--accent-text); font-weight: var(--fw-bold); text-decoration: underline;
@@ -122,8 +110,8 @@
   letter-spacing: .04em; text-transform: uppercase; color: var(--text-subtle);
 }
 .auth-steps .s-n {
-  display: inline-grid; place-items: center; width: 20px; height: 20px; flex: none;
-  border-radius: 6px; font-family: var(--font-mono); font-size: 11px;
+  display: inline-grid; place-items: center; width: 22px; height: 22px; flex: none;
+  border-radius: var(--r-xs); font-family: var(--font-mono); font-size: 11px;
   background: var(--surface-3); color: var(--text-subtle);
 }
 .auth-steps li[data-state="now"] { border-top-color: var(--accent); color: var(--text); }
@@ -156,7 +144,7 @@
 .pw-toggle {
   position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
   width: 40px; height: 40px; display: grid; place-items: center;
-  border: 0; background: none; color: var(--text-subtle); cursor: pointer; border-radius: 8px;
+  border: 0; background: none; color: var(--text-subtle); cursor: pointer; border-radius: var(--r-sm);
 }
 .pw-toggle:hover { color: var(--text); background: var(--surface-3); }
 
@@ -178,7 +166,7 @@
 /* Verification code */
 .code-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .code-row input {
-  width: 100%; height: 62px; text-align: center; padding: 0;
+  width: 100%; height: 58px; text-align: center; padding: 0;
   font-family: var(--font-mono); font-size: var(--fs-2xl); font-weight: var(--fw-semi);
   color: var(--text); background: var(--surface);
   border: 1px solid var(--line-field); border-radius: var(--a-radius);
@@ -196,8 +184,8 @@
 .ctx-option + .ctx-option { margin-top: 10px; }
 .ctx-option:hover { background: var(--surface-2); }
 .ctx-option .co-ic {
-  display: grid; place-items: center; width: 36px; height: 36px; flex: none;
-  border-radius: 9px; background: var(--surface-3); color: var(--text-subtle);
+  display: grid; place-items: center; width: 38px; height: 38px; flex: none;
+  border-radius: var(--r-xs); background: var(--surface-3); color: var(--text-subtle);
 }
 .ctx-option .co-main { flex: 1; min-width: 0; }
 .ctx-option .co-main b { display: block; font-size: var(--fs-md); font-weight: var(--fw-semi); }
@@ -243,11 +231,6 @@
   background: var(--brand-deep);
   color: #FFFFFF;
 }
-.brand-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.auth-brand::after {
-  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(86% 58% at 74% 8%, rgba(23,162,74,.30), rgba(13,74,37,0) 70%);
-}
 .auth-brand > .brand-help,
 .auth-brand > .brand-body,
 .auth-brand > .brand-strip { position: relative; z-index: 2; }
@@ -265,12 +248,11 @@
    there is no wrapper card around it. */
 .clinic-illo {
   display: block; width: 100%; height: auto;
-  filter: drop-shadow(0 18px 38px rgba(0,0,0,.26));
 }
 
 .brand-note h2 {
-  font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 700;
-  line-height: 1.2; letter-spacing: -0.02em;
+  font-size: var(--fs-2xl); font-weight: var(--fw-bold);
+  line-height: 1.25; letter-spacing: -0.015em;
 }
 .brand-note p { margin-top: 12px; font-size: var(--fs-md); line-height: 1.6; color: rgba(255,255,255,.88); }
 /* One quiet line at the foot of the panel for the notice that has a date on
@@ -296,5 +278,5 @@
 @media (max-width: 480px) {
   .auth { --a-pad: 22px; }
   .code-row { gap: 7px; }
-  .code-row input { height: 56px; font-size: var(--fs-xl); }
+  .code-row input { height: 52px; font-size: var(--fs-xl); }
 }

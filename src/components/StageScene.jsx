@@ -11,12 +11,32 @@
 
    Everything here stops under `prefers-reduced-motion`. */
 
+import { useState, useEffect, useRef } from 'react';
+import { WALK_VIDEO, WALK_POSTER } from '../config/media.js';
+
 const SKIN = '#E8BE9B', SKIN_D = '#D2A17F';
 const TOP = '#15803E', TOP_D = '#0F6431';
 const LEG_D = '#262D29';
 const SHOE = '#FBFCFB';
 
 export default function StageScene() {
+  /* A generated clip if one is configured, the drawn figure if not. The clip
+     is the only remote asset on the screen, so it is treated as optional:
+     if it will not load, `onError` takes it out and the SVG takes over. */
+  const [clipOk, setClipOk] = useState(!!WALK_VIDEO);
+  const reduced = useRef(false);
+  useEffect(() => {
+    reduced.current = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  }, []);
+
+  if (WALK_VIDEO && clipOk) return (
+    <div className="stage-scene stage-clip" aria-hidden="true">
+      <video className="stage-video" src={WALK_VIDEO} poster={WALK_POSTER || undefined}
+        autoPlay={!reduced.current} loop muted playsInline preload="metadata"
+        onError={() => setClipOk(false)} />
+    </div>
+  );
+
   return (
     <div className="stage-scene" aria-hidden="true">
       <svg className="stage-art" viewBox="0 0 420 520" role="presentation">

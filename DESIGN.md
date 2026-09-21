@@ -273,11 +273,20 @@ choice of look never becomes a choice of behaviour — asserted by comparing
 the rendered field list, button list, step count and account count across all
 three.
 
-The figure on `stage` is **SVG, not a rendered video**: it walks, breathes and
-drifts at a few kilobytes, it is sharp at any size, and it still works on a
-clinic PC with no network. The rig only holds together if the bob is on the
-whole figure — put it on the torso alone and the legs stay behind. Every
-animation on that screen stops under `prefers-reduced-motion`.
+The figure on `stage` plays a **generated walk clip** when one is configured
+in `src/config/media.js`, and falls back to a **drawn SVG figure** when it is
+not — or when the clip will not load. `onError` does the swap, so a dead link
+costs a look, not a login, and the suite asserts the panel is never empty.
+
+Those two URLs are the only remote assets in the product. Everything else —
+fonts, icons, illustrations — is in the bundle, because a clinic with bad
+internet should still get a working sign-in screen. Setting `WALK_VIDEO` back
+to `null` returns the screen to fully self-contained.
+
+The SVG figure's rig only holds together if the bob is on the whole figure —
+put it on the torso alone and the legs stay behind. Every animation on that
+screen stops under `prefers-reduced-motion`, and the clip does not autoplay
+under it either.
 
 Both new frames use a soft background wash, so the 50+ audit reports two
 gradients it did not before. They sit behind no text that has to be read, and

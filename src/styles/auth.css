@@ -321,6 +321,14 @@
 .stage-scene { width: min(86%, 470px); }
 .stage-art { width: 100%; height: auto; display: block; }
 
+/* The generated clip, when one is configured. It keeps the figure's own
+   background, so it is framed as a media block rather than cut out. */
+.stage-clip { width: min(78%, 400px); }
+.stage-video {
+  width: 100%; height: auto; display: block; border-radius: var(--r-lg);
+  box-shadow: var(--sh-3); background: var(--pou-50);
+}
+
 /* ---- The walk. Four loops on one 1.6s clock: the legs and arms swing in
    opposite pairs, the body rises on each stride, and the whole figure drifts
    a few pixels so it reads as moving through the scene rather than marching

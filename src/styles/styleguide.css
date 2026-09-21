@@ -2,7 +2,7 @@
 .sg-wrap { max-width: 1080px; }
 .sg-lede { color: var(--text-muted); max-width: 64ch; }
 
-.sg-jump { position: sticky; top: 0; z-index: 5; margin: 0 calc(var(--s-6) * -1) var(--s-5);
+.sg-jump { position: sticky; top: 0; z-index: 5; margin: 0 calc(var(--page-gutter) * -1) var(--s-5); flex-wrap: wrap;
   padding: 9px var(--s-6); background: color-mix(in srgb, var(--bg) 88%, transparent);
   border-bottom: 1px solid var(--line);
   display: flex; gap: 2px; flex-wrap: wrap; }

@@ -50,7 +50,9 @@ you can click one to fill the form.
 | **Secondary** | Clay `#B87848`, the warm earth tone green needs opposite it |
 | **Neutrals** | Near-neutral greys with a faint green cast, on a `#F6F9F7` ground |
 | **Type** | Roboto throughout at a 17px body, Roboto Mono for every identifier and figure |
-| **Shape** | 2px chips, 4px controls, 6px cards, 8px overlays; radius scales with density |
+| **Shape** | 4px chips, 8px controls, 12px cards, 16px overlays; radius scales with density |
+| **Ground** | White page, light hairlines, a wash of brand green behind every column header |
+| **Width** | No column cap; panels are inset by a 16px gutter so a wide monitor shows more rows, not more margin |
 | **Targets** | 44px minimum on anything pressable, 52px for a primary action |
 | **Rows of controls** | Every input, select and button on a line is exactly 44px, asserted in a test rather than eyeballed |
 | **Elevation** | Flat. A hairline separates; a shadow means the thing genuinely floats, so only overlays get one |
@@ -232,3 +234,5 @@ The prototype was checked in headless Chromium:
   selection and the bulk action it unlocks
 - **Rows of controls** — every `.input`, `.select` and `.btn` sharing a line is
   measured across 13 routes and must agree to the pixel
+- **Sideways overflow** — every route at 1440px and 1280px, asserting nothing
+  pushes the shell wider than the window and drags the sidebar off-screen

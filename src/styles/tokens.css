@@ -42,7 +42,8 @@
   --n-100: #EDF1EE;
   --n-150: #E1E7E3;
   --n-200: #CFD7D2;
-  --n-300: #B2BCB6;
+  --n-250: #C3CCC7;
+  --n-300: #A8B3AC;
   --n-400: #8B978F;
   --n-500: #5E6862;
   --n-600: #4E5852;
@@ -87,12 +88,22 @@
   --appt-telehealth:#2C5B79;
   --appt-admin:    #66716A;
 
-  /* ---- Applied surface tokens (light theme is the default) ---- */
-  --bg:            var(--n-50);
-  --bg-sunken:     var(--n-100);
+  /* ---- Applied surface tokens (light theme is the default) ----
+
+     The page is white. A grid of four hundred rows on a tinted ground reads
+     as a panel floating on a background; on white it reads as the page, which
+     is what it is. Depth comes from a hairline and a radius, not from two
+     shades of off-white stacked on each other. ---- */
+  --bg:            var(--n-0);
+  --bg-sunken:     var(--n-50);
   --surface:       var(--n-0);
-  --surface-2:     var(--n-25);
-  --surface-3:     var(--n-50);
+  --surface-2:     var(--n-50);
+  --surface-3:     var(--n-100);
+  /* The one place colour is structural rather than semantic: a column header
+     is a different kind of row and says so. */
+  --th-bg:         var(--pou-100);
+  --th-fg:         var(--pou-800);
+  --field-bg:      var(--n-50);
   --surface-inv:   var(--pou-800);
   --overlay:       rgba(8, 48, 24, 0.40);
 
@@ -105,7 +116,12 @@
   --line:          var(--n-150);   /* decorative hairline */
   --line-strong:   var(--n-200);   /* stronger divider */
   --line-faint:    var(--n-100);
-  --line-field:    #859089;        /* control boundary, meets 3:1 on every surface */
+  /* Control boundary. Softened from #859089 at the client's request: it now
+     reads as a light edge rather than a drawn box. That trades non-text
+     contrast (3.0:1 down to about 2.4:1, under WCAG 1.4.11) for the lighter
+     look, so the focus state carries more of the load: a full accent border
+     plus a 3px halo, not a shade change. */
+  --line-field:    var(--n-300);
 
   --accent:        var(--pou-600);
   --accent-hover:  var(--pou-700);
@@ -123,11 +139,11 @@
 
   /* ---- Radii. Scaled to the density of the thing: dense controls stay
          nearly square, only true overlays get a soft corner. ---- */
-  --r-xs: 2px;   /* chips, tags, swatches */
-  --r-sm: 4px;   /* buttons, inputs, menu items */
-  --r-md: 6px;   /* sections, panels */
-  --r-lg: 8px;   /* modals, drawers */
-  --r-xl: 10px;
+  --r-xs: 4px;   /* chips, tags, swatches */
+  --r-sm: 8px;   /* buttons, inputs, menu items */
+  --r-md: 12px;  /* cards, grids, panels */
+  --r-lg: 16px;  /* modals, drawers */
+  --r-xl: 20px;
   --r-pill: 999px;  /* avatars and genuinely circular things only */
 
   /* ---- Elevation: soft, warm-tinted, never harsh ---- */
@@ -188,8 +204,12 @@
   /* ---- Layout ---- */
   --sidebar-w: 254px;
   --sidebar-w-collapsed: 68px;
-  --topbar-h: 62px;
-  --content-max: 1560px;
+  --topbar-h: 68px;
+  /* No column cap. A practice-management grid earns its keep by showing more
+     rows and more columns at once; a 1560px measure in the middle of a 2560px
+     monitor throws that away. The gutter is small and fixed instead. */
+  --content-max: none;
+  --page-gutter: var(--s-4);
 
   /* ---- Motion ---- */
   --ease: cubic-bezier(.2,.7,.3,1);
@@ -217,10 +237,14 @@
   --text-inv:      var(--ink-900);
   --text-on-accent:#FFFFFF;
 
+  --th-bg:         rgba(41,164,89,.10);
+  --th-fg:         #8FDBB0;
+  --field-bg:      var(--ink-750);
+
   --line:          var(--ink-600);
   --line-strong:   var(--ink-500);
   --line-faint:    var(--ink-700);
-  --line-field:    #6B7B78;
+  --line-field:    #66756F;
 
   --accent:        #29A459;
   --accent-hover:  #3DB86C;
@@ -271,10 +295,14 @@
     --text-subtle:   #879389;
     --text-inv:      #0B100D;
 
+    --th-bg:         rgba(41,164,89,.10);
+    --th-fg:         #8FDBB0;
+    --field-bg:      #18211C;
+
     --line:          #2A3630;
     --line-strong:   #39473F;
     --line-faint:    #1F2923;
-    --line-field:    #6A7C71;
+    --line-field:    #66756F;
 
     --accent:        #29A459;
     --accent-hover:  #3DB86C;

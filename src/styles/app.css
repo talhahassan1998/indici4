@@ -4,11 +4,18 @@
 
 .app {
   display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
+  /* minmax(0, 1fr), not 1fr: an auto-minimum track is sized by its content,
+     so the patient grid pushed the whole shell 21px wider than the window and
+     the sidebar scrolled off the left edge with it. */
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   min-height: 100vh;
+  /* `clip`, not `hidden`: it trims a tooltip that overhangs the right edge
+     without making the shell a scroll container, so the sidebar and the
+     sticky headers inside still stick to the window. */
+  overflow-x: clip;
   transition: grid-template-columns var(--dur-3) var(--ease-out);
 }
-.app[data-rail="true"] { grid-template-columns: var(--sidebar-w-collapsed) 1fr; }
+.app[data-rail="true"] { grid-template-columns: var(--sidebar-w-collapsed) minmax(0, 1fr); }
 
 /* ------------------------------------------------------------- Sidebar */
 .app-sidebar {
@@ -83,14 +90,14 @@
 .app-topbar {
   position: sticky; top: 0; z-index: 35;
   display: flex; align-items: center; gap: var(--s-3);
-  height: var(--topbar-h); padding: 0 var(--s-5); flex: none;
+  height: var(--topbar-h); padding: 0 var(--page-gutter); flex: none;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 .global-search {
-  position: relative; flex: 1 1 auto; max-width: 560px;
+  position: relative; flex: 1 1 auto; min-width: 0; max-width: 620px;
 }
-.global-search .input { height: 38px; padding-left: 36px; padding-right: 58px; background: var(--surface); border-radius: var(--r-md); }
+.global-search .input { padding-left: 40px; padding-right: 58px; background: var(--surface); border-radius: var(--r-sm); }
 .global-search .ic-lead { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-subtle); pointer-events: none; }
 .global-search .kbd { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .search-results {
@@ -109,11 +116,14 @@
 .search-hit b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .search-hit span { display: block; font-size: var(--fs-xs); color: var(--text-subtle); }
 
-.topbar-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+/* `flex: none` meant the cluster kept its full width and pushed past the bar
+   at anything under about 1500px, which is where the top of the screen looked
+   broken. It shrinks now; the search beside it gives up space first. */
+.topbar-actions { display: flex; align-items: center; gap: 6px; flex: 0 1 auto; min-width: 0; }
 .role-switch {
-  display: flex; align-items: center; gap: 7px; height: 34px; padding: 0 10px;
+  display: flex; align-items: center; gap: 7px; height: var(--h-md); padding: 0 12px;
   border-radius: var(--r-sm); background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line-strong);
+  box-shadow: inset 0 0 0 1px var(--line);
   font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-muted);
 }
 .role-switch:hover { background: var(--surface-3); }
@@ -127,9 +137,11 @@
 .app-topbar .tip:hover::after, .app-topbar .tip:focus-visible::after { transform: translateX(-50%); }
 
 /* ------------------------------------------------------------- Page */
+/* Full width, small gutter. More rows and more columns on screen is the whole
+   point of the product; a centred column throws half a monitor away. */
 .page {
   flex: 1; min-width: 0;
-  padding: var(--s-6) var(--s-6) var(--s-10);
+  padding: var(--s-5) var(--page-gutter) var(--s-9);
   max-width: var(--content-max); width: 100%; margin: 0 auto;
 }
 .page-flush { padding: 0; max-width: none; }
@@ -153,18 +165,18 @@
    line is straight. A placeholder is not a label — it disappears the moment
    someone types, and then the field is unnamed. ---- */
 .filter-bar {
-  display: grid; gap: var(--s-3) var(--s-3); align-items: end;
-  grid-template-columns: minmax(210px, 1.4fr) minmax(150px, .8fr) minmax(150px, .8fr) auto;
+  display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: end;
+  /* Same reasoning as .ps-filter-grid: wrap on the space that is actually
+     there, not on a guess about the window. */
   padding: var(--s-4) var(--s-5) var(--s-5);
   margin-bottom: var(--s-5);
   background: var(--surface); border-radius: var(--r-md);
   box-shadow: inset 0 0 0 1px var(--line);
 }
-.filter-bar .fb-actions { display: flex; align-items: center; gap: var(--s-2); }
-@media (max-width: 1000px) {
-  .filter-bar { grid-template-columns: 1fr 1fr; }
-  .filter-bar .fb-actions { grid-column: 1 / -1; }
-}
+.filter-bar > .field { flex: 1 1 200px; min-width: 0; }
+.filter-bar .fb-actions { flex: 0 0 auto; display: flex; align-items: center; gap: var(--s-2); }
+.filter-bar > .field:first-child { flex: 2 1 260px; }
+
 
 /* ------------------------------------------------------------- Command palette */
 .cmdk-scrim { position: fixed; inset: 0; z-index: 110; background: var(--overlay); animation: fade var(--dur-2) var(--ease); }
@@ -217,7 +229,7 @@
 
 .stat-strip {
   display: flex; flex-wrap: wrap; margin-top: var(--s-5);
-  border-top: 2px solid var(--text); border-bottom: 1px solid var(--line);
+  border-top: 2px solid var(--accent); border-bottom: 1px solid var(--line);
 }
 .stat-strip .ss {
   display: flex; flex-direction: column; gap: 2px;
@@ -253,7 +265,7 @@
    gets a hairline, so the order of the page is legible before you read a
    word of it. */
 .sect > .sect-hd      { border-bottom: 1px solid var(--line); }
-.sect-lead > .sect-hd { border-bottom: 2px solid var(--text); }
+.sect-lead > .sect-hd { border-bottom: 2px solid var(--accent); }
 
 /* Rows sit flush with the heading above them; only the hover state and the
    in-progress highlight run wider, which is what the inset margin buys. */
@@ -555,7 +567,45 @@
 .inbox-shell { display: grid; grid-template-columns: 250px 380px 1fr; height: calc(100vh - var(--topbar-h)); overflow: hidden; }
 .inbox-nav { border-right: 1px solid var(--line); padding: var(--s-4) var(--s-3); overflow-y: auto; background: var(--surface); }
 .inbox-list { border-right: 1px solid var(--line); overflow-y: auto; background: var(--surface); }
-.inbox-preview { overflow-y: auto; background: var(--bg); }
+.inbox-preview { overflow: hidden; background: var(--bg); display: flex; flex-direction: column; min-width: 0; }
+
+/* The preview pane: a header that stays, a body that scrolls and fills the
+   width it is given, and the actions pinned at the bottom where they can be
+   reached without scrolling past the whole letter. */
+.ib-pane { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.ib-pane-hd {
+  flex: none; display: flex; align-items: flex-start; gap: var(--s-3);
+  padding: var(--s-4) var(--page-gutter); border-bottom: 1px solid var(--line);
+}
+.ib-pane-bd { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: var(--s-4) var(--page-gutter) var(--s-6); }
+.ib-pane-ft {
+  flex: none; padding: var(--s-3) var(--page-gutter);
+  border-top: 1px solid var(--line); background: var(--surface);
+}
+.ib-patient {
+  padding: var(--s-3); border-radius: var(--r-md);
+  border: 1px solid var(--line); background: var(--surface);
+  text-decoration: none; color: inherit;
+}
+.ib-patient:hover { border-color: var(--accent); background: var(--accent-soft); }
+
+/* The letter itself, set as a document: a measure you can read, real spacing
+   between paragraphs, and the letterhead rule in the brand green. */
+.ib-letter {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: var(--s-6) var(--s-7); font-size: var(--fs-md); line-height: 1.7;
+}
+.ib-letter p { max-width: 78ch; }
+.ib-letter p + p { margin-top: var(--s-4); }
+.ib-letterhead {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 10px; margin-bottom: var(--s-5);
+  border-bottom: 2px solid var(--accent-text);
+}
+.ib-letterhead b { color: var(--accent-text); font-size: var(--fs-lg); }
+.ib-letterhead span { font-size: var(--fs-sm); color: var(--text-muted); }
+.ib-sign { margin-top: var(--s-6); }
+.ib-sign span { font-size: var(--fs-sm); color: var(--text-muted); }
 .inbox-item {
   display: flex; gap: var(--s-3); width: 100%; text-align: left;
   padding: 12px var(--s-4); border-bottom: 1px solid var(--line-faint);
@@ -750,17 +800,21 @@
 }
 .ps-head {
   display: flex; align-items: flex-end; gap: var(--s-4); flex-wrap: wrap;
-  padding: var(--s-5) var(--s-5) var(--s-4); flex: none;
+  padding: var(--s-4) var(--page-gutter) var(--s-4); flex: none;
 }
 .ps-filters {
-  flex: none; padding: 0 var(--s-5) var(--s-4);
+  flex: none; padding: 0 var(--page-gutter) var(--s-4);
   border-bottom: 1px solid var(--line);
 }
-.ps-filter-grid {
-  display: grid; gap: var(--s-3);
-  grid-template-columns: minmax(200px, 1.6fr) minmax(130px, .8fr) minmax(130px, .8fr) minmax(170px, 1.1fr) auto;
-  align-items: end;
+.ps-filter-grid { gap: var(--s-3);
+  /* Flex, not a fixed grid. A breakpoint is written against the window, but
+     what has to fit is the window minus the sidebar, so a four-column grid
+     kept overflowing at widths the media query thought were roomy. Flex wraps
+     when it runs out of room, at any width, with no numbers to keep in step. */
+  display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: end;
 }
+.ps-filter-grid > .field { flex: 1 1 190px; min-width: 0; }
+.ps-filter-grid > .row   { flex: 0 0 auto; }
 /* The selection column: a fixed narrow cell, and a row that is selected says
    so with a tint rather than only a ticked box in the corner of the eye. */
 .tbl th.sel-cell, .tbl td.sel-cell { width: 46px; padding-right: 0; }
@@ -770,6 +824,19 @@
 /* A grid bar inside a card sits flush with the card's edge. */
 .card > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
 
+/* The grid, its bar and its footer are one panel: a white card with a hairline
+   and a radius, inset from the window by the page gutter and nothing more.
+   Full width is the point; a border is what stops it bleeding off the edge. */
+.grid-panel {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; overflow: hidden;
+  margin: 0 var(--page-gutter) var(--page-gutter);
+  background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+}
+.grid-panel > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
+.grid-panel > .ps-foot  { border-radius: 0 0 var(--r-md) var(--r-md); }
+
 /* ---- The bar over a grid.
 
    What you have, what you have selected, what you can do about it, and the
@@ -778,7 +845,7 @@
    the selects and the buttons share a baseline. ---- */
 .grid-bar {
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; flex: none;
-  padding: var(--s-2) var(--s-5); min-height: 60px;
+  padding: var(--s-2) var(--page-gutter); min-height: 60px;
   background: var(--surface); border-bottom: 1px solid var(--line);
 }
 .grid-bar .gb-count { font-size: var(--fs-md); }
@@ -795,14 +862,14 @@
 .ps-grid table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; }
 .ps-grid thead th {
   position: sticky; top: 0; z-index: 3;
-  background: var(--surface-2);
-  padding: 8px var(--s-3); white-space: nowrap;
+  background: var(--th-bg);
+  padding: 11px var(--s-3); white-space: nowrap;
   font-size: var(--fs-2xs); font-weight: var(--fw-bold);
-  letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-subtle);
-  text-align: left; border-bottom: 1px solid var(--line-strong);
+  letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--th-fg);
+  text-align: left; border-bottom: 1px solid var(--line);
 }
 .ps-grid thead th.sortable { cursor: pointer; user-select: none; }
-.ps-grid thead th.sortable:hover { color: var(--text); background: var(--surface-3); }
+.ps-grid thead th.sortable:hover { color: var(--accent); background: var(--accent-soft-2); }
 .ps-grid thead th .sort-ind { opacity: .35; margin-left: 3px; }
 .ps-grid thead th[aria-sort] .sort-ind { opacity: 1; color: var(--accent-text); }
 .ps-grid tbody td {
@@ -829,7 +896,7 @@
 
 .ps-foot {
   display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; flex: none;
-  padding: var(--s-2) var(--s-5); border-top: 1px solid var(--line); background: var(--surface-2);
+  padding: var(--s-2) var(--page-gutter); border-top: 1px solid var(--line); background: var(--surface);
 }
 .ps-foot .lg { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-sm); color: var(--text-muted); }
 .ps-foot .lg i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
@@ -847,11 +914,6 @@
 .pager button[aria-current="true"] { background: var(--accent); color: var(--text-on-accent); }
 .pager button:disabled { opacity: .35; cursor: not-allowed; }
 
-@media (max-width: 1100px) {
-  .ps-filter-grid { grid-template-columns: 1fr 1fr; }
-  .ps-filter-grid > *:last-child { grid-column: 1 / -1; }
-}
-
 /* Name and Actions stay pinned while the middle columns scroll horizontally —
    otherwise the most-used column is the one furthest off-screen. */
 .ps-grid thead th:first-child,
@@ -860,7 +922,7 @@
    second one starts where the first one ends and the shadow moves with it. */
 .ps-grid thead th:nth-child(2),
 .ps-grid tbody td:nth-child(2) { position: sticky; left: 46px; z-index: 2; background: var(--surface); }
-.ps-grid thead th:nth-child(2) { z-index: 5; background: var(--surface-2); }
+.ps-grid thead th:nth-child(2) { z-index: 5; background: var(--th-bg); }
 .ps-grid th.sel-cell, .ps-grid td.sel-cell {
   width: 46px; min-width: 46px; padding-left: var(--s-4); padding-right: 0;
 }
@@ -869,7 +931,7 @@
 .ps-grid thead th:last-child,
 .ps-grid tbody td:last-child  { position: sticky; right: 0; z-index: 2; background: var(--surface); }
 .ps-grid thead th:first-child,
-.ps-grid thead th:last-child  { z-index: 5; background: var(--surface-2); }
+.ps-grid thead th:last-child  { z-index: 5; background: var(--th-bg); }
 
 /* A soft edge, not just a hairline: it has to read as floating over the
    columns that scroll underneath, or the row looks like it simply ends. */

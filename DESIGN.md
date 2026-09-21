@@ -191,6 +191,43 @@ Tinted pill, 19px tall, uppercase, `--fs-2xs`, radius `--r-xs`.
 four times. A dot is reserved for one thing: a genuinely live indicator, such
 as a running consultation timer.
 
+### Surfaces
+
+**The page is white.** A grid of four hundred rows on a tinted ground reads as a
+panel floating on a background; on white it reads as the page, which is what it
+is. Depth comes from a hairline and a radius, not from two shades of off-white
+stacked on each other.
+
+**Borders are light.** `--line` for structure, `--line-faint` between rows. The
+resting field border is `--n-300`, deliberately softer than the 3:1 that WCAG
+1.4.11 asks of a control boundary. That trade is paid for twice: every field
+also carries a tinted fill (`--field-bg`), so it is a well rather than an
+outline, and focus is a full accent border plus a halo rather than a shade
+change. The contrast suite records the resting value at what it actually ships
+at rather than dropping the check.
+
+**Colour in a column header, and nowhere else structural.** `--th-bg` is a wash
+of the brand green with `--th-fg` over it. A header is a different kind of row
+and should say so; a grey header reads as a disabled row.
+
+### Full width
+
+`--content-max` is `none` and `--page-gutter` is 16px. A practice-management
+grid earns its keep by showing more rows and more columns at once, and a
+1560px measure in the middle of a 2560px monitor throws that away. Panels are
+inset by the gutter and nothing more; the border and the radius are what stop
+them bleeding off the edge.
+
+Two rules keep that honest:
+
+- `.app` is `grid-template-columns: var(--sidebar-w) minmax(0, 1fr)`. An
+  `auto`-minimum track is sized by its content, so the patient grid pushed the
+  whole shell wider than the window and dragged the sidebar off the left edge.
+- Filter rows are flex with `flex-wrap`, not a fixed grid. A media query is
+  written against the window, but what has to fit is the window minus the
+  sidebar, so a four-column grid kept overflowing at widths the breakpoint
+  thought were roomy.
+
 ### Sections, and the few real cards
 
 A block of related content is a **section**: an `h2`, a rule, and its rows,
@@ -263,20 +300,20 @@ Use the scale. A hand-typed `13px` gap is a bug.
 
 | Token | Size | Applies to |
 |---|---|---|
-| `--r-xs` | 2px | Chips, tags, swatches |
-| `--r-sm` | 4px | Buttons, inputs, menu items |
-| `--r-md` | 6px | Cards, panels |
-| `--r-lg` | 8px | Modals, drawers |
+| `--r-xs` | 4px | Chips, tags, swatches |
+| `--r-sm` | 8px | Buttons, inputs, menu items |
+| `--r-md` | 12px | Cards, grid panels |
+| `--r-lg` | 16px | Modals, drawers |
 | `--r-pill` | 999px | Avatars and genuinely circular things only |
 
-Small radii, used sparingly. A pill on every control reads as a consumer app;
-the only pills here are avatars and one sync indicator.
+Softened corners, still not pills. A pill on every control reads as a consumer
+app; the only pills here are avatars and one sync indicator.
 
 **Control sizes.** `--h-sm` and `--h-md` are both **44px** — "small" changes the
 padding, never the target — and `--h-lg` is 52px for a primary action. Anything
 you press is at least 44px tall, including the label wrapping a switch.
 
-**Shell.** Sidebar `254px`, topbar `62px`, content max `1560px`.
+**Shell.** Sidebar `254px`, topbar `68px`, no content cap, `--page-gutter` `16px`.
 
 **Whitespace.** Dense where data is compared, generous where a decision is
 made. The patient grid runs full width with no page gutter; a sign-in panel
@@ -391,14 +428,16 @@ accent          #15803E     primary action
 accent bright   #17A24A     focus, bright step
 accent text     #116330     accent text on light
 page ground     #F6F9F7
-surface         #FFFFFF
+page + surface  #FFFFFF
 hairline        #E1E7E3
-field border    #859089
+field fill      #F6F9F7
+field border    #A8B3AC
+table header    #E5EFE7 on #0D4A25
 text            #141A17
 text muted      #4E5852
 warm secondary  #B87848
 ok / warn / bad #146B35 / #8A5A12 / #A33528
-radius          2 / 4 / 6 / 8 px, by density
+radius          4 / 8 / 12 / 16 px, by density
 spacing         4 8 12 16 20 24 32 40 48 64
 type            Roboto 17px body · Roboto Mono (numbers, IDs)
 controls        44px minimum, 52px for a primary action
@@ -408,7 +447,8 @@ controls        44px minimum, 52px for a primary action
 
 > Build a `<screen>` for Kora Health following DESIGN.md. Deep green `#15803E`
 > carries every primary action; clay `#B87848` marks emphasis. Hairline borders,
-> no shadows, sections rather than boxes. Roboto throughout at a 17px body,
+> no shadows, white page, sections rather than boxes, full width with a 16px
+> gutter. Roboto throughout at a 17px body,
 > Roboto Mono for every NHI, claim number, time and dollar figure. Status chips
 > are tinted pills with a label and no dot. Nothing pressable under 44px.
 

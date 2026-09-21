@@ -230,6 +230,7 @@ export default function Patients() {
           you have, what you have selected and what you can do about it, with
           the pages where you can reach them without scrolling to the bottom
           of four hundred rows. */}
+      <div className="grid-panel">
       <div className="grid-bar">
         <span className="gb-count">
           <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
@@ -362,6 +363,7 @@ export default function Patients() {
         {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
           <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
         ))}
+      </div>
       </div>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
     </div>

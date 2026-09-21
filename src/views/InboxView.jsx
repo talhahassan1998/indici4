@@ -94,21 +94,23 @@ function Preview({ item, toast, nav, onClear }) {
   const p = K.pt(item.pt);
   const l = item.letter ? K.ltr(item.letter) : null;
   const Icon = KIND_ICON[item.kind];
+  /* No max-width and no card around the card. The pane is as wide as it is;
+     capping the letter at 820px left a third of the screen empty beside the
+     one thing the screen exists to show. */
   return (
-    <div className="page" style={{ maxWidth: 820 }}>
-      <section className="card">
-        <div className="card-hd">
-          <span className={`stat-ic ${item.pri === 'high' ? 'bad' : ''}`}><Icon size={15} /></span>
-          <div className="grow"><h3>{item.subj}</h3>
-            <span className="t-xs subtle">{item.from} · {fmtDate(item.at.slice(0, 10))} {fmtClock(item.at)}</span></div>
-          {item.pri === 'high' && <Chip status="overdue" label="Urgent" />}
-        </div>
-        <div className="card-bd col g-4">
-          <a className="row g-3 card card-flat" style={{ padding: 12, textDecoration: 'none', color: 'inherit' }}
-            href={`#/patient/${p.id}`}>
+    <div className="ib-pane">
+      <div className="ib-pane-hd">
+        <span className={`stat-ic ${item.pri === 'high' ? 'bad' : ''}`}><Icon size={17} /></span>
+        <div className="grow"><h2 className="t-h3">{item.subj}</h2>
+          <span className="t-sm muted">{item.from} · {fmtDate(item.at.slice(0, 10))} {fmtClock(item.at)}</span></div>
+        {item.pri === 'high' && <Chip status="overdue" label="Urgent" />}
+      </div>
+      <div className="ib-pane-bd">
+        <div className="col g-4">
+          <a className="row g-3 ib-patient" href={`#/patient/${p.id}`}>
             <Avatar id={p.id} size="lg" />
-            <span className="grow"><b>{p.first} {p.last}</b>
-              <span className="t-xs subtle" style={{ display: 'block' }}>{p.nhi} · {age(p.dob)}y · GP {K.gp(p.gp).name}</span></span>
+            <span className="grow"><b className="t-h4">{p.first} {p.last}</b>
+              <span className="t-sm muted" style={{ display: 'block' }}>{p.nhi} · {age(p.dob)}y · GP {K.gp(p.gp).name}</span></span>
             <FunderChip funder={p.funder} />
             <ChevronRight size={16} className="subtle" />
           </a>
@@ -118,14 +120,32 @@ function Preview({ item, toast, nav, onClear }) {
               <Banner tone="warn" icon={<Clock size={15} />}>
                 <span className="t-sm"><b>Waiting for your approval.</b> Typed by {K.st(l.typedBy).name}, {relTime(l.updated)}.</span>
               </Banner>
-              <div className="card card-flat" style={{ background: '#fff', color: '#151B18', padding: '26px 30px', fontSize: 13, lineHeight: 1.7 }}>
-                <div style={{ borderBottom: '2px solid #116330', paddingBottom: 10, marginBottom: 18, display: 'flex', justifyContent: 'space-between' }}>
-                  <b style={{ color: '#116330', fontSize: 15 }}>Kora Health</b>
-                  <span style={{ fontSize: 13, color: '#4E5852' }}>{fmtDate(K.TODAY)}</span></div>
-                <p><b>Re: {p.first} {p.last}, NHI {p.nhi}</b></p>
-                <p style={{ marginTop: 10 }}>Dear {K.gp(l.to).name},</p>
-                <p style={{ marginTop: 10 }}>Thank you for referring {p.first}, whom I reviewed in clinic. The history,
-                  examination findings and management plan are set out below…</p>
+              {/* The whole letter, not three lines and an ellipsis. You are
+                  being asked to approve it, so you have to be able to read it. */}
+              <div className="ib-letter">
+                <div className="ib-letterhead">
+                  <b>Kora Health</b>
+                  <span>{fmtDate(K.TODAY)}</span></div>
+                <p><b>Re: {p.first} {p.last}, NHI {p.nhi}, DOB {fmtDate(p.dob)}</b></p>
+                <p>Dear {K.gp(l.to).name},</p>
+                <p>Thank you for referring {p.first}, whom I reviewed in clinic today.</p>
+                <p><b>History.</b> {p.first} describes a six month history of pain, worse on weight
+                  bearing and at night, with no history of trauma. Previous management has been
+                  simple analgesia and activity modification, with limited benefit.</p>
+                <p><b>Examination.</b> Antalgic gait. Tenderness over the joint line with a
+                  reduced range of movement in flexion. No effusion. Ligaments stable.
+                  Neurovascularly intact distally.</p>
+                <p><b>Investigations.</b> Plain films show joint space narrowing with subchondral
+                  sclerosis. Bloods are unremarkable; CRP and ESR are within range.</p>
+                <p><b>Impression.</b> Symptomatic degenerative change, consistent with the
+                  radiological findings.</p>
+                <p><b>Plan.</b> Supervised physiotherapy for twelve weeks, a corticosteroid
+                  injection if symptoms persist, and review in three months. I have discussed
+                  surgical options and {p.first} would prefer to defer that decision.</p>
+                <p>Thank you again for the referral. Please contact me if anything changes in
+                  the interim.</p>
+                <p className="ib-sign">Yours sincerely,<br /><b>{K.st(l.cl).name}</b><br />
+                  <span>{K.st(l.cl).role} · Kora Specialists, Newmarket</span></p>
               </div>
             </>
           )}
@@ -147,7 +167,8 @@ function Preview({ item, toast, nav, onClear }) {
               <p className="t-xs subtle mt-3">From {item.from} · {relTime(item.at)}</p></div>
           )}
         </div>
-        <div className="card-ft row g-2 wrap">
+      </div>
+      <div className="ib-pane-ft row g-2 wrap">
           {item.kind === 'approval' ? (
             <>
               <button className="btn btn-primary" data-act="approve" onClick={() => {
@@ -167,8 +188,7 @@ function Preview({ item, toast, nav, onClear }) {
           )}
           <span className="spacer" />
           <button className="btn btn-ghost btn-icon tip" data-tip="Print" aria-label="Print"><Printer size={15} /></button>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

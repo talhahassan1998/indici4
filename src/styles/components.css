@@ -83,9 +83,13 @@
    put inputs at 46.6px next to a 44px button, and every filter bar in the
    product was three pixels out of true. A control you can press is exactly
    --h-md tall, whatever is inside it. */
+/* A light fill as well as a light border. The border was softened at the
+   client's request, which costs non-text contrast, so the field no longer
+   relies on its outline alone to read as a field: it is a tinted well on a
+   white page, and the focus state is a full accent border plus a halo. */
 .input, .select, .textarea {
   width: 100%; padding: 0 13px;
-  background: var(--surface); color: var(--text);
+  background: var(--field-bg); color: var(--text);
   border: 1px solid var(--line-field); border-radius: var(--r-sm);
   font-size: var(--fs-md); line-height: 1.45;
   transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
@@ -96,7 +100,8 @@
 .input:hover, .select:hover, .textarea:hover { border-color: var(--n-500); }
 :root[data-theme="dark"] .input:hover { border-color: var(--accent-text); }
 .input:focus, .select:focus, .textarea:focus {
-  outline: none; border-color: var(--focus); box-shadow: var(--sh-focus);
+  outline: none; background: var(--surface);
+  border-color: var(--focus); box-shadow: var(--sh-focus), inset 0 0 0 1px var(--focus);
 }
 .input[aria-invalid="true"], .select[aria-invalid="true"] {
   border-color: var(--bad-line); background: var(--bad-bg);
@@ -283,19 +288,24 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 /* --------------------------------------------------------------- Tables */
 .table-wrap { width: 100%; overflow-x: auto; }
 .tbl { width: 100%; font-size: var(--fs-sm); }
+/* The column header is a different kind of row and says so with a wash of the
+   brand green, not with a grey that reads as a disabled row. */
 .tbl thead th {
   position: sticky; top: 0; z-index: 2;
-  text-align: left; padding: 7px var(--s-3);
-  background: var(--surface-2);
+  text-align: left; padding: 11px 10px;
+  background: var(--th-bg);
   font-size: var(--fs-2xs); font-weight: var(--fw-bold);
   letter-spacing: var(--tracking-caps); text-transform: uppercase;
-  color: var(--text-subtle); white-space: nowrap;
+  color: var(--th-fg); white-space: nowrap;
   border-bottom: 1px solid var(--line);
 }
+.tbl thead th:first-child { border-top-left-radius: var(--r-md); }
+.tbl thead th:last-child  { border-top-right-radius: var(--r-md); }
+.tbl tbody tr:last-child td { border-bottom: 0; }
 .tbl thead th.sortable { cursor: pointer; user-select: none; }
-.tbl thead th.sortable:hover { color: var(--text); }
+.tbl thead th.sortable:hover { color: var(--accent); background: var(--accent-soft-2); }
 .tbl tbody td {
-  padding: 9px var(--s-3);
+  padding: 10px 10px;
   border-bottom: 1px solid var(--line-faint);
   vertical-align: middle;
   /* Rows stay one line. A wrapped invoice number reads as two invoice numbers,

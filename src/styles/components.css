@@ -42,7 +42,7 @@
 
 .btn-sm { height: var(--h-sm); padding: 0 12px; font-size: var(--fs-sm); gap: 7px; }
 .btn-lg { height: var(--h-lg); padding: 0 22px; font-size: var(--fs-lg); font-weight: var(--fw-bold); }
-.btn-icon { width: 36px; padding: 0; }
+.btn-icon { width: var(--h-md); padding: 0; }
 .btn-icon.btn-sm { width: var(--h-sm); }
 .btn-icon.btn-lg { width: var(--h-lg); }
 .btn-block { width: 100%; }
@@ -79,13 +79,19 @@
 .hint { font-size: var(--fs-sm); color: var(--text-subtle); }
 .err  { font-size: var(--fs-sm); color: var(--bad-fg); display: flex; gap: 6px; align-items: center; }
 
+/* Height is set, not derived. `min-height` plus padding plus a 1.45 line box
+   put inputs at 46.6px next to a 44px button, and every filter bar in the
+   product was three pixels out of true. A control you can press is exactly
+   --h-md tall, whatever is inside it. */
 .input, .select, .textarea {
-  width: 100%; min-height: var(--h-md); padding: 10px 13px;
+  width: 100%; padding: 0 13px;
   background: var(--surface); color: var(--text);
   border: 1px solid var(--line-field); border-radius: var(--r-sm);
   font-size: var(--fs-md); line-height: 1.45;
   transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
 }
+.input, .select { height: var(--h-md); }
+.textarea { padding: 10px 13px; }
 .input::placeholder, .textarea::placeholder { color: var(--text-subtle); }
 .input:hover, .select:hover, .textarea:hover { border-color: var(--n-500); }
 :root[data-theme="dark"] .input:hover { border-color: var(--accent-text); }
@@ -292,7 +298,12 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
   padding: 9px var(--s-3);
   border-bottom: 1px solid var(--line-faint);
   vertical-align: middle;
+  /* Rows stay one line. A wrapped invoice number reads as two invoice numbers,
+     and a table whose row heights vary with the length of a name cannot be
+     scanned down a column. Cells that genuinely need to wrap opt in. */
+  white-space: nowrap;
 }
+.tbl tbody td.wrap-cell { white-space: normal; }
 .tbl tbody tr { transition: background var(--dur-1) var(--ease); }
 .tbl tbody tr:hover { background: var(--surface-2); }
 .tbl tbody tr.selected { background: var(--accent-soft); }

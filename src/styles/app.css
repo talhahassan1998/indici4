@@ -145,6 +145,27 @@
   box-shadow: inset 0 0 0 1px var(--line);
 }
 
+/* ---- A filter row with its labels above it.
+
+   `align-items: end` is the whole trick: the labelled fields and the bare
+   buttons land on the same bottom edge, so the controls read as one line
+   whether or not they carry a label. Every control in it is --h-md, so that
+   line is straight. A placeholder is not a label — it disappears the moment
+   someone types, and then the field is unnamed. ---- */
+.filter-bar {
+  display: grid; gap: var(--s-3) var(--s-3); align-items: end;
+  grid-template-columns: minmax(210px, 1.4fr) minmax(150px, .8fr) minmax(150px, .8fr) auto;
+  padding: var(--s-4) var(--s-5) var(--s-5);
+  margin-bottom: var(--s-5);
+  background: var(--surface); border-radius: var(--r-md);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.filter-bar .fb-actions { display: flex; align-items: center; gap: var(--s-2); }
+@media (max-width: 1000px) {
+  .filter-bar { grid-template-columns: 1fr 1fr; }
+  .filter-bar .fb-actions { grid-column: 1 / -1; }
+}
+
 /* ------------------------------------------------------------- Command palette */
 .cmdk-scrim { position: fixed; inset: 0; z-index: 110; background: var(--overlay); animation: fade var(--dur-2) var(--ease); }
 .cmdk {
@@ -675,7 +696,7 @@
   padding: 9px var(--s-6); border-top: 1px solid var(--line-faint); background: var(--surface-2);
 }
 .cb-ctl { display: flex; align-items: center; gap: 7px; }
-.cb-ctl .select { height: 30px; padding-top: 3px; padding-bottom: 3px; font-size: var(--fs-xs); max-width: 168px; }
+.cb-ctl .select { max-width: 168px; }
 
 .consult-body {
   display: grid; grid-template-columns: 216px minmax(0, 1fr) minmax(300px, 380px);
@@ -740,13 +761,34 @@
   grid-template-columns: minmax(200px, 1.6fr) minmax(130px, .8fr) minmax(130px, .8fr) minmax(170px, 1.1fr) auto;
   align-items: end;
 }
-.ps-legend {
-  display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap;
-  padding: 7px var(--s-5); flex: none;
-  background: var(--surface-2); border-bottom: 1px solid var(--line);
+/* The selection column: a fixed narrow cell, and a row that is selected says
+   so with a tint rather than only a ticked box in the corner of the eye. */
+.tbl th.sel-cell, .tbl td.sel-cell { width: 46px; padding-right: 0; }
+.tbl td.sel-cell { cursor: default; }
+.tbl tbody tr[data-selected] > td { background: var(--accent-soft); }
+
+/* A grid bar inside a card sits flush with the card's edge. */
+.card > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
+
+/* ---- The bar over a grid.
+
+   What you have, what you have selected, what you can do about it, and the
+   pages — on one line, directly above the rows, so none of it needs a scroll
+   to four hundred rows down to be reached. Controls on it are all --h-md, so
+   the selects and the buttons share a baseline. ---- */
+.grid-bar {
+  display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; flex: none;
+  padding: var(--s-2) var(--s-5); min-height: 60px;
+  background: var(--surface); border-bottom: 1px solid var(--line);
 }
-.ps-legend .lg { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-2xs); color: var(--text-muted); }
-.ps-legend .lg i { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+.grid-bar .gb-count { font-size: var(--fs-md); }
+.grid-bar .gb-count b { font-weight: var(--fw-bold); }
+.grid-bar .gb-sel {
+  padding: 0 11px; height: 32px; display: inline-flex; align-items: center;
+  border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-text);
+  font-size: var(--fs-sm); font-weight: var(--fw-semi);
+}
+.grid-bar .gb-rows { width: 86px; }
 
 /* The grid itself owns the remaining height and scrolls in both directions. */
 .ps-grid { flex: 1 1 auto; overflow: auto; background: var(--surface); min-height: 0; }
@@ -786,15 +828,21 @@
 .p-actions .btn { white-space: nowrap; padding: 0 10px; }
 
 .ps-foot {
-  display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; flex: none;
-  padding: 9px var(--s-5); border-top: 1px solid var(--line); background: var(--surface-2);
+  display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; flex: none;
+  padding: var(--s-2) var(--s-5); border-top: 1px solid var(--line); background: var(--surface-2);
 }
+.ps-foot .lg { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-sm); color: var(--text-muted); }
+.ps-foot .lg i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
 .pager { display: inline-flex; align-items: center; gap: 2px; }
 .pager button {
+  display: inline-flex; align-items: center; justify-content: center;
   min-width: var(--h-md); height: var(--h-md); padding: 0 10px; border-radius: var(--r-xs);
-  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text-muted);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
 }
+/* The jump-to-end buttons carry two chevrons. Without the overlap they were
+   wider than the button and wrapped onto a second line. */
+.pager button svg + svg { margin-left: -7px; }
 .pager button:hover:not(:disabled) { background: var(--surface-3); color: var(--text); }
 .pager button[aria-current="true"] { background: var(--accent); color: var(--text-on-accent); }
 .pager button:disabled { opacity: .35; cursor: not-allowed; }
@@ -808,6 +856,16 @@
    otherwise the most-used column is the one furthest off-screen. */
 .ps-grid thead th:first-child,
 .ps-grid tbody td:first-child { position: sticky; left: 0; z-index: 2; background: var(--surface); }
+/* Two columns ride the left edge now — the checkbox and the name — so the
+   second one starts where the first one ends and the shadow moves with it. */
+.ps-grid thead th:nth-child(2),
+.ps-grid tbody td:nth-child(2) { position: sticky; left: 46px; z-index: 2; background: var(--surface); }
+.ps-grid thead th:nth-child(2) { z-index: 5; background: var(--surface-2); }
+.ps-grid th.sel-cell, .ps-grid td.sel-cell {
+  width: 46px; min-width: 46px; padding-left: var(--s-4); padding-right: 0;
+}
+.ps-grid td.sel-cell { cursor: default; }
+.ps-grid tbody tr[data-selected] > td { background: var(--accent-soft); }
 .ps-grid thead th:last-child,
 .ps-grid tbody td:last-child  { position: sticky; right: 0; z-index: 2; background: var(--surface); }
 .ps-grid thead th:first-child,
@@ -815,17 +873,19 @@
 
 /* A soft edge, not just a hairline: it has to read as floating over the
    columns that scroll underneath, or the row looks like it simply ends. */
-.ps-grid tbody td:first-child { box-shadow: 6px 0 7px -6px rgba(13,35,26,.22), 1px 0 0 var(--line-faint); }
+.ps-grid tbody td:nth-child(2) { box-shadow: 6px 0 7px -6px rgba(13,35,26,.22), 1px 0 0 var(--line-faint); }
 .ps-grid tbody td:last-child  { box-shadow: -6px 0 7px -6px rgba(13,35,26,.22), -1px 0 0 var(--line-faint); }
-.ps-grid thead th:first-child { box-shadow: 6px 0 7px -6px rgba(13,35,26,.22), 1px 0 0 var(--line); }
+.ps-grid thead th:nth-child(2) { box-shadow: 6px 0 7px -6px rgba(13,35,26,.22), 1px 0 0 var(--line); }
 .ps-grid thead th:last-child  { box-shadow: -6px 0 7px -6px rgba(13,35,26,.22), -1px 0 0 var(--line); }
-:root[data-theme="dark"] .ps-grid tbody td:first-child,
-:root[data-theme="dark"] .ps-grid thead th:first-child { box-shadow: 6px 0 8px -6px rgba(0,0,0,.6), 1px 0 0 var(--line); }
+:root[data-theme="dark"] .ps-grid tbody td:nth-child(2),
+:root[data-theme="dark"] .ps-grid thead th:nth-child(2) { box-shadow: 6px 0 8px -6px rgba(0,0,0,.6), 1px 0 0 var(--line); }
 :root[data-theme="dark"] .ps-grid tbody td:last-child,
 :root[data-theme="dark"] .ps-grid thead th:last-child  { box-shadow: -6px 0 8px -6px rgba(0,0,0,.6), -1px 0 0 var(--line); }
 
 /* Pinned cells paint their own background, so the row hover has to be repeated. */
 .ps-grid tbody tr:hover td:first-child,
+.ps-grid tbody tr:hover td:nth-child(2),
 .ps-grid tbody tr:hover td:last-child { background: var(--surface-2); }
 .ps-grid tbody tr:focus-visible td:first-child,
+.ps-grid tbody tr:focus-visible td:nth-child(2),
 .ps-grid tbody tr:focus-visible td:last-child { background: var(--accent-soft); }

@@ -52,6 +52,7 @@ you can click one to fill the form.
 | **Type** | Roboto throughout at a 17px body, Roboto Mono for every identifier and figure |
 | **Shape** | 2px chips, 4px controls, 6px cards, 8px overlays; radius scales with density |
 | **Targets** | 44px minimum on anything pressable, 52px for a primary action |
+| **Rows of controls** | Every input, select and button on a line is exactly 44px, asserted in a test rather than eyeballed |
 | **Elevation** | Flat. A hairline separates; a shadow means the thing genuinely floats, so only overlays get one |
 
 Success reuses the brand green rather than introducing a second one. Two
@@ -226,5 +227,8 @@ The prototype was checked in headless Chromium:
   search with NHI check-digit validation, and the consult screen end to end:
   SOAP autosave, BMI, templates, dot phrases, the confidential flag, the
   function rail, services for invoicing, and sign-and-file
-- **Patient grid** — 494 records, full-width layout, pinned Name and Actions
-  columns, sticky header, sorting, paging and live filtering
+- **Patient grid** — 494 records, full-width layout, pinned selection, Name and
+  Actions columns, sticky header, sorting, paging, live filtering, row
+  selection and the bulk action it unlocks
+- **Rows of controls** — every `.input`, `.select` and `.btn` sharing a line is
+  measured across 13 routes and must agree to the pixel

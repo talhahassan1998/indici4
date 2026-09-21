@@ -12,6 +12,7 @@ import { Avatar, Switch, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Menu } from '../lib/ui.jsx';
 
 const COLS = [
+  { k: null,       label: '', select: true },
   { k: 'last',     label: 'Name', sort: true },
   { k: 'dob',      label: 'DOB', sort: true },
   { k: 'age',      label: 'Age', sort: true, num: true },
@@ -62,6 +63,29 @@ const MORE = [
 
 const digits = v => String(v).replace(/\D/g, '');
 
+/* One pager, used above the grid and below it. Every target is --h-md, and
+   the page you are on is stated rather than only tinted. */
+function Pager({ cur, pages, onGo }) {
+  const window5 = Array.from({ length: Math.min(5, pages) }, (_, i) =>
+    Math.max(1, Math.min(pages - 4, cur - 2)) + i).filter(n => n >= 1 && n <= pages);
+  return (
+    <div className="pager" role="group" aria-label="Pagination">
+      <button onClick={() => onGo(1)} disabled={cur === 1} aria-label="First page">
+        <ChevronLeft size={15} /><ChevronLeft size={15} /></button>
+      <button onClick={() => onGo(cur - 1)} disabled={cur === 1} aria-label="Previous page">
+        <ChevronLeft size={16} /></button>
+      {window5.map(n => (
+        <button key={n} aria-current={n === cur} aria-label={`Page ${n} of ${pages}`}
+          onClick={() => onGo(n)}>{n}</button>
+      ))}
+      <button onClick={() => onGo(cur + 1)} disabled={cur === pages} aria-label="Next page">
+        <ChevronRight size={16} /></button>
+      <button onClick={() => onGo(pages)} disabled={cur === pages} aria-label="Last page">
+        <ChevronRight size={15} /><ChevronRight size={15} /></button>
+    </div>
+  );
+}
+
 export default function Patients() {
   const nav = useNavigate();
   const { toast } = useUi();
@@ -71,6 +95,7 @@ export default function Patients() {
   const [per, setPer] = useState(100);
   const [vault, setVault] = useState(false);
   const [menu, setMenu] = useState(null);
+  const [sel, setSel] = useState(() => new Set());
   const gridRef = useRef(null);
 
   const set = (k, v) => { setF(p => ({ ...p, [k]: v })); setPage(1); };
@@ -106,6 +131,14 @@ export default function Patients() {
   const pages = Math.max(1, Math.ceil(list.length / per));
   const cur = Math.min(page, pages);
   const rows = list.slice((cur - 1) * per, cur * per);
+  const pageIds = rows.map(r => r.id);
+  const allOnPage = pageIds.length > 0 && pageIds.every(id => sel.has(id));
+  const toggleRow = id => setSel(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const togglePage = () => setSel(s2 => {
+    const n = new Set(s2);
+    allOnPage ? pageIds.forEach(id => n.delete(id)) : pageIds.forEach(id => n.add(id));
+    return n;
+  });
   const nhiState = f.nhi.trim() ? K.nhiCheck(f.nhi) : null;
 
   const act = (id, pid, anchor) => {
@@ -193,16 +226,39 @@ export default function Patients() {
         </div>
       </div>
 
-      <div className="ps-legend">
-        <span className="t-eyebrow">Enrolment</span>
-        {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
-          <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
-        ))}
+      {/* One bar over the grid rather than a legend strip and a footer: what
+          you have, what you have selected and what you can do about it, with
+          the pages where you can reach them without scrolling to the bottom
+          of four hundred rows. */}
+      <div className="grid-bar">
+        <span className="gb-count">
+          <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
+          <span className="subtle"> · showing {list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</span>
+        </span>
+
+        {sel.size > 0 ? (
+          <>
+            <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
+            <button className="btn btn-primary btn-sm" onClick={() => {
+              toast(`Recall letter queued`, `${sel.size} patient${sel.size === 1 ? '' : 's'} added to the typing queue.`, 'ok');
+              setSel(new Set());
+            }}><Mail size={16} /> Send recall letter</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
+          </>
+        ) : (
+          <label className="row g-2">
+            <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
+            <span className="t-sm muted">Include deceased and archived</span>
+          </label>
+        )}
+
         <span className="spacer" />
-        <label className="row g-2 t-xs" style={{ cursor: 'pointer' }}>
-          <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
-          <span className="muted">Include deceased and archived</span>
-        </label>
+        <label className="row g-2 t-sm muted">Rows
+          <select className="select gb-rows" value={per} aria-label="Rows per page"
+            onChange={e => { setPer(Number(e.target.value)); setPage(1); }}>
+            {[50, 100, 200].map(n => <option key={n}>{n}</option>)}
+          </select></label>
+        <Pager cur={cur} pages={pages} onGo={n => { setPage(n); if (gridRef.current) gridRef.current.scrollTop = 0; }} />
       </div>
 
       <div className="ps-grid" ref={gridRef}>
@@ -210,6 +266,15 @@ export default function Patients() {
           <thead><tr>
             {COLS.map(c => {
               const sorted = c.k && sort.k === c.k;
+              if (c.select) return (
+                <th key="sel" className="sel-cell">
+                  <span className="check" role="checkbox" tabIndex={0} aria-checked={allOnPage}
+                    aria-label={allOnPage ? 'Clear selection on this page' : 'Select every patient on this page'}
+                    onClick={togglePage}
+                    onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); togglePage(); } }}>
+                    <Check size={13} /></span>
+                </th>
+              );
               return (
                 <th key={c.label}
                   className={`${c.sort ? 'sortable' : ''} ${c.tip ? 'tip' : ''} ${c.num ? 'num-cell' : ''}`}
@@ -227,9 +292,16 @@ export default function Patients() {
               const mobile = p.phone && p.phone.startsWith('+64 2') ? p.phone : '';
               const landline = p.phone && !p.phone.startsWith('+64 2') ? p.phone : '';
               return (
-                <tr key={p.id} tabIndex={0}
-                  onClick={e => { if (!e.target.closest('.p-actions')) nav(`/patient/${p.id}`); }}
+                <tr key={p.id} tabIndex={0} data-selected={sel.has(p.id) || undefined}
+                  onClick={e => { if (!e.target.closest('.p-actions, .sel-cell')) nav(`/patient/${p.id}`); }}
                   onKeyDown={e => { if (e.key === 'Enter') nav(`/patient/${p.id}`); }}>
+                  <td className="sel-cell">
+                    <span className="check" role="checkbox" tabIndex={0} aria-checked={sel.has(p.id)}
+                      aria-label={`Select ${K.displayName(p)}`}
+                      onClick={e => { e.stopPropagation(); toggleRow(p.id); }}
+                      onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleRow(p.id); } }}>
+                      <Check size={13} /></span>
+                  </td>
                   <td><span className="pname">
                     <i className="p-dot" style={{ background: st.tone }} title={st.label} />
                     <b style={{ color: st.tone }}>{p.last.toUpperCase()}, {p.first}</b>
@@ -286,23 +358,10 @@ export default function Patients() {
       </div>
 
       <div className="ps-foot">
-        <span className="t-sm muted">Showing <b className="num">{list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</b> of <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients</span>
-        <span className="spacer" />
-        <label className="row g-2 t-xs muted">Rows
-          <select className="select" value={per} aria-label="Rows per page"
-            style={{ height: 30, width: 76, paddingTop: 2, paddingBottom: 2 }}
-            onChange={e => { setPer(Number(e.target.value)); setPage(1); }}>
-            {[50, 100, 200].map(n => <option key={n}>{n}</option>)}
-          </select></label>
-        <div className="pager" role="group" aria-label="Pagination">
-          <button onClick={() => { setPage(1); gridRef.current.scrollTop = 0; }} disabled={cur === 1} aria-label="First page"><ChevronLeft size={13} /><ChevronLeft size={13} /></button>
-          <button onClick={() => { setPage(cur - 1); gridRef.current.scrollTop = 0; }} disabled={cur === 1} aria-label="Previous page"><ChevronLeft size={14} /></button>
-          {Array.from({ length: Math.min(5, pages) }, (_, i) => Math.max(1, Math.min(pages - 4, cur - 2)) + i)
-            .filter(n => n >= 1 && n <= pages)
-            .map(n => <button key={n} aria-current={n === cur} onClick={() => { setPage(n); gridRef.current.scrollTop = 0; }}>{n}</button>)}
-          <button onClick={() => { setPage(cur + 1); gridRef.current.scrollTop = 0; }} disabled={cur === pages} aria-label="Next page"><ChevronRight size={14} /></button>
-          <button onClick={() => { setPage(pages); gridRef.current.scrollTop = 0; }} disabled={cur === pages} aria-label="Last page"><ChevronRight size={13} /><ChevronRight size={13} /></button>
-        </div>
+        <span className="t-eyebrow">Enrolment</span>
+        {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
+          <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
+        ))}
       </div>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
     </div>

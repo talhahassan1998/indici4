@@ -16,6 +16,7 @@ export default function Billing() {
   const [, force] = useState(0);
   const [menu, setMenu] = useState(null);
   const [syncing, setSyncing] = useState(false);
+  const [sel, setSel] = useState(() => new Set());
 
   const list = useMemo(() => K.invoices.filter(i =>
     (f.status === 'all' || i.status === f.status) &&
@@ -23,6 +24,10 @@ export default function Billing() {
     (f.cl === 'all' || i.cl === f.cl) &&
     (!f.q || `${i.id} ${K.ptName(i.pt)}`.toLowerCase().includes(f.q.toLowerCase()))
   ), [f, K.invoices.length]);
+
+  const allSelected = list.length > 0 && list.every(i => sel.has(i.id));
+  const toggleOne = id => setSel(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleAll = () => setSel(allSelected ? new Set() : new Set(list.map(i => i.id)));
 
   const sum = s => K.invoices.filter(i => !s || i.status === s).reduce((a, i) => a + invoiceTotals(i).incl, 0);
   const count = s => K.invoices.filter(i => i.status === s).length;
@@ -83,29 +88,62 @@ export default function Billing() {
         lands in the bank and is matched in Xero, the invoice is marked paid here automatically.</span>
       </Banner>
 
-      <div className="toolbar mt-4">
-        <div className="input-group" style={{ maxWidth: 250 }}>
-          <span className="ic-lead"><Search size={15} /></span>
-          <input className="input" value={f.q} placeholder="Invoice number or patient…" aria-label="Search invoices"
-            onChange={e => setF(p => ({ ...p, q: e.target.value }))} />
+      <div className="filter-bar mt-4">
+        <div className="field">
+          <label className="label" htmlFor="invQ">What are you looking for?</label>
+          <div className="input-group">
+            <span className="ic-lead"><Search size={17} /></span>
+            <input className="input" id="invQ" value={f.q} placeholder="Invoice number or patient name"
+              autoComplete="off" onChange={e => setF(p => ({ ...p, q: e.target.value }))} />
+          </div>
         </div>
-        <select className="select" style={{ maxWidth: 160 }} aria-label="Status" value={f.status}
-          onChange={e => setF(p => ({ ...p, status: e.target.value }))}>
-          <option value="all">All statuses</option>
-          {['draft', 'sent', 'paid', 'overdue'].map(s => <option value={s} key={s}>{s}</option>)}
-        </select>
-        <select className="select" style={{ maxWidth: 180 }} aria-label="Payer" value={f.payer}
-          onChange={e => setF(p => ({ ...p, payer: e.target.value }))}>
-          <option value="all">All payers</option>
-          {['ACC', 'Southern Cross', 'Private', 'Hospital'].map(s => <option key={s}>{s}</option>)}
-        </select>
-        <span className="spacer" />
-        <span className="t-xs subtle">{list.length} invoices</span>
+        <div className="field">
+          <label className="label" htmlFor="invStatus">Status</label>
+          <select className="select" id="invStatus" value={f.status}
+            onChange={e => setF(p => ({ ...p, status: e.target.value }))}>
+            <option value="all">All statuses</option>
+            {['draft', 'sent', 'paid', 'overdue'].map(s => <option value={s} key={s}>{s}</option>)}
+          </select>
+        </div>
+        <div className="field">
+          <label className="label" htmlFor="invPayerF">Payer</label>
+          <select className="select" id="invPayerF" value={f.payer}
+            onChange={e => setF(p => ({ ...p, payer: e.target.value }))}>
+            <option value="all">All payers</option>
+            {['ACC', 'Southern Cross', 'Private', 'Hospital'].map(s => <option key={s}>{s}</option>)}
+          </select>
+        </div>
+        <div className="fb-actions">
+          <button className="btn btn-primary"><Search size={17} /> Search</button>
+          <button className="btn btn-ghost"
+            onClick={() => setF({ q: '', status: 'all', payer: 'all', cl: 'all' })}>Clear</button>
+        </div>
       </div>
 
       <section className="card">
+        <div className="grid-bar">
+          <span className="gb-count"><b className="num">{list.length}</b> invoices</span>
+          {sel.size > 0 && (
+            <>
+              <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
+              <button className="btn btn-primary btn-sm" onClick={() => {
+                toast('Reminders queued', `${sel.size} invoice${sel.size === 1 ? '' : 's'} will be emailed tonight.`, 'ok');
+                setSel(new Set());
+              }}><Send size={16} /> Send reminder</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
+            </>
+          )}
+        </div>
         {list.length ? <div className="table-wrap"><table className="tbl">
-          <thead><tr><th>Invoice</th><th>Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
+          <thead><tr>
+            <th className="sel-cell">
+              <span className="check" role="checkbox" tabIndex={0} aria-checked={allSelected}
+                aria-label={allSelected ? 'Clear selection' : 'Select every invoice shown'}
+                onClick={toggleAll}
+                onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleAll(); } }}>
+                <Check size={13} /></span>
+            </th>
+            <th>Invoice</th><th>Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
             <th className="num-cell">Excl GST</th><th className="num-cell">GST</th><th className="num-cell">Total</th>
             <th>Status</th><th /></tr></thead>
           <tbody>{list.map(i => {
@@ -113,8 +151,16 @@ export default function Billing() {
             const od = i.status === 'overdue' ? daysOverdue(i.due) : 0;
             return (
               <tr key={i.id} className={`row-link ${i.status === 'overdue' ? 'row-err' : ''}`} tabIndex={0}
-                onClick={e => { if (!e.target.closest('.row-actions')) openInvoice(i); }}
+                data-selected={sel.has(i.id) || undefined}
+                onClick={e => { if (!e.target.closest('.row-actions, .sel-cell')) openInvoice(i); }}
                 onKeyDown={e => { if (e.key === 'Enter') openInvoice(i); }}>
+                <td className="sel-cell">
+                  <span className="check" role="checkbox" tabIndex={0} aria-checked={sel.has(i.id)}
+                    aria-label={`Select invoice ${i.id}`}
+                    onClick={e => { e.stopPropagation(); toggleOne(i.id); }}
+                    onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleOne(i.id); } }}>
+                    <Check size={13} /></span>
+                </td>
                 <td className="t-mono t-sm"><b>{i.id}</b></td>
                 <td><span className="row g-2"><Avatar id={p.id} size="xs" />
                   <span className="t-sm">{p.first} {p.last}</span></span></td>
@@ -355,7 +401,7 @@ function CreateInvoice({ close, apptId, toast, onDone }) {
             <div className="row between"><span className="t-eyebrow">Patient share</span>
               <span className="row g-2">
                 <input className="input input-money" type="number" min="0" max="100" value={pct}
-                  style={{ width: 74, height: 30 }} aria-label="Patient share percent"
+                  style={{ width: 86 }} aria-label="Patient share percent"
                   onChange={e => setPct(Math.max(0, Math.min(100, Number(e.target.value) || 0)))} />
                 <span className="t-sm muted">%</span></span></div>
             <input className="range" type="range" min="0" max="100" value={pct} aria-label="Patient share slider"

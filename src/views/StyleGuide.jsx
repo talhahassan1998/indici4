@@ -243,8 +243,25 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="inputs" title="Inputs"
-        lede="Every field has a visible label. Errors say what to do, not just what is wrong, in the same voice used for ACC validation.">
+        lede="Every field has a visible label, and every control on a line is exactly 44px tall so the line is straight. A placeholder is not a label: it disappears the moment someone types.">
         <div className="sg-block">
+          {/* The filter row, the pattern behind every search on the product.
+              `align-items: end` puts the bare buttons on the same bottom edge
+              as the labelled fields. */}
+          <div className="filter-bar" style={{ marginBottom: 'var(--s-6)' }}>
+            <div className="field"><label className="label" htmlFor="sgf1">What are you looking for?</label>
+              <div className="input-group"><span className="ic-lead"><Search size={17} /></span>
+                <input className="input" id="sgf1" placeholder="Name, NHI or invoice number" /></div></div>
+            <div className="field"><label className="label" htmlFor="sgf2">Status</label>
+              <select className="select" id="sgf2"><option>All statuses</option><option>Overdue</option></select></div>
+            <div className="field"><label className="label" htmlFor="sgf3">Payer</label>
+              <select className="select" id="sgf3"><option>All payers</option><option>ACC</option></select></div>
+            <div className="fb-actions">
+              <button className="btn btn-primary"><Search size={17} /> Search</button>
+              <button className="btn btn-ghost">Clear</button>
+            </div>
+          </div>
+
           <div className="sg-auto">
             <div className="field"><label className="label" htmlFor="sg1">Patient name</label>
               <input className="input" id="sg1" placeholder="Search by name or NHI" /></div>
@@ -311,7 +328,7 @@ export default function StyleGuide() {
       </Section>
 
       <Section id="cards" title="Sections and cards"
-        lede="A block of content is a heading, a rule and its rows, sitting on the page. A bordered card is the exception — a data table, a docked panel, the one thing a page is built around — and a page gets about one. Figures go on a divided line, never four matching tiles.">
+        lede="A block of content is a heading, a rule and its rows, sitting on the page. A bordered card is the exception: a data table, a docked panel, the one thing a page is built around. A page gets about one. Figures go on a divided line, never four matching tiles.">
         <div className="sg-block col g-7">
           <section className="sect sect-lead">
             <div className="sect-hd"><h2>Lead section</h2>

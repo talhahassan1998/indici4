@@ -206,11 +206,37 @@ every block the same weight, and buries the content two surfaces deep.
 Figures go in a `.fig-row`: a divided line of numbers, each with its label
 underneath. Not four matching tiles. Colour on a figure means *do something*.
 
-### Tables
+### Filter rows
 
-Sticky header, right-aligned tabular numbers, row actions revealed on hover
-**and** keyboard focus, and a tinted row (`.row-err`) when something needs
-fixing. The patient grid pins the Name and Actions columns.
+Labels above, controls below, `align-items: end` on the grid. That last part is
+the whole trick: the labelled fields and the bare buttons land on the same
+bottom edge, so the row reads as one line whether or not a control carries a
+label. The primary action sits in that line, not above it.
+
+**Every control on a line is exactly `--h-md`.** Inputs take `height`, never
+`min-height` — `min-height` plus padding plus a 1.45 line box renders at
+46.6px, and a 44px button beside it is visibly out of true.
+
+A placeholder is not a label. It disappears the moment someone types, and then
+the field is unnamed for everybody, not only for a screen reader.
+
+### Grids
+
+Sticky header, right-aligned tabular numbers, row actions always visible (never
+revealed on hover: someone who cannot see them cannot find them), and a tinted
+row (`.row-err`) when something needs fixing. Rows stay one line; a wrapped
+invoice number reads as two invoice numbers, and a table whose row heights vary
+with the length of a name cannot be scanned down a column. Cells that genuinely
+need to wrap opt in with `.wrap-cell`.
+
+**Selection** is a 46px first column carrying a `.check`, with a select-all in
+the header. A selected row says so with a tint, not only with a ticked box in
+the corner of the eye. The patient grid pins that column and the name beside it.
+
+**The bar over the grid** (`.grid-bar`) carries what you have, what you have
+selected, the bulk action that selection unlocks, and the pages. It sits
+directly above the rows, because a pager only reachable by scrolling past four
+hundred rows is a pager nobody uses.
 
 ### Empty values
 

@@ -1012,7 +1012,7 @@
 /* Action row: same affordances as before, drawn as one consistent icon set. */
 /* Always visible, never revealed on hover: someone who cannot see them
    cannot find them. */
-.p-actions { display: flex; align-items: center; gap: var(--s-3); }
+.p-actions { display: flex; align-items: center; gap: 5px; }
 .p-actions .btn { white-space: nowrap; padding: 0 10px; }
 
 .ps-foot {

@@ -457,8 +457,12 @@
 /* Round, not the product's usual rounded-square badge — a Teams calendar
    column header reads a person by a circular photo/initials, not a chip. */
 .cal-col-head .avatar { border-radius: 50%; }
-.cal-col-head b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-bold); }
-.cal-col-head span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
+/* Scoped to the text wrapper, not every span in the header — the avatar is
+   a span too, and "every span in here is a block" was overriding its own
+   display:grid centering, which is how the initials ended up hugging the
+   top-left of the circle instead of sitting in its middle. */
+.cal-col-head-text b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+.cal-col-head-text span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
 .cal-gutter { position: sticky; left: 0; z-index: 6; background: var(--surface); border-right: 1px solid var(--line); width: calc(68px * var(--text-scale)); }
 .cal-body { display: grid; position: relative; }
 /* One hour at 72px (see PX_PER_MIN in Appointments.jsx) — the height here is

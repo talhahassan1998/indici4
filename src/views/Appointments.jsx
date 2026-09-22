@@ -9,11 +9,11 @@ import { fmtTime, fmtLongDate, age, money } from '../lib/format.js';
 import { Chip, FunderChip, Avatar, Banner, Empty, Switch } from '../components/Primitives.jsx';
 import { useUi, Modal } from '../lib/ui.jsx';
 
-/* One hour of the day at 72px rather than a bare 60, so a back-to-back
+/* One hour of the day at 78px rather than a bare 60, so a back-to-back
    8:00/8:30/9:00 doesn't read as a wall of touching cards. Every pixel
    position in this file is minutes * PX_PER_MIN — change the one constant,
    not the arithmetic. */
-const PX_PER_MIN = 1.2;
+const PX_PER_MIN = 1.3;
 const START_H = 8, END_H = 18, HOURS = END_H - START_H, NOW = 10 * 60 + 22;
 const top = m => (m - START_H * 60) * PX_PER_MIN;
 const snap = m => Math.round(m / 5) * 5;
@@ -135,7 +135,7 @@ export default function Appointments() {
                   return (
                     <div className="appt" key={a.id} draggable data-appt={a.id} data-type={t.type} tabIndex={0}
                       role="button" aria-label={`${p.first} ${p.last}, ${fmtTime(a.start)}, ${t.name}`}
-                      style={{ top: top(a.start), height: Math.max(42, t.mins * PX_PER_MIN - 6),
+                      style={{ top: top(a.start), height: t.mins * PX_PER_MIN - 4,
                         opacity: a.status === 'dna' ? .65 : a.status === 'done' ? .8 : 1 }}
                       onDragStart={e => { dragId.current = a.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.id); }}
                       onClick={() => openAppt(a)}

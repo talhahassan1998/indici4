@@ -137,14 +137,16 @@ export default function Appointments() {
                   return (
                     <div className={`appt ${short ? 'is-compact' : ''}`} key={a.id} draggable data-appt={a.id} data-type={t.type} tabIndex={0}
                       role="button" aria-label={`${p.first} ${p.last}, ${fmtTime(a.start)}, ${t.name}`}
-                      style={{ top: top(a.start), height: t.mins * PX_PER_MIN - 3,
+                      style={{ top: top(a.start), height: t.mins * PX_PER_MIN - 5,
                         opacity: a.status === 'dna' ? .65 : a.status === 'done' ? .8 : 1 }}
                       onDragStart={e => { dragId.current = a.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.id); }}
                       onClick={() => openAppt(a)}
                       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAppt(a); } }}>
-                      <b className="truncate">{fmtTime(a.start)} {p.first} {p.last}</b>
+                      <span className="appt-row">
+                        <b className="truncate">{fmtTime(a.start)} {p.first} {p.last}</b>
+                        {a.status !== 'booked' && <Chip status={a.status} />}
+                      </span>
                       {!short && <span className="appt-meta truncate">{t.name} · {p.nhi}</span>}
-                      <span className="appt-flag row g-1">{a.status !== 'booked' && <Chip status={a.status} />}</span>
                     </div>
                   );
                 })}

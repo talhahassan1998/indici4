@@ -492,22 +492,27 @@
 .appt:hover { box-shadow: var(--sh-3); z-index: 6; transform: translateY(-1px); }
 .appt:active { cursor: grabbing; }
 .appt.dragging { opacity: .5; }
+/* Name and status chip share one flex row instead of the chip floating
+   absolutely over the text: at a narrow week-view column width the chip was
+   overlapping and slicing through the last few letters of the name rather
+   than the name truncating cleanly before it. Flex plus min-width:0 on the
+   name is what makes the ellipsis point respect the chip's real width at
+   any column width, not a fixed guess. */
+.appt-row { display: flex; align-items: center; gap: 6px; }
+.appt-row b { flex: 1 1 auto; min-width: 0; }
+.appt-row .chip { flex: none; }
 .appt b { display: block; font-weight: var(--fw-bold); font-size: var(--fs-sm); }
 .appt .appt-meta { display: block; color: var(--text-muted); font-size: var(--fs-xs); margin-top: 1px; }
 /* A 15-minute booking gets a box just tall enough for one line at the
-   product's text-size floor — nothing here goes smaller than --fs-2xs.
-   The status chip shrinks and moves up to match, or its own fixed 24px
-   height would clip against a box this short. */
+   product's text-size floor — nothing here goes smaller than --fs-2xs. */
 .appt.is-compact { padding: 2px 9px; border-radius: var(--r-sm); }
 .appt.is-compact b { font-size: var(--fs-2xs); line-height: 1.15; }
-.appt.is-compact .appt-flag { top: 2px; right: 6px; }
-.appt-flag .chip { height: 17px; padding: 0 6px; }
+.appt-row .chip { height: 17px; padding: 0 6px; }
 .appt[data-type="consult"]   { border-left-color: var(--appt-consult);   background: color-mix(in srgb, var(--appt-consult) 11%, var(--surface)); }
 .appt[data-type="followup"]  { border-left-color: var(--appt-followup);  background: color-mix(in srgb, var(--appt-followup) 12%, var(--surface)); }
 .appt[data-type="procedure"] { border-left-color: var(--appt-procedure); background: color-mix(in srgb, var(--appt-procedure) 12%, var(--surface)); }
 .appt[data-type="acc"]       { border-left-color: var(--appt-acc);       background: color-mix(in srgb, var(--appt-acc) 13%, var(--surface)); }
 .appt[data-type="telehealth"]{ border-left-color: var(--appt-telehealth);background: color-mix(in srgb, var(--appt-telehealth) 12%, var(--surface)); }
-.appt .appt-flag { position: absolute; top: 7px; right: 8px; }
 
 .blocked {
   position: absolute; left: 4px; right: 4px; z-index: 2; border-radius: var(--r-md);

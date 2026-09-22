@@ -557,8 +557,11 @@
 .cal-hour-label { height: calc(96px * var(--text-scale)); font-size: var(--fs-xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 3px 10px 0 0; text-align: right; border-top: 1px solid transparent; }
 .cal-col { position: relative; border-left: 1px solid var(--line-faint); min-width: 0; }
 .cal-col:first-child { border-left: 0; }
-.cal-slot { height: calc(48px * var(--text-scale)); border-bottom: 1px solid var(--line-faint); }
-.cal-slot.half { border-bottom: 1px solid color-mix(in srgb, var(--line-faint) 55%, transparent); }
+/* Four evenly-weighted dashed lines an hour, not two lines of different
+   strength — the reference calendar's grid reads as one continuous fine
+   mesh rather than hour boundaries competing with the bookings for
+   attention. */
+.cal-slot { height: calc(24px * var(--text-scale)); border-bottom: 1px dashed var(--line-faint); }
 .cal-slot.drop-target { background: var(--accent-soft); }
 .cal-now {
   position: absolute; left: 0; right: 0; height: 2px; background: var(--bad-fg); z-index: 4; pointer-events: none;

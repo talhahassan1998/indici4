@@ -132,8 +132,8 @@ export default function Appointments() {
                   force(n => n + 1);
                   toast('Appointment moved', `${K.ptName(a.pt)} · ${from} → ${fmtTime(a.start)}`, 'ok');
                 }}>
-                {Array.from({ length: HOURS * 2 }).map((_, i) => (
-                  <div className={`cal-slot ${i % 2 ? 'half' : ''}`} key={i} />
+                {Array.from({ length: HOURS * 4 }).map((_, i) => (
+                  <div className="cal-slot" key={i} />
                 ))}
                 {blocksFor(c).map((b, i) => (
                   <div className="blocked" key={i} style={{ top: top(b.start), height: b.mins * pxPerMin }}>{b.label}</div>

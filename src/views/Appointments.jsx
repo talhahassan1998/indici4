@@ -9,8 +9,13 @@ import { fmtTime, fmtLongDate, age, money } from '../lib/format.js';
 import { Chip, FunderChip, Avatar, Banner, Empty, Switch } from '../components/Primitives.jsx';
 import { useUi, Modal } from '../lib/ui.jsx';
 
+/* One hour of the day at 72px rather than a bare 60, so a back-to-back
+   8:00/8:30/9:00 doesn't read as a wall of touching cards. Every pixel
+   position in this file is minutes * PX_PER_MIN — change the one constant,
+   not the arithmetic. */
+const PX_PER_MIN = 1.2;
 const START_H = 8, END_H = 18, HOURS = END_H - START_H, NOW = 10 * 60 + 22;
-const top = m => m - START_H * 60;
+const top = m => (m - START_H * 60) * PX_PER_MIN;
 const snap = m => Math.round(m / 5) * 5;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const DATES = ['14 Sep', '15 Sep', '16 Sep', '17 Sep', '18 Sep'];
@@ -46,7 +51,7 @@ export default function Appointments() {
 
   const openAppt = a => open(close => <ApptModal close={close} a={a} toast={toast} nav={nav} onDone={() => force(n => n + 1)} />);
 
-  const tpl = `62px repeat(${cols.length}, minmax(190px, 1fr))`;
+  const tpl = `68px repeat(${cols.length}, minmax(220px, 1fr))`;
 
   return (
     <div className={`cal-shell ${panel ? 'with-panel' : ''}`}>
@@ -92,7 +97,10 @@ export default function Appointments() {
               <div className="cal-gutter" style={{ borderBottom: 0 }} />
               {cols.map(c => (
                 <div className="cal-col-head" key={c.id}>
-                  <b className="truncate">{c.title}</b><span className="truncate">{c.sub || ''}</span></div>
+                  {mode === 'day' && <Avatar id={c.id} size="sm" />}
+                  <span className="cal-col-head-text">
+                    <b className="truncate">{c.title}</b><span className="truncate">{c.sub || ''}</span></span>
+                </div>
               ))}
             </div>
             <div className="cal-gutter">
@@ -101,14 +109,14 @@ export default function Appointments() {
               ))}
             </div>
             {cols.map(c => (
-              <div className="cal-col" data-col={c.id} key={c.id} style={{ height: HOURS * 60 }}
+              <div className="cal-col" data-col={c.id} key={c.id} style={{ height: HOURS * 60 * PX_PER_MIN }}
                 onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
                 onDrop={e => {
                   e.preventDefault();
                   const a = K.appts.find(x => x.id === (dragId.current || e.dataTransfer.getData('text/plain')));
                   if (!a) return;
                   const r = e.currentTarget.getBoundingClientRect();
-                  const mins = snap(Math.max(0, e.clientY - r.top) + START_H * 60);
+                  const mins = snap(Math.max(0, (e.clientY - r.top) / PX_PER_MIN) + START_H * 60);
                   const from = fmtTime(a.start);
                   a.start = Math.min(mins, END_H * 60 - K.at(a.type).mins);
                   if (mode === 'day' && K.st(c.id)) a.cl = c.id;
@@ -119,7 +127,7 @@ export default function Appointments() {
                   <div className={`cal-slot ${i % 2 ? 'half' : ''}`} key={i} />
                 ))}
                 {blocksFor(c).map((b, i) => (
-                  <div className="blocked" key={i} style={{ top: top(b.start), height: b.mins }}>{b.label}</div>
+                  <div className="blocked" key={i} style={{ top: top(b.start), height: b.mins * PX_PER_MIN }}>{b.label}</div>
                 ))}
                 {apptsFor(c).map(a => {
                   const p = K.pt(a.pt), t = K.at(a.type);
@@ -127,7 +135,7 @@ export default function Appointments() {
                   return (
                     <div className="appt" key={a.id} draggable data-appt={a.id} data-type={t.type} tabIndex={0}
                       role="button" aria-label={`${p.first} ${p.last}, ${fmtTime(a.start)}, ${t.name}`}
-                      style={{ top: top(a.start), height: Math.max(34, t.mins - 3),
+                      style={{ top: top(a.start), height: Math.max(42, t.mins * PX_PER_MIN - 6),
                         opacity: a.status === 'dna' ? .65 : a.status === 'done' ? .8 : 1 }}
                       onDragStart={e => { dragId.current = a.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.id); }}
                       onClick={() => openAppt(a)}

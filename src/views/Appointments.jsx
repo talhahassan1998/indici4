@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, List, SquareKanban, Plus, Check, X, Search, Stethoscope,
-  ReceiptText, Pencil, User,
+  ReceiptText, Pencil, User, Rows3, Flame,
 } from 'lucide-react';
 import K from '../data/sample.js';
-import { fmtTime, fmtLongDate, age, money } from '../lib/format.js';
+import { fmtTime, fmtLongDate, age, money, STATUS } from '../lib/format.js';
 import { Chip, FunderChip, Avatar, Banner, Empty, Switch } from '../components/Primitives.jsx';
 import { useUi, Modal } from '../lib/ui.jsx';
 import { useTextScale } from '../lib/theme.js';
@@ -32,6 +32,7 @@ export default function Appointments() {
   const nav = useNavigate();
   const [sp, setSp] = useSearchParams();
   const [mode, setMode] = useState('day');
+  const [view, setView] = useState('diary');
   const [clinic, setClinic] = useState('all');
   const [panel, setPanel] = useState(false);
   const [panelPt, setPanelPt] = useState(null);
@@ -78,7 +79,11 @@ export default function Appointments() {
               : 'Week 38 · Dr Alice Fenwick'}</span>
           </div>
           <span className="spacer" />
-          <div className="segmented" role="group" aria-label="Calendar view">
+          <div className="segmented" role="group" aria-label="Appointment view">
+            <button aria-pressed={view === 'diary'} data-view="diary" onClick={() => setView('diary')}><Rows3 size={13} /> Diary</button>
+            <button aria-pressed={view === 'heatmap'} data-view="heatmap" onClick={() => setView('heatmap')}><Flame size={13} /> Heat map</button>
+          </div>
+          <div className="segmented" role="group" aria-label="Calendar range">
             <button aria-pressed={mode === 'day'} data-mode="day" onClick={() => setMode('day')}><List size={13} /> Day</button>
             <button aria-pressed={mode === 'week'} data-mode="week" onClick={() => setMode('week')}><SquareKanban size={13} /> Week</button>
           </div>
@@ -100,6 +105,9 @@ export default function Appointments() {
           <span className="t-xs subtle">Drag an appointment to reschedule it</span>
         </div>
 
+        {view === 'heatmap' ? (
+          <HeatMap mode={mode} clinic={clinic} openAppt={openAppt} />
+        ) : (
         <div className="cal-scroll" ref={scrollRef}>
           <div className="cal-grid" style={{ gridTemplateColumns: tpl }}>
             <div className="cal-head" style={{ gridColumn: '1 / -1', gridTemplateColumns: tpl }}>
@@ -162,6 +170,7 @@ export default function Appointments() {
             ))}
           </div>
         </div>
+        )}
       </div>
 
       {panel && (
@@ -173,6 +182,91 @@ export default function Appointments() {
             toast('Appointment booked', `${p.first} ${p.last} · ${fmtTime(mins)} · ${t.name}`, 'ok');
           }} toast={toast} />
       )}
+    </div>
+  );
+}
+
+/* One compressed row per clinician, coloured by appointment type (the same
+   legend as the diary strip above), so the whole day or week reads at a
+   glance without opening each clinician's own column. Blocks are the real
+   appointments, positioned by minute the same way the diary cards are, just
+   laid out left-to-right instead of top-to-bottom. */
+function HeatMap({ mode, clinic, openAppt }) {
+  const START = START_H * 60, END = END_H * 60, SPAN = END - START;
+  const rows = K.clinicians.filter(c => clinic === 'all' || K.appts.some(a => a.cl === c.id && a.clinic === clinic));
+
+  const Block = ({ a }) => {
+    const p = K.pt(a.pt), t = K.at(a.type);
+    const left = ((Math.max(START, a.start) - START) / SPAN) * 100;
+    const width = Math.max(mode === 'week' ? 7 : 1.4, (t.mins / SPAN) * 100);
+    const st = STATUS[a.status] || {};
+    return (
+      <button type="button" className="heatmap-block" data-type={t.type}
+        style={{ left: `${left}%`, width: `${width}%`, background: `var(--appt-${t.type})`,
+          opacity: a.status === 'dna' ? .5 : a.status === 'done' ? .68 : 1 }}
+        title={`${p.first} ${p.last} · ${fmtTime(a.start)} · ${t.name}${a.status !== 'booked' ? ` · ${st.label}` : ''}`}
+        onClick={() => openAppt(a)} />
+    );
+  };
+
+  if (!rows.length) {
+    return <Empty icon={<Flame size={22} />} title="Nothing to show"
+      body="No clinicians have appointments at this location today." />;
+  }
+
+  if (mode === 'week') {
+    return (
+      <div className="heatmap-wrap">
+        <div className="heatmap-row heatmap-ruler">
+          <div className="heatmap-who" aria-hidden="true" />
+          <div className="heatmap-days">
+            {DAYS.map((d, i) => (
+              <div className="heatmap-daylabel" key={d}>{d} <span className="subtle">{DATES[i]}</span></div>
+            ))}
+          </div>
+        </div>
+        {rows.map(c => (
+          <div className="heatmap-row" key={c.id}>
+            <div className="heatmap-who">
+              <Avatar id={c.id} size="sm" />
+              <span className="truncate t-sm"><b className="truncate">{c.name}</b></span>
+            </div>
+            <div className="heatmap-days">
+              {DAYS.map((d, i) => (
+                <div className="heatmap-track heatmap-track-day" key={d}>
+                  {K.appts.filter(a => a.cl === c.id && hashDay(a.id) === i && (clinic === 'all' || a.clinic === clinic))
+                    .map(a => <Block a={a} key={a.id} />)}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="heatmap-wrap">
+      <div className="heatmap-row heatmap-ruler">
+        <div className="heatmap-who" aria-hidden="true" />
+        <div className="heatmap-track heatmap-ruler-track" style={{ gridTemplateColumns: `repeat(${HOURS}, 1fr)` }}>
+          {Array.from({ length: HOURS }).map((_, i) => (
+            <span className="heatmap-tick" key={i}>{fmtTime((START_H + i) * 60)}</span>
+          ))}
+        </div>
+      </div>
+      {rows.map(c => (
+        <div className="heatmap-row" key={c.id}>
+          <div className="heatmap-who">
+            <Avatar id={c.id} size="sm" />
+            <span className="truncate t-sm"><b className="truncate">{c.name}</b></span>
+          </div>
+          <div className="heatmap-track">
+            {K.appts.filter(a => a.cl === c.id && (clinic === 'all' || a.clinic === clinic)).map(a => <Block a={a} key={a.id} />)}
+            <div className="heatmap-now" style={{ left: `${((NOW - START) / SPAN) * 100}%` }} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -103,7 +103,6 @@ export default function Billing() {
 
       <section className="grid-panel is-page">
         <div className="grid-bar">
-          <span className="gb-count"><b className="num">{list.length}</b> invoices</span>
           {sel.size > 0 && (
             <>
               <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>

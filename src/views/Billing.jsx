@@ -127,7 +127,7 @@ export default function Billing() {
             {/* Excl GST left the row and stayed in the footer and the invoice
                 drawer: it is Total minus GST, and the column it took is worth
                 more to the three buttons at the end of the row. */}
-            <th>Invoice</th><th className="grow-cell">Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
+            <th>Invoice</th><th>Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
             <th className="num-cell">GST</th><th className="num-cell">Total</th>
             <th>Status</th><th className="act-col">Actions</th></tr></thead>
           <tbody>{list.map(i => {
@@ -146,7 +146,7 @@ export default function Billing() {
                     <Check size={13} /></span>
                 </td>
                 <td className="t-mono t-sm"><b>{i.id}</b></td>
-                <td className="grow-cell"><span className="row g-2"><Avatar id={p.id} size="xs" />
+                <td><span className="row g-2"><Avatar id={p.id} size="xs" />
                   <span className="t-sm">{p.first} {p.last}</span></span></td>
                 <td><span className="cell2"><span>{fmtDateShort(i.date)}</span>
                   {od > 0 && <span className="bad-t">{od} days late</span>}</span></td>
@@ -172,13 +172,15 @@ export default function Billing() {
                   <button className="act-icon tip" data-tip="Send invoice" aria-label={`Send ${i.id}`}
                     onClick={() => { if (i.status === 'draft') i.status = 'sent'; force(n => n + 1); toast('Invoice sent', i.id, 'ok'); }}>
                     <Send size={20} /></button>
+                  <button className="act-icon tip" data-tip="View invoice" aria-label={`View ${i.id}`}
+                    onClick={() => openInvoice(i)}><Eye size={20} /></button>
+                  <button className="act-icon tip" data-tip="Edit lines" aria-label={`Edit lines for ${i.id}`}
+                    onClick={() => openCreate()}><Pencil size={20} /></button>
+                  <button className="act-icon tip" data-tip="Print receipt" aria-label={`Print receipt for ${i.id}`}
+                    onClick={() => toast('Receipt', 'Sent to the printer.', 'ok')}><Printer size={20} /></button>
                   <button className="act-icon tip" data-tip="More actions" aria-label={`More actions for ${i.id}`}
                     onClick={e => setMenu({ anchor: e.currentTarget, items: [
                       { heading: i.id },
-                      { icon: <Eye size={15} />, label: 'View invoice', action: () => openInvoice(i) },
-                      { icon: <Pencil size={15} />, label: 'Edit lines', action: () => openCreate() },
-                      { icon: <Printer size={15} />, label: 'Print receipt', action: () => toast('Receipt', 'Sent to the printer.', 'ok') },
-                      '-',
                       { icon: <Trash2 size={15} />, label: 'Void invoice', danger: true, action: () => toast('Void', 'Voiding needs a reason and manager approval.', 'warn') },
                     ]})}><EllipsisVertical size={20} /></button>
                 </span></td>

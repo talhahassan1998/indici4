@@ -345,10 +345,6 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 /* The trailing action column takes a fixed width so the slack goes to a column
    that can use it, instead of pooling as dead space on the right. */
 .tbl th.act-col, .tbl td.act-col { width: 1%; white-space: nowrap; text-align: right; padding-right: var(--s-4); }
-/* Grow takes the table's own slack so no other column stretches to fill it,
-   but unbounded that slack reads as a huge gap next to a short name. Cap it
-   at a width an avatar and a name actually need. */
-.tbl th.grow-cell, .tbl td.grow-cell { width: 100%; max-width: 260px; }
 .tbl tr.row-err { background: color-mix(in srgb, var(--bad-bg) 45%, transparent); }
 .tbl tr.row-err:hover { background: color-mix(in srgb, var(--bad-bg) 70%, transparent); }
 .tbl-compact tbody td { padding: 7px var(--s-3); }

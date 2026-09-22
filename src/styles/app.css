@@ -461,10 +461,10 @@
 /* One hour at 72px (see PX_PER_MIN in Appointments.jsx) — the height here is
    a constant that has to move in lockstep with that scale, not a value to
    restyle on its own. */
-.cal-hour-label { height: 78px; font-size: var(--fs-xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 3px 10px 0 0; text-align: right; border-top: 1px solid transparent; }
+.cal-hour-label { height: 96px; font-size: var(--fs-xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 3px 10px 0 0; text-align: right; border-top: 1px solid transparent; }
 .cal-col { position: relative; border-left: 1px solid var(--line-faint); min-width: 0; }
 .cal-col:first-child { border-left: 0; }
-.cal-slot { height: 39px; border-bottom: 1px solid var(--line-faint); }
+.cal-slot { height: 48px; border-bottom: 1px solid var(--line-faint); }
 .cal-slot.half { border-bottom: 1px solid color-mix(in srgb, var(--line-faint) 55%, transparent); }
 .cal-slot.drop-target { background: var(--accent-soft); }
 .cal-now {
@@ -491,6 +491,14 @@
 .appt.dragging { opacity: .5; }
 .appt b { display: block; font-weight: var(--fw-bold); font-size: var(--fs-sm); }
 .appt .appt-meta { display: block; color: var(--text-muted); font-size: var(--fs-xs); margin-top: 1px; }
+/* A 15-minute booking gets a box just tall enough for one line at the
+   product's text-size floor — nothing here goes smaller than --fs-2xs.
+   The status chip shrinks and moves up to match, or its own fixed 24px
+   height would clip against a box this short. */
+.appt.is-compact { padding: 2px 9px; border-radius: var(--r-sm); }
+.appt.is-compact b { font-size: var(--fs-2xs); line-height: 1.15; }
+.appt.is-compact .appt-flag { top: 2px; right: 6px; }
+.appt-flag .chip { height: 17px; padding: 0 6px; }
 .appt[data-type="consult"]   { border-left-color: var(--appt-consult);   background: color-mix(in srgb, var(--appt-consult) 11%, var(--surface)); }
 .appt[data-type="followup"]  { border-left-color: var(--appt-followup);  background: color-mix(in srgb, var(--appt-followup) 12%, var(--surface)); }
 .appt[data-type="procedure"] { border-left-color: var(--appt-procedure); background: color-mix(in srgb, var(--appt-procedure) 12%, var(--surface)); }

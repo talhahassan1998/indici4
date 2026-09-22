@@ -12,14 +12,6 @@ export default function Letters() {
   const count = s => K.letters.filter(l => l.status === s).length;
   return (
     <div className="page">
-      <div className="page-hd">
-        <div className="page-title"><h1>Letters</h1>
-          <span className="page-sub">{count('pending')} awaiting approval · {count('draft')} in draft · {count('sent')} sent this week</span></div>
-        <div className="page-actions">
-          <button className="btn btn-secondary btn-sm" onClick={() => nav('/admin/tpl')}><LayoutTemplate size={14} /> Templates</button>
-          <button className="btn btn-primary btn-sm" onClick={() => nav('/letter/new')}><Plus size={14} /> New letter</button>
-        </div>
-      </div>
       <div className="toolbar">
         <div className="pill-nav" role="group" aria-label="Filter letters">
           {[['all','All'],['draft','Draft'],['pending','Awaiting approval'],['approved','Approved'],['sent','Sent']].map(([k, l]) => (
@@ -29,6 +21,8 @@ export default function Letters() {
         </div>
         <span className="spacer" />
         <button className="btn btn-ghost btn-sm"><Filter size={14} /> More filters</button>
+        <button className="btn btn-secondary btn-sm" onClick={() => nav('/admin/tpl')}><LayoutTemplate size={14} /> Templates</button>
+        <button className="btn btn-primary btn-sm" onClick={() => nav('/letter/new')}><Plus size={14} /> New letter</button>
       </div>
       <section className="card">
         {list.length ? <div className="table-wrap"><table className="tbl">

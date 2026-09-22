@@ -1012,8 +1012,15 @@
 /* Action row: same affordances as before, drawn as one consistent icon set. */
 /* Always visible, never revealed on hover: someone who cannot see them
    cannot find them. */
-.p-actions { display: flex; align-items: center; gap: 5px; }
+.p-actions { display: flex; align-items: center; gap: 4px; }
 .p-actions .btn { white-space: nowrap; padding: 0 10px; }
+/* The icons still need to look close together in a dense row, but the 44px
+   tap target underneath them is a deliberate choice (see .act-icon above),
+   not a default to shrink. Draw the visible box small and grow the real hit
+   area back out on an invisible pseudo-element, so the icons pack tight
+   without making them harder to hit. */
+.p-actions .act-icon { position: relative; width: 28px; height: 28px; }
+.p-actions .act-icon::before { content: ''; position: absolute; inset: -8px; }
 
 .ps-foot {
   display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; flex: none;

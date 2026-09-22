@@ -102,18 +102,16 @@ export default function Billing() {
       </div>
 
       <section className="grid-panel is-page">
-        <div className="grid-bar">
-          {sel.size > 0 && (
-            <>
-              <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
-              <button className="btn btn-primary btn-sm" onClick={() => {
-                toast('Reminders queued', `${sel.size} invoice${sel.size === 1 ? '' : 's'} will be emailed tonight.`, 'ok');
-                setSel(new Set());
-              }}><Send size={16} /> Send reminder</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
-            </>
-          )}
-        </div>
+        {sel.size > 0 && (
+          <div className="grid-bar">
+            <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
+            <button className="btn btn-primary btn-sm" onClick={() => {
+              toast('Reminders queued', `${sel.size} invoice${sel.size === 1 ? '' : 's'} will be emailed tonight.`, 'ok');
+              setSel(new Set());
+            }}><Send size={16} /> Send reminder</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
+          </div>
+        )}
         {list.length ? <div className="table-wrap"><table className="tbl">
           <thead><tr>
             <th className="sel-cell">

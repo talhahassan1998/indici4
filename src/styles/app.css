@@ -886,7 +886,6 @@
      few pixels apart is a seam, not a separator. */
   flex: none; padding: var(--s-4) var(--page-gutter) var(--s-2);
 }
-.ps-context { display: block; margin-bottom: var(--s-2); }
 .ps-filter-grid { gap: var(--s-3);
   /* Flex, not a fixed grid. A breakpoint is written against the window, but
      what has to fit is the window minus the sidebar, so a four-column grid
@@ -992,9 +991,8 @@
 .ps-grid tbody tr:focus-visible { background: var(--accent-soft); outline: 2px solid var(--focus); outline-offset: -2px; }
 .ps-grid td.wrap-cell { white-space: normal; min-width: 210px; max-width: 280px; }
 
-/* Name cell carries the enrolment colour, with a dot that repeats it as shape. */
+/* Name cell carries the enrolment colour on the text itself. */
 .pname { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
-.pname .p-dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
 .pname b { font-weight: var(--fw-semi); }
 .pname .p-pref { color: var(--text-subtle); font-weight: var(--fw-regular); }
 

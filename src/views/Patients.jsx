@@ -7,7 +7,7 @@ import {
   ReceiptText, Copy,
 } from 'lucide-react';
 import K from '../data/sample.js';
-import { fmtDate, age, money } from '../lib/format.js';
+import { fmtDateDMY, age, money } from '../lib/format.js';
 import { Avatar, Switch, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Menu } from '../lib/ui.jsx';
 
@@ -67,6 +67,28 @@ const MORE = [
 ];
 
 const digits = v => String(v).replace(/\D/g, '');
+
+/* Mars/Venus glyphs rather than lucide (which ships neither): stroke-only,
+   24x24 viewBox, so they sit at the same weight as the rest of the icon set. */
+function GenderIcon({ sex }) {
+  const isF = sex === 'F';
+  return (
+    <span className="tip" data-tip={isF ? 'Female' : 'Male'} aria-label={isF ? 'Female' : 'Male'}
+      style={{ display: 'inline-flex', color: isF ? 'var(--gender-f)' : 'var(--gender-m)' }}>
+      {isF ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="9" r="6" /><path d="M12 15v7M8.5 19h7" />
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="10" cy="14" r="6" /><path d="M14.5 9.5L21 3M21 3h-5.5M21 3v5.5" />
+        </svg>
+      )}
+    </span>
+  );
+}
 
 /* One pager, used above the grid and below it. Every target is --h-md, and
    the page you are on is stated rather than only tinted. */
@@ -183,7 +205,6 @@ export default function Patients() {
   return (
     <div className="ps-shell">
       <div className="ps-filters">
-        <span className="page-sub ps-context">Kora Specialists, Newmarket</span>
         <div className="ps-filter-grid">
           <div className="field"><label className="label" htmlFor="fName">Patient name</label>
             <input className="input" id="fName" value={f.name} placeholder="Surname, then first name"
@@ -300,7 +321,6 @@ export default function Patients() {
                       <Check size={13} /></span>
                   </td>
                   <td><span className="pname">
-                    <i className="p-dot" style={{ background: st.tone }} title={st.label} />
                     <b style={{ color: st.tone }}>{p.last.toUpperCase()}, {p.first}</b>
                     {p.preferred && <span className="p-pref">({p.preferred})</span>}
                     {p.alerts.length > 0 && (
@@ -308,9 +328,9 @@ export default function Patients() {
                         <TriangleAlert size={13} /></span>
                     )}
                   </span></td>
-                  <td className="t-mono t-xs">{fmtDate(p.dob)}</td>
+                  <td className="t-mono t-xs">{fmtDateDMY(p.dob)}</td>
                   <td className="num-cell">{age(p.dob)}</td>
-                  <td>{p.sex === 'F' ? 'Female' : 'Male'}</td>
+                  <td><GenderIcon sex={p.sex} /></td>
                   <td className="t-mono t-xs">{p.nhi}</td>
                   <td className="t-mono t-xs subtle">{p.chart}</td>
                   <td className="wrap-cell t-xs">{p.addr}</td>

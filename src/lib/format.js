@@ -11,6 +11,8 @@ const d = v => (v instanceof Date ? v : new Date(v));
 
 export const fmtDate = v => { const x = d(v); return `${x.getDate()} ${MONTHS[x.getMonth()]} ${x.getFullYear()}`; };
 export const fmtDateShort = v => { const x = d(v); return `${x.getDate()} ${MONTHS[x.getMonth()]}`; };
+export const fmtDateDMY = v => { const x = d(v);
+  return `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${x.getFullYear()}`; };
 export const fmtLongDate = v => { const x = d(v); return `${DAYS[x.getDay()]} ${x.getDate()} ${MONTHS[x.getMonth()]} ${x.getFullYear()}`; };
 
 export function fmtTime(mins) {

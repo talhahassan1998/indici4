@@ -79,6 +79,8 @@
   --info-fg:    #2C5B79;   /* informational / in consult */
   --info-bg:    #E3EDF4;
   --info-line:  #AECCE0;
+  --gender-m:   #2C5B79;   /* male marker, reuses the info blue */
+  --gender-f:   #A3315F;   /* female marker */
 
   /* ---- Appointment type hues (calendar) ---- */
   --appt-consult:  #15803E;
@@ -266,6 +268,7 @@
   --bad-fg:     #EE8E7C;  --bad-bg:  rgba(238,142,124,.14);   --bad-line: rgba(238,142,124,.30);
   --draft-fg:   #9FACA4;  --draft-bg:rgba(159,172,164,.12);   --draft-line:rgba(159,172,164,.26);
   --info-fg:    #8FBEDD;  --info-bg: rgba(143,190,221,.14);   --info-line:rgba(143,190,221,.30);
+  --gender-m:   #8FBEDD;  --gender-f: #E796BB;
 
   --appt-consult:  #29A459;
   --appt-followup: #6ED295;
@@ -324,6 +327,7 @@
     --bad-fg:  #EE8E7C; --bad-bg:  rgba(238,142,124,.14);  --bad-line: rgba(238,142,124,.30);
     --draft-fg:#9FACA4; --draft-bg:rgba(159,172,164,.12);  --draft-line:rgba(159,172,164,.26);
     --info-fg: #8FBEDD; --info-bg: rgba(143,190,221,.14);  --info-line:rgba(143,190,221,.30);
+    --gender-m:#8FBEDD; --gender-f:#E796BB;
 
     --appt-consult:#29A459; --appt-followup:#6ED295; --appt-procedure:#B78CBB;
     --appt-acc:#DFAE7E; --appt-telehealth:#8FBEDD; --appt-admin:#9FACA4;

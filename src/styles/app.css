@@ -904,8 +904,8 @@
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
-.cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
-.cb-id { min-width: 190px; }
+.cb-row { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
+.cb-id { min-width: 170px; }
 .cb-name {
   font-size: var(--fs-xl); font-weight: var(--fw-x); letter-spacing: -0.02em;
   color: var(--text); text-decoration: none; line-height: 1.2;
@@ -914,19 +914,38 @@
 .cb-name:hover { color: var(--accent-text); }
 .cb-sub { display: flex; gap: 7px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
 
-/* Facts read as a table of labelled values, not a run-on sentence of chips. */
-.cb-facts {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-  gap: 6px var(--s-4); flex: 1 1 420px; min-width: 0; margin: 0;
+/* A hairline column rule, like the reference strap: it separates identity,
+   contact and quick actions without boxing each into its own card. */
+.cb-divider { align-self: stretch; width: 1px; background: var(--line); flex: none; }
+
+.cb-contact { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cb-contact-row {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+  font-size: var(--fs-xs); color: var(--text-muted); text-decoration: none;
 }
-.cb-facts > div { min-width: 0; }
-.cb-facts dt {
+.cb-contact-row .ic { flex: none; color: var(--text-subtle); }
+a.cb-contact-row:hover { color: var(--accent-text); }
+a.cb-contact-row:hover .ic { color: var(--accent-text); }
+
+.cb-quick { display: flex; gap: 6px; flex: none; }
+
+.cb-alerts { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: none; max-width: 260px; }
+
+/* Facts read as a table of labelled values, not a run-on sentence of chips.
+   Demoted to a quieter second line under the strap: identity, contact and
+   quick actions are the part that should look like the reference at a
+   glance, this is the supporting clinical detail underneath. */
+.cb-facts-strip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px var(--s-4); margin: 0; padding: 9px var(--s-6) var(--s-3);
+  border-top: 1px solid var(--line-faint);
+}
+.cb-facts-strip > div { min-width: 0; }
+.cb-facts-strip dt {
   font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--text-subtle);
 }
-.cb-facts dd { font-size: var(--fs-sm); margin: 0; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-
-.cb-alerts { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: none; max-width: 260px; }
+.cb-facts-strip dd { font-size: var(--fs-sm); margin: 0; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 
 .cb-strip {
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;

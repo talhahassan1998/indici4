@@ -3,10 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Clock, FileText, SquareCheckBig, Activity, Pill, FlaskConical, TriangleAlert, HeartPulse,
   Shield, Bell, Copy, Eye, Share2, ShieldCheck, LayoutTemplate, Plus, X, Check, Mail,
-  CalendarDays, ReceiptText, Mic, LayoutDashboard,
+  CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen,
 } from 'lucide-react';
 import K from '../data/sample.js';
-import { fmtDate, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
+import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
 import { Chip, FunderChip, Avatar, Banner, Empty } from '../components/Primitives.jsx';
 import { useUi, Modal, Menu, useAutosave, SavedIndicator } from '../lib/ui.jsx';
 
@@ -264,27 +264,42 @@ export default function Consult() {
           <div className="cb-id">
             <Link className="cb-name" to={`/patient/${p.id}`}>{K.displayName(p)}</Link>
             <div className="cb-sub">
-              <span>{fmtDate(p.dob)}</span><span className="dot-sep">·</span>
-              <span>{age(p.dob)} yrs {p.sex === 'F' ? 'Female' : 'Male'}</span>
-              <span className="dot-sep">·</span><span>{p.ethnicity}</span>
+              <span>{age(p.dob)}yo</span><span className="dot-sep">·</span>
+              <span>{fmtDateDMY(p.dob)}</span><span className="dot-sep">·</span>
+              <span>{p.sex}</span><span className="dot-sep">·</span>
+              <span className="t-mono">{p.nhi}</span>
             </div>
           </div>
-          <dl className="cb-facts">
-            <div><dt>NHI</dt><dd className="t-mono">{p.nhi} <span className="chip chip-ok">{p.enrol}</span></dd></div>
-            <div><dt>Chart</dt><dd className="t-mono">{p.chart}</dd></div>
-            <div><dt>Provider</dt><dd>{K.st(p.provider).name}</dd></div>
-            <div><dt>Enrolment</dt><dd><span className={`chip ${st.chip}`}>{st.label}</span></dd></div>
-            <div><dt>GMS</dt><dd>{p.gms} {p.fund === 'F' ? <span className="chip chip-ok">Funded</span> : <span className="chip chip-warn">Not funded</span>}</dd></div>
-            <div><dt>Balance</dt><dd className={bal > 0 ? 'bad-t' : ''}><b>{money(bal)}</b></dd></div>
-            <div><dt>Quintile</dt><dd>{p.quintile} <span className="subtle">· DHB {p.dhb}</span></dd></div>
-            <div><dt>Portal</dt><dd>{p.portal ? 'Registered' : <span className="subtle">Not registered</span>}</dd></div>
-          </dl>
+          <span className="cb-divider" aria-hidden="true" />
+          <div className="cb-contact">
+            <a className="cb-contact-row" href={`mailto:${p.email}`}><Mail size={13} className="ic" />{p.email}</a>
+            <a className="cb-contact-row" href={`tel:${p.phone}`}><Phone size={13} className="ic" />{p.phone}</a>
+            <span className="cb-contact-row"><MapPin size={13} className="ic" />{p.addr}</span>
+          </div>
+          <span className="cb-divider" aria-hidden="true" />
+          <div className="cb-quick">
+            <button className="btn btn-soft btn-icon tip" data-tip="Book appointment"
+              aria-label="Book appointment" onClick={() => nav('/appointments')}><CalendarDays size={16} /></button>
+            <button className="btn btn-soft btn-icon tip" data-tip="Edit patient details"
+              aria-label="Edit patient details" onClick={() => toast('Edit', 'Demographics form would open.', 'info')}><SquarePen size={16} /></button>
+          </div>
+          <span className="spacer" />
           <div className="cb-alerts">
             {p.alerts.map(a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>)}
             {p.warn.map(a => <span className="alert-badge warn" key={a}>{a}</span>)}
             {p.claim && <span className="chip chip-warm">{p.claim}</span>}
           </div>
         </div>
+        <dl className="cb-facts-strip">
+          <div><dt>Chart</dt><dd className="t-mono">{p.chart}</dd></div>
+          <div><dt>Provider</dt><dd>{K.st(p.provider).name}</dd></div>
+          <div><dt>Enrolment</dt><dd><span className={`chip ${st.chip}`}>{st.label}</span></dd></div>
+          <div><dt>GMS</dt><dd>{p.gms} {p.fund === 'F' ? <span className="chip chip-ok">Funded</span> : <span className="chip chip-warn">Not funded</span>}</dd></div>
+          <div><dt>Balance</dt><dd className={bal > 0 ? 'bad-t' : ''}><b>{money(bal)}</b></dd></div>
+          <div><dt>Quintile</dt><dd>{p.quintile} <span className="subtle">· DHB {p.dhb}</span></dd></div>
+          <div><dt>Ethnicity</dt><dd>{p.ethnicity}</dd></div>
+          <div><dt>Portal</dt><dd>{p.portal ? 'Registered' : <span className="subtle">Not registered</span>}</dd></div>
+        </dl>
         <div className="cb-strip">
           <label className="cb-ctl"><span className="label">Consult type</span>
             <select className="select" value={type} onChange={e => { setType(e.target.value); bump(); }}>

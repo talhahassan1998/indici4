@@ -10,6 +10,22 @@ export function useTheme() {
   return [theme, toggle];
 }
 
+/* normal -> large -> extra large -> back to normal. "Normal" is the
+   default and carries no attribute at all, so a fresh visitor's markup
+   matches what data-text-size="large" would produce minus the override —
+   nothing to clean up if the feature were ever removed. */
+const TEXT_SIZES = ['normal', 'large', 'xl'];
+export function useTextSize() {
+  const [size, setSize] = useState(() => localStorage.getItem('kora.textSize') || 'normal');
+  useEffect(() => {
+    if (size === 'normal') document.documentElement.removeAttribute('data-text-size');
+    else document.documentElement.setAttribute('data-text-size', size);
+    localStorage.setItem('kora.textSize', size);
+  }, [size]);
+  const cycle = useCallback(() => setSize(s => TEXT_SIZES[(TEXT_SIZES.indexOf(s) + 1) % TEXT_SIZES.length]), []);
+  return [size, cycle];
+}
+
 export function useLocalState(key, initial) {
   const [v, setV] = useState(() => {
     try { const raw = localStorage.getItem(key); return raw === null ? initial : JSON.parse(raw); }

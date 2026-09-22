@@ -3,12 +3,36 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, CalendarDays, Users, Inbox, Mail, SquareCheckBig, ReceiptText,
   ShieldCheck, ChartColumn, Settings, Search, PanelLeftClose, PanelLeftOpen, Bell, Moon, Sun, Sparkles,
-  ChevronDown, User, LogOut,
+  ChevronDown, User, LogOut, ALargeSmall, CircleHelp, Phone,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { age, fmtDate } from '../lib/format.js';
 import { Avatar, FunderChip } from './Primitives.jsx';
-import { Menu } from '../lib/ui.jsx';
+import { Menu, Modal, useUi } from '../lib/ui.jsx';
+
+const TEXT_SIZE_LABEL = { normal: 'Normal text', large: 'Large text', xl: 'Extra large text' };
+
+function HelpModal({ close }) {
+  return (
+    <Modal title="Help & support" sub="Kora Specialists" icon={<CircleHelp size={16} />} onClose={close}>
+      <div className="col g-4">
+        <div className="row g-3">
+          <span className="stat-ic"><Phone size={16} /></span>
+          <span className="grow"><b className="t-sm">Call your clinic</b>
+            <span className="t-sm muted" style={{ display: 'block' }}>
+              {K.clinics.map(c => `${c.short} ${c.phone}`).join(' · ')}</span></span>
+        </div>
+        <div className="row g-3">
+          <span className="stat-ic"><Mail size={16} /></span>
+          <span className="grow"><b className="t-sm">Email support</b>
+            <a className="t-sm" href={`mailto:${K.org.email}`} style={{ display: 'block' }}>{K.org.email}</a></span>
+        </div>
+        <p className="t-sm muted">If something in Kora looks wrong or you are stuck partway through a task,
+          call the front desk — someone is there every day the clinic is open.</p>
+      </div>
+    </Modal>
+  );
+}
 
 export const ROLES = {
   clinician: { user: 'u1', label: 'Clinician',        desc: 'Dr Alice Fenwick · Orthopaedics' },
@@ -45,9 +69,10 @@ const GO_TO = {
   r: '/reports', s: '/admin',
 };
 
-export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail, onPalette, onSignOut, children }) {
+export default function Shell({ role, setRole, theme, toggleTheme, textSize, cycleTextSize, rail, setRail, onPalette, onSignOut, children }) {
   const nav = useNavigate();
   const loc = useLocation();
+  const { open } = useUi();
   const user = K.st(ROLES[role].user);
   const [menu, setMenu] = useState(null);
   const [q, setQ] = useState('');
@@ -196,6 +221,14 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
               <Bell size={17} />
               {unread > 0 && <span className="badge-count" style={{ position: 'absolute', top: 1, right: 1 }}>{unread}</span>}
             </button>
+            <button className="btn btn-ghost btn-icon tip" data-tip={`Text size: ${TEXT_SIZE_LABEL[textSize]}`}
+              onClick={cycleTextSize} aria-label={`Text size, currently ${TEXT_SIZE_LABEL[textSize].toLowerCase()}. Press to change.`}>
+              <ALargeSmall size={19} />
+            </button>
+            <button className="btn btn-ghost btn-icon tip" data-tip="Help & support"
+              onClick={() => open(close => <HelpModal close={close} />)} aria-label="Help and support">
+              <CircleHelp size={17} />
+            </button>
             <button className="btn btn-ghost btn-icon tip" data-tip={theme === 'dark' ? 'Light mode' : 'Dark mode'}
               onClick={toggleTheme} aria-label="Toggle dark mode">
               {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
@@ -210,7 +243,9 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
               items: [
                 { heading: `${user.name} · ${user.spec}` },
                 { icon: <User size={15} />, label: 'My profile & signature', action: () => nav('/admin/users') },
+                { icon: <ALargeSmall size={15} />, label: `Text size: ${TEXT_SIZE_LABEL[textSize]}`, action: cycleTextSize },
                 { icon: theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />, label: theme === 'dark' ? 'Light mode' : 'Dark mode', action: toggleTheme },
+                { icon: <CircleHelp size={15} />, label: 'Help & support', action: () => open(close => <HelpModal close={close} />) },
                 '-',
                 { icon: <LogOut size={15} />, label: 'Sign out', danger: true, action: onSignOut },
               ],

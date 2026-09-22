@@ -12,7 +12,6 @@ import { Avatar, Switch, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Menu } from '../lib/ui.jsx';
 
 const COLS = [
-  { k: null,       label: '', select: true },
   { k: 'last',     label: 'Name', sort: true },
   { k: 'dob',      label: 'DOB', sort: true },
   { k: 'age',      label: 'Age', sort: true, num: true },
@@ -76,13 +75,13 @@ function GenderIcon({ sex }) {
     <span className="tip" data-tip={isF ? 'Female' : 'Male'} aria-label={isF ? 'Female' : 'Male'}
       style={{ display: 'inline-flex', color: isF ? 'var(--gender-f)' : 'var(--gender-m)' }}>
       {isF ? (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="9" r="6" /><path d="M12 15v7M8.5 19h7" />
         </svg>
       ) : (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="10" cy="14" r="6" /><path d="M14.5 9.5L21 3M21 3h-5.5M21 3v5.5" />
         </svg>
       )}
@@ -122,7 +121,6 @@ export default function Patients() {
   const [per, setPer] = useState(100);
   const [vault, setVault] = useState(false);
   const [menu, setMenu] = useState(null);
-  const [sel, setSel] = useState(() => new Set());
   const gridRef = useRef(null);
 
   const set = (k, v) => { setF(p => ({ ...p, [k]: v })); setPage(1); };
@@ -158,14 +156,6 @@ export default function Patients() {
   const pages = Math.max(1, Math.ceil(list.length / per));
   const cur = Math.min(page, pages);
   const rows = list.slice((cur - 1) * per, cur * per);
-  const pageIds = rows.map(r => r.id);
-  const allOnPage = pageIds.length > 0 && pageIds.every(id => sel.has(id));
-  const toggleRow = id => setSel(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const togglePage = () => setSel(s2 => {
-    const n = new Set(s2);
-    allOnPage ? pageIds.forEach(id => n.delete(id)) : pageIds.forEach(id => n.add(id));
-    return n;
-  });
   const nhiState = f.nhi.trim() ? K.nhiCheck(f.nhi) : null;
 
   const act = (id, pid, anchor) => {
@@ -219,20 +209,18 @@ export default function Patients() {
           <div className="field"><label className="label" htmlFor="fStreet">Street or suburb</label>
             <input className="input" id="fStreet" value={f.street} placeholder="Devon Street"
               autoComplete="off" onChange={e => set('street', e.target.value)} /></div>
-          <div className="row g-2">
+          <div className="row g-2 ps-actions">
             <button className="btn btn-primary" data-act="search"
               onClick={() => { setPage(1); if (gridRef.current) gridRef.current.scrollTop = 0; }}>
               Search <Search size={15} /></button>
+            <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
+              Register patient <Plus size={14} /></button>
             <button className="btn btn-ghost btn-sm" onClick={() => { setF({ name: '', dob: '', nhi: '', street: '' }); setPage(1); }}>Clear</button>
             <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="Advanced search" aria-label="Advanced search"
               onClick={() => toast('Advanced search', 'Provider, enrolment, payment group and ACC claim would filter here.', 'info')}>
               <Filter size={15} /></button>
-          </div>
-          <div className="row g-2 ps-actions">
             <button className="btn btn-ghost btn-sm" onClick={() => toast('Export queued', `${list.length} rows will be emailed as CSV.`, 'ok')}>
               Export <Download size={14} /></button>
-            <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
-              Register patient <Plus size={14} /></button>
           </div>
         </div>
         <div className="row g-3 mt-2">
@@ -244,9 +232,8 @@ export default function Patients() {
       </div>
 
       {/* One bar over the grid rather than a legend strip and a footer: what
-          you have, what you have selected and what you can do about it, with
-          the pages where you can reach them without scrolling to the bottom
-          of four hundred rows. */}
+          you have and what you can do about it, with the pages where you can
+          reach them without scrolling to the bottom of four hundred rows. */}
       <div className="grid-panel">
       <div className="grid-bar">
         <span className="gb-count">
@@ -254,21 +241,10 @@ export default function Patients() {
           <span className="subtle"> · showing {list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</span>
         </span>
 
-        {sel.size > 0 ? (
-          <>
-            <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
-            <button className="btn btn-primary btn-sm" onClick={() => {
-              toast(`Recall letter queued`, `${sel.size} patient${sel.size === 1 ? '' : 's'} added to the typing queue.`, 'ok');
-              setSel(new Set());
-            }}><Mail size={16} /> Send recall letter</button>
-            <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
-          </>
-        ) : (
-          <label className="row g-2">
-            <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
-            <span className="t-sm muted">Include deceased and archived</span>
-          </label>
-        )}
+        <label className="row g-2">
+          <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
+          <span className="t-sm muted">Include deceased and archived</span>
+        </label>
 
         <span className="spacer" />
         <label className="row g-2 t-sm muted">Rows
@@ -284,15 +260,6 @@ export default function Patients() {
           <thead><tr>
             {COLS.map(c => {
               const sorted = c.k && sort.k === c.k;
-              if (c.select) return (
-                <th key="sel" className="sel-cell">
-                  <span className="check" role="checkbox" tabIndex={0} aria-checked={allOnPage}
-                    aria-label={allOnPage ? 'Clear selection on this page' : 'Select every patient on this page'}
-                    onClick={togglePage}
-                    onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); togglePage(); } }}>
-                    <Check size={13} /></span>
-                </th>
-              );
               return (
                 <th key={c.label}
                   className={`${c.sort ? 'sortable' : ''} ${c.tip ? 'tip' : ''} ${c.num ? 'num-cell' : ''}`}
@@ -310,16 +277,9 @@ export default function Patients() {
               const mobile = p.phone && p.phone.startsWith('+64 2') ? p.phone : '';
               const landline = p.phone && !p.phone.startsWith('+64 2') ? p.phone : '';
               return (
-                <tr key={p.id} tabIndex={0} data-selected={sel.has(p.id) || undefined}
-                  onClick={e => { if (!e.target.closest('.p-actions, .sel-cell')) nav(`/patient/${p.id}`); }}
+                <tr key={p.id} tabIndex={0}
+                  onClick={e => { if (!e.target.closest('.p-actions')) nav(`/patient/${p.id}`); }}
                   onKeyDown={e => { if (e.key === 'Enter') nav(`/patient/${p.id}`); }}>
-                  <td className="sel-cell">
-                    <span className="check" role="checkbox" tabIndex={0} aria-checked={sel.has(p.id)}
-                      aria-label={`Select ${K.displayName(p)}`}
-                      onClick={e => { e.stopPropagation(); toggleRow(p.id); }}
-                      onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleRow(p.id); } }}>
-                      <Check size={13} /></span>
-                  </td>
                   <td><span className="pname">
                     <b style={{ color: st.tone }}>{p.last.toUpperCase()}, {p.first}</b>
                     {p.preferred && <span className="p-pref">({p.preferred})</span>}
@@ -331,7 +291,7 @@ export default function Patients() {
                   <td className="t-mono t-xs">{fmtDateDMY(p.dob)}</td>
                   <td className="num-cell">{age(p.dob)}</td>
                   <td><GenderIcon sex={p.sex} /></td>
-                  <td className="t-mono t-xs">{p.nhi}</td>
+                  <td><span className="nhi-card t-mono t-xs" style={{ '--tone': st.tone }}>{p.nhi}</span></td>
                   <td className="t-mono t-xs subtle">{p.chart}</td>
                   <td className="wrap-cell t-xs">{p.addr}</td>
                   <td className="t-xs">{landline || <Nil label="No landline" />}</td>

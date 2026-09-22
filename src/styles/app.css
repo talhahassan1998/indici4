@@ -516,30 +516,9 @@
 .work-ic { width: 32px; height: 32px; border-radius: var(--r-sm); display: grid; place-items: center; flex: none; }
 
 /* ------------------------------------------------------------- Calendar */
-.cal-shell { display: grid; grid-template-columns: 220px 1fr; gap: 0; height: calc(100vh - var(--topbar-h)); }
-.cal-shell.with-panel { grid-template-columns: 220px 1fr 380px; }
-.cal-sidebar { border-right: 1px solid var(--line); background: var(--surface); padding: var(--s-4); overflow-y: auto; }
+.cal-shell { display: grid; grid-template-columns: 1fr; gap: 0; height: calc(100vh - var(--topbar-h)); }
+.cal-shell.with-panel { grid-template-columns: 1fr 380px; }
 .cal-main { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-
-/* ---- Mini month calendar, cut down from the reference to just the date
-   grid: no calendar list, no "Add calendar" — this app already has exactly
-   one calendar. Picking a day moves the toolbar's date; it does not change
-   which appointments show, because the sample data models one week, not a
-   real backend with a booking for every day of the year. ---- */
-.mini-cal-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-3); }
-.mini-cal-hd b { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.btn-xs { height: 22px; width: 22px; padding: 0; }
-.mini-cal-dow, .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
-.mini-cal-dow span { text-align: center; font-size: var(--fs-2xs); color: var(--text-subtle); padding-bottom: 4px; }
-.mini-cal-day {
-  aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%;
-  font-size: var(--fs-xs); color: var(--text); font-variant-numeric: tabular-nums;
-}
-.mini-cal-day.is-out { visibility: hidden; }
-.mini-cal-day:not(.is-out):hover { background: var(--surface-2); }
-.mini-cal-day.in-week:not(.is-selected) { background: color-mix(in srgb, var(--accent) 16%, transparent); }
-.mini-cal-day.is-today { color: var(--accent-text); font-weight: var(--fw-bold); }
-.mini-cal-day.is-selected { background: var(--accent); color: var(--text-on-accent); font-weight: var(--fw-bold); }
 .cal-toolbar {
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
   padding: var(--s-3) var(--s-5); border-bottom: 1px solid var(--line); flex: none;
@@ -899,8 +878,7 @@
   .app .brand { justify-content: center; padding: 0; }
   .pt-body { grid-template-columns: 1fr; }
   .pt-side { position: static; }
-  .cal-shell, .cal-shell.with-panel { grid-template-columns: 1fr; }
-  .cal-sidebar { display: none; }
+  .cal-shell.with-panel { grid-template-columns: 1fr; }
   .cal-panel { position: fixed; right: 0; top: var(--topbar-h); bottom: 0; width: min(380px, 100vw); z-index: 45; box-shadow: var(--sh-4); }
   .ed-shell { grid-template-columns: 1fr; }
   .ed-shell .ed-pane.preview { display: none; }

@@ -22,15 +22,15 @@ const NAV = [
     { to: '/dashboard',    label: 'Dashboard',    Icon: LayoutDashboard },
     { to: '/appointments', label: 'Appointments', Icon: CalendarDays, badge: () => K.appts.filter(a => a.status === 'arrived').length },
     { to: '/patients',     label: 'Patients',     Icon: Users },
-    { to: '/inbox',        label: 'Inbox',        Icon: Inbox, badge: () => K.inbox.filter(i => i.unread).length, tone: 'bad' },
+    { to: '/inbox',        label: 'Inbox',        Icon: Inbox, badge: () => K.inbox.filter(i => i.unread).length },
   ]},
   { group: 'Clinical', items: [
-    { to: '/letters', label: 'Letters', Icon: Mail, badge: () => K.letters.filter(l => l.status === 'pending').length, tone: 'warm' },
+    { to: '/letters', label: 'Letters', Icon: Mail, badge: () => K.letters.filter(l => l.status === 'pending').length },
     { to: '/tasks',   label: 'Tasks',   Icon: SquareCheckBig, badge: () => K.tasks.filter(t => t.col !== 'done').length },
   ]},
   { group: 'Money', items: [
     { to: '/billing', label: 'Billing', Icon: ReceiptText },
-    { to: '/acc',     label: 'ACC',     Icon: ShieldCheck, badge: () => K.accQueue.filter(a => !a.valid).length, tone: 'bad' },
+    { to: '/acc',     label: 'ACC',     Icon: ShieldCheck, badge: () => K.accQueue.filter(a => !a.valid).length },
   ]},
   { group: 'Practice', items: [
     { to: '/reports', label: 'Reports', Icon: ChartColumn },
@@ -113,14 +113,14 @@ export default function Shell({ role, setRole, theme, toggleTheme, rail, setRail
           {NAV.map(g => (
             <div className="nav-group" key={g.group}>
               <div className="nav-group-label">{g.group}</div>
-              {g.items.map(({ to, label, Icon, badge, tone }) => {
+              {g.items.map(({ to, label, Icon, badge }) => {
                 const n = badge ? badge() : 0;
                 return (
                   <NavLink to={to} key={to} className="nav-item"
                     aria-current={loc.pathname.startsWith(to) ? 'page' : undefined}>
                     <Icon size={18} className="ic" />
                     <span className="nav-label">{label}</span>
-                    {n > 0 && <span className={`badge-count ${tone === 'warm' ? 'warm' : tone === 'bad' ? '' : 'quiet'}`}>{n}</span>}
+                    {n > 0 && <span className="badge-count nav-badge">{n}</span>}
                   </NavLink>
                 );
               })}

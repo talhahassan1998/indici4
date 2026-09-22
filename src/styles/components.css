@@ -195,6 +195,10 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 }
 .badge-count.quiet { background: var(--surface-3); color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--line); }
 .badge-count.warm { background: var(--warm); color: #2B2823; }
+/* Sidebar nav badges: one colour regardless of what they're counting, fixed
+   rather than theme-linked so white always reads on it — the brighter
+   accent green dark mode uses elsewhere needs dark text to pass contrast. */
+.badge-count.nav-badge { background: #15803E; color: #FFFFFF; }
 
 /* Allergy / clinical alert badge */
 .alert-badge {

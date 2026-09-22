@@ -52,7 +52,7 @@ export function invoiceTotals(inv) {
 
 export const STATUS = {
   booked:    { label: 'Booked',      cls: '' },
-  arrived:   { label: 'Arrived',     cls: 'chip-ok' },
+  arrived:   { label: 'Arrived',     cls: 'chip-warm' },
   consult:   { label: 'In consult',  cls: 'chip-info' },
   done:      { label: 'Done',        cls: 'chip-ok' },
   dna:       { label: 'DNA',         cls: 'chip-bad' },

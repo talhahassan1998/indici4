@@ -222,7 +222,7 @@ export default function Patients() {
           <div className="row g-2">
             <button className="btn btn-primary" data-act="search"
               onClick={() => { setPage(1); if (gridRef.current) gridRef.current.scrollTop = 0; }}>
-              <Search size={15} /> Search</button>
+              Search <Search size={15} /></button>
             <button className="btn btn-ghost btn-sm" onClick={() => { setF({ name: '', dob: '', nhi: '', street: '' }); setPage(1); }}>Clear</button>
             <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="Advanced search" aria-label="Advanced search"
               onClick={() => toast('Advanced search', 'Provider, enrolment, payment group and ACC claim would filter here.', 'info')}>
@@ -230,9 +230,9 @@ export default function Patients() {
           </div>
           <div className="row g-2 ps-actions">
             <button className="btn btn-ghost btn-sm" onClick={() => toast('Export queued', `${list.length} rows will be emailed as CSV.`, 'ok')}>
-              <Download size={14} /> Export</button>
+              Export <Download size={14} /></button>
             <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
-              <Plus size={14} /> Register patient</button>
+              Register patient <Plus size={14} /></button>
           </div>
         </div>
         <div className="row g-3 mt-2">

@@ -26,6 +26,25 @@ export function useTextSize() {
   return [size, cycle];
 }
 
+/* For the one screen (the appointment calendar) that positions things in
+   raw pixels computed from real time rather than in CSS driven off --fs-*:
+   those pixel maths need the current --text-scale too, or "Extra large
+   text" makes a card's own content taller than the fixed-height box the JS
+   gave it, and it spills into the next booking. Read the live CSS value —
+   set by useTextSize above via data-text-size — via a MutationObserver on
+   that attribute rather than duplicating the size state, so the two can
+   never drift out of sync. */
+export function useTextScale() {
+  const read = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--text-scale')) || 1;
+  const [scale, setScale] = useState(read);
+  useEffect(() => {
+    const mo = new MutationObserver(() => setScale(read()));
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-text-size'] });
+    return () => mo.disconnect();
+  }, []);
+  return scale;
+}
+
 export function useLocalState(key, initial) {
   const [v, setV] = useState(() => {
     try { const raw = localStorage.getItem(key); return raw === null ? initial : JSON.parse(raw); }

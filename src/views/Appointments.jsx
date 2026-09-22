@@ -8,16 +8,20 @@ import K from '../data/sample.js';
 import { fmtTime, fmtLongDate, age, money } from '../lib/format.js';
 import { Chip, FunderChip, Avatar, Banner, Empty, Switch } from '../components/Primitives.jsx';
 import { useUi, Modal } from '../lib/ui.jsx';
+import { useTextScale } from '../lib/theme.js';
 
-/* One hour of the day at 96px rather than a bare 60. Every pixel position in
-   this file is minutes * PX_PER_MIN — change the one constant, not the
-   arithmetic. The floor is set by the shortest appointment type (15 minutes)
-   needing enough height for one full, un-clipped line of the product's own
-   text-size floor (--fs-2xs, 13px) plus a visible gap to the next booking —
-   go any smaller and the choice becomes "overlap" or "clip", not "compact". */
+/* One hour of the day at 96px rather than a bare 60 at the default text
+   size. Every pixel position in this file is minutes * pxPerMin, where
+   pxPerMin is this base rate times the live --text-scale (see useTextScale)
+   — never the bare constant. A card's box is sized in JS from real minutes,
+   not from --fs-*, so if only the font grew under "Extra large text" and
+   the box didn't, the now-taller text would spill into the next booking.
+   The floor is set by the shortest appointment type (15 minutes) needing
+   enough height for one full, un-clipped line of the product's own
+   text-size floor (--fs-2xs) plus a visible gap to the next booking — go
+   any smaller and the choice becomes "overlap" or "clip", not "compact". */
 const PX_PER_MIN = 1.6;
 const START_H = 8, END_H = 18, HOURS = END_H - START_H, NOW = 10 * 60 + 22;
-const top = m => (m - START_H * 60) * PX_PER_MIN;
 const snap = m => Math.round(m / 5) * 5;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const DATES = ['14 Sep', '15 Sep', '16 Sep', '17 Sep', '18 Sep'];
@@ -34,6 +38,9 @@ export default function Appointments() {
   const [, force] = useState(0);
   const dragId = useRef(null);
   const scrollRef = useRef(null);
+  const textScale = useTextScale();
+  const pxPerMin = PX_PER_MIN * textScale;
+  const top = m => (m - START_H * 60) * pxPerMin;
 
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = Math.max(0, top(NOW) - 220); }, [mode]);
   useEffect(() => { if (sp.get('book')) { setPanel(true); sp.delete('book'); setSp(sp, { replace: true }); } }, [sp]);
@@ -53,7 +60,7 @@ export default function Appointments() {
 
   const openAppt = a => open(close => <ApptModal close={close} a={a} toast={toast} nav={nav} onDone={() => force(n => n + 1)} />);
 
-  const tpl = `68px repeat(${cols.length}, minmax(220px, 1fr))`;
+  const tpl = `${68 * textScale}px repeat(${cols.length}, minmax(220px, 1fr))`;
 
   return (
     <div className={`cal-shell ${panel ? 'with-panel' : ''}`}>
@@ -111,14 +118,14 @@ export default function Appointments() {
               ))}
             </div>
             {cols.map(c => (
-              <div className="cal-col" data-col={c.id} key={c.id} style={{ height: HOURS * 60 * PX_PER_MIN }}
+              <div className="cal-col" data-col={c.id} key={c.id} style={{ height: HOURS * 60 * pxPerMin }}
                 onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
                 onDrop={e => {
                   e.preventDefault();
                   const a = K.appts.find(x => x.id === (dragId.current || e.dataTransfer.getData('text/plain')));
                   if (!a) return;
                   const r = e.currentTarget.getBoundingClientRect();
-                  const mins = snap(Math.max(0, (e.clientY - r.top) / PX_PER_MIN) + START_H * 60);
+                  const mins = snap(Math.max(0, (e.clientY - r.top) / pxPerMin) + START_H * 60);
                   const from = fmtTime(a.start);
                   a.start = Math.min(mins, END_H * 60 - K.at(a.type).mins);
                   if (mode === 'day' && K.st(c.id)) a.cl = c.id;
@@ -129,7 +136,7 @@ export default function Appointments() {
                   <div className={`cal-slot ${i % 2 ? 'half' : ''}`} key={i} />
                 ))}
                 {blocksFor(c).map((b, i) => (
-                  <div className="blocked" key={i} style={{ top: top(b.start), height: b.mins * PX_PER_MIN }}>{b.label}</div>
+                  <div className="blocked" key={i} style={{ top: top(b.start), height: b.mins * pxPerMin }}>{b.label}</div>
                 ))}
                 {apptsFor(c).map(a => {
                   const p = K.pt(a.pt), t = K.at(a.type);
@@ -137,7 +144,7 @@ export default function Appointments() {
                   return (
                     <div className={`appt ${short ? 'is-compact' : ''}`} key={a.id} draggable data-appt={a.id} data-type={t.type} tabIndex={0}
                       role="button" aria-label={`${p.first} ${p.last}, ${fmtTime(a.start)}, ${t.name}`}
-                      style={{ top: top(a.start), height: t.mins * PX_PER_MIN - 5,
+                      style={{ top: top(a.start), height: t.mins * pxPerMin - 5,
                         opacity: a.status === 'dna' ? .65 : a.status === 'done' ? .8 : 1 }}
                       onDragStart={e => { dragId.current = a.id; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.id); }}
                       onClick={() => openAppt(a)}

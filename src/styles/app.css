@@ -459,15 +459,19 @@
 .cal-col-head .avatar { border-radius: 50%; }
 .cal-col-head b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-bold); }
 .cal-col-head span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
-.cal-gutter { position: sticky; left: 0; z-index: 6; background: var(--surface); border-right: 1px solid var(--line); width: 68px; }
+.cal-gutter { position: sticky; left: 0; z-index: 6; background: var(--surface); border-right: 1px solid var(--line); width: calc(68px * var(--text-scale)); }
 .cal-body { display: grid; position: relative; }
 /* One hour at 72px (see PX_PER_MIN in Appointments.jsx) — the height here is
    a constant that has to move in lockstep with that scale, not a value to
    restyle on its own. */
-.cal-hour-label { height: 96px; font-size: var(--fs-xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 3px 10px 0 0; text-align: right; border-top: 1px solid transparent; }
+/* calc(...*var(--text-scale)) here, not a bare px, because Appointments.jsx
+   computes every appointment's own top/height in JS from the same scale
+   (see pxPerMin there) — these rows and that JS have to move together or
+   the gridlines drift away from what's actually booked at that hour. */
+.cal-hour-label { height: calc(96px * var(--text-scale)); font-size: var(--fs-xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 3px 10px 0 0; text-align: right; border-top: 1px solid transparent; }
 .cal-col { position: relative; border-left: 1px solid var(--line-faint); min-width: 0; }
 .cal-col:first-child { border-left: 0; }
-.cal-slot { height: 48px; border-bottom: 1px solid var(--line-faint); }
+.cal-slot { height: calc(48px * var(--text-scale)); border-bottom: 1px solid var(--line-faint); }
 .cal-slot.half { border-bottom: 1px solid color-mix(in srgb, var(--line-faint) 55%, transparent); }
 .cal-slot.drop-target { background: var(--accent-soft); }
 .cal-now {

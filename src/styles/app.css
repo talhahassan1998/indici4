@@ -881,15 +881,12 @@
   height: calc(100vh - var(--topbar-h));
   min-width: 0;
 }
-.ps-head {
-  display: flex; align-items: flex-end; gap: var(--s-4); flex-wrap: wrap;
-  padding: var(--s-4) var(--page-gutter) var(--s-4); flex: none;
-}
 .ps-filters {
   /* No bottom rule: the panel below has its own border, and two hairlines a
      few pixels apart is a seam, not a separator. */
-  flex: none; padding: 0 var(--page-gutter) var(--s-2);
+  flex: none; padding: var(--s-4) var(--page-gutter) var(--s-2);
 }
+.ps-context { display: block; margin-bottom: var(--s-2); }
 .ps-filter-grid { gap: var(--s-3);
   /* Flex, not a fixed grid. A breakpoint is written against the window, but
      what has to fit is the window minus the sidebar, so a four-column grid
@@ -899,6 +896,9 @@
 }
 .ps-filter-grid > .field { flex: 1 1 190px; min-width: 0; }
 .ps-filter-grid > .row   { flex: 0 0 auto; }
+/* The export/register pair reads as a toolbar, not another filter, so it
+   rides the far end of the row rather than wrapping in with the fields. */
+.ps-filter-grid > .ps-actions { margin-left: auto; }
 /* The selection column: a fixed narrow cell, and a row that is selected says
    so with a tint rather than only a ticked box in the corner of the eye. */
 .tbl th.sel-cell, .tbl td.sel-cell { width: 46px; padding-right: 0; }

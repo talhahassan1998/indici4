@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, Filter, Plus, Link2, Download, Check, TriangleAlert, User, Pencil, FilePen,
+  Search, Filter, Plus, Download, Check, TriangleAlert, User, Pencil, FilePen,
   SquareCheckBig, DollarSign, CalendarDays, Bell, Syringe, House, UserPlus, UserCheck,
   Printer, IdCard, EllipsisVertical, ChevronLeft, ChevronRight, Mail, Pill, FlaskConical,
   ReceiptText, Copy,
@@ -182,23 +182,8 @@ export default function Patients() {
 
   return (
     <div className="ps-shell">
-      <div className="ps-head">
-        <div className="page-title">
-          <h1 className="t-h2">Search Patient</h1>
-          <span className="page-sub">Kora Specialists, Newmarket</span>
-        </div>
-        <span className="spacer" />
-        <div className="row g-2">
-          <button className="btn btn-ghost btn-sm" onClick={() => toast('Export queued', `${list.length} rows will be emailed as CSV.`, 'ok')}>
-            <Download size={14} /> Export</button>
-          <button className="btn btn-secondary btn-sm" onClick={() => toast('Duplicate check', 'Candidates matched on name, date of birth and address.', 'info')}>
-            <Link2 size={14} /> Find duplicates</button>
-          <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
-            <Plus size={14} /> Register patient</button>
-        </div>
-      </div>
-
       <div className="ps-filters">
+        <span className="page-sub ps-context">Kora Specialists, Newmarket</span>
         <div className="ps-filter-grid">
           <div className="field"><label className="label" htmlFor="fName">Patient name</label>
             <input className="input" id="fName" value={f.name} placeholder="Surname, then first name"
@@ -221,6 +206,12 @@ export default function Patients() {
             <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="Advanced search" aria-label="Advanced search"
               onClick={() => toast('Advanced search', 'Provider, enrolment, payment group and ACC claim would filter here.', 'info')}>
               <Filter size={15} /></button>
+          </div>
+          <div className="row g-2 ps-actions">
+            <button className="btn btn-ghost btn-sm" onClick={() => toast('Export queued', `${list.length} rows will be emailed as CSV.`, 'ok')}>
+              <Download size={14} /> Export</button>
+            <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
+              <Plus size={14} /> Register patient</button>
           </div>
         </div>
         <div className="row g-3 mt-2">

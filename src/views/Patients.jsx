@@ -223,18 +223,25 @@ export default function Patients() {
               Export <Download size={14} /></button>
           </div>
         </div>
-        <div className="row g-3 mt-2">
-          {!nhiState ? <span className="hint">Three letters, four digits</span>
-            : nhiState.state === 'ok' ? <span className="err ok-t"><Check size={12} /> Check digit valid</span>
-            : nhiState.state === 'partial' ? <span className="hint">{nhiState.why}</span>
-            : <span className="err"><TriangleAlert size={12} /> {nhiState.why}</span>}
-        </div>
+        {nhiState && (
+          <div className="row g-3 mt-2">
+            {nhiState.state === 'ok' ? <span className="err ok-t"><Check size={12} /> Check digit valid</span>
+              : nhiState.state === 'partial' ? <span className="hint">{nhiState.why}</span>
+              : <span className="err"><TriangleAlert size={12} /> {nhiState.why}</span>}
+          </div>
+        )}
       </div>
 
-      {/* One bar over the grid rather than a legend strip and a footer: what
-          you have and what you can do about it, with the pages where you can
-          reach them without scrolling to the bottom of four hundred rows. */}
+      {/* Legend on top so the colour on every name is explained before you
+          hit the grid, pagination on the bottom where a footer belongs. */}
       <div className="grid-panel">
+      <div className="ps-foot ps-foot-top">
+        <span className="t-eyebrow">Enrolment</span>
+        {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
+          <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
+        ))}
+      </div>
+
       <div className="grid-bar">
         <span className="gb-count">
           <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
@@ -245,14 +252,6 @@ export default function Patients() {
           <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
           <span className="t-sm muted">Include deceased and archived</span>
         </label>
-
-        <span className="spacer" />
-        <label className="row g-2 t-sm muted">Rows
-          <select className="select gb-rows" value={per} aria-label="Rows per page"
-            onChange={e => { setPer(Number(e.target.value)); setPage(1); }}>
-            {[50, 100, 200].map(n => <option key={n}>{n}</option>)}
-          </select></label>
-        <Pager cur={cur} pages={pages} onGo={n => { setPage(n); if (gridRef.current) gridRef.current.scrollTop = 0; }} />
       </div>
 
       <div className="ps-grid" ref={gridRef}>
@@ -336,11 +335,14 @@ export default function Patients() {
         )}
       </div>
 
-      <div className="ps-foot">
-        <span className="t-eyebrow">Enrolment</span>
-        {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
-          <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
-        ))}
+      <div className="grid-bar grid-bar-bottom">
+        <span className="spacer" />
+        <label className="row g-2 t-sm muted">Rows
+          <select className="select gb-rows" value={per} aria-label="Rows per page"
+            onChange={e => { setPer(Number(e.target.value)); setPage(1); }}>
+            {[50, 100, 200].map(n => <option key={n}>{n}</option>)}
+          </select></label>
+        <Pager cur={cur} pages={pages} onGo={n => { setPage(n); if (gridRef.current) gridRef.current.scrollTop = 0; }} />
       </div>
       </div>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}

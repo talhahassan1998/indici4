@@ -933,9 +933,10 @@
   background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--r-md);
 }
-.grid-panel > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
-.grid-panel > .ps-foot,
-.grid-panel > .grid-foot { border-radius: 0 0 var(--r-md) var(--r-md); }
+/* Whichever bar ends up first or last (the legend now leads, pagination now
+   trails) takes the panel's own corner radius, not a fixed element type. */
+.grid-panel > *:first-child { border-radius: var(--r-md) var(--r-md) 0 0; }
+.grid-panel > *:last-child  { border-radius: 0 0 var(--r-md) var(--r-md); }
 /* Inside an ordinary padded page the panel supplies its own edge and takes no
    margin: the page gutter is already there. */
 .grid-panel.is-page { margin: 0; flex: 0 1 auto; }
@@ -1017,6 +1018,12 @@
 }
 .ps-foot .lg { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-sm); color: var(--text-muted); }
 .ps-foot .lg i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+/* Legend leads the panel now, so its hairline runs along the bottom edge it
+   shares with the bar below, not the top edge it no longer has above it. */
+.ps-foot-top { border-top: none; border-bottom: 1px solid var(--line); }
+/* Pagination trails the panel: hairline on top, none below, same reasoning
+   in reverse. */
+.grid-bar-bottom { border-bottom: none; border-top: 1px solid var(--line); }
 .pager { display: inline-flex; align-items: center; gap: 2px; }
 .pager button {
   display: inline-flex; align-items: center; justify-content: center;

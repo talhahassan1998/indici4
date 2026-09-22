@@ -454,6 +454,9 @@
 }
 .cal-col-head:first-child { border-left: 0; }
 .cal-col-head-text { display: block; min-width: 0; }
+/* Round, not the product's usual rounded-square badge — a Teams calendar
+   column header reads a person by a circular photo/initials, not a chip. */
+.cal-col-head .avatar { border-radius: 50%; }
 .cal-col-head b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-bold); }
 .cal-col-head span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
 .cal-gutter { position: sticky; left: 0; z-index: 6; background: var(--surface); border-right: 1px solid var(--line); width: 68px; }

@@ -58,17 +58,6 @@ export default function Billing() {
 
   return (
     <div className="page">
-      <div className="page-hd">
-        <div className="page-title"><h1>Billing</h1>
-          <span className="page-sub">All amounts in NZD and include 15% GST unless shown otherwise</span></div>
-        <div className="page-actions">
-          <span className="sync-pill tip" data-tip={`Last synced ${fmtClock(K.XERO_SYNC)}`}><RefreshCw size={13} /> Xero connected</span>
-          <button className="btn btn-secondary btn-sm" data-act="sync" onClick={doSync} disabled={syncing}>
-            {syncing ? <><span className="spinner" /> Syncing…</> : <><RefreshCw size={14} /> Sync items</>}</button>
-          <button className="btn btn-primary btn-sm" data-act="create" onClick={() => openCreate()}><Plus size={14} /> Create invoice</button>
-        </div>
-      </div>
-
       {/* The summary strip and the Xero note are gone. Every figure they
           carried is a filter away in the grid's own footer, which totals what
           you are actually looking at rather than a fixed four numbers, and
@@ -102,6 +91,13 @@ export default function Billing() {
           <button className="btn btn-primary"><Search size={17} /> Search</button>
           <button className="btn btn-ghost"
             onClick={() => setF({ q: '', status: 'all', payer: 'all', cl: 'all' })}>Clear</button>
+        </div>
+        <span className="spacer" />
+        <div className="fb-actions">
+          <span className="sync-pill tip" data-tip={`Last synced ${fmtClock(K.XERO_SYNC)}`}><RefreshCw size={13} /> Xero connected</span>
+          <button className="btn btn-secondary btn-sm" data-act="sync" onClick={doSync} disabled={syncing}>
+            {syncing ? <><span className="spinner" /> Syncing…</> : <><RefreshCw size={14} /> Sync items</>}</button>
+          <button className="btn btn-primary btn-sm" data-act="create" onClick={() => openCreate()}><Plus size={14} /> Create invoice</button>
         </div>
       </div>
 

@@ -242,13 +242,6 @@ export default function Patients() {
         ))}
       </div>
 
-      <div className="grid-bar">
-        <span className="gb-count">
-          <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
-          <span className="subtle"> · showing {list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</span>
-        </span>
-      </div>
-
       <div className="ps-grid" ref={gridRef}>
         <table>
           <thead><tr>
@@ -331,6 +324,10 @@ export default function Patients() {
       </div>
 
       <div className="grid-bar grid-bar-bottom">
+        <span className="gb-count">
+          <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
+          <span className="subtle"> · showing {list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</span>
+        </span>
         <label className="row g-2">
           <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
           <span className="t-sm muted">Include deceased and archived</span>

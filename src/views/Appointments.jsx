@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, List, SquareKanban, Plus, Check, X, Search, Stethoscope,
-  ReceiptText, Pencil, User, Rows3, Flame,
+  ReceiptText, Pencil, User, Rows3, Flame, Table2,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtTime, fmtLongDate, age, money, STATUS } from '../lib/format.js';
@@ -82,6 +82,7 @@ export default function Appointments() {
           <div className="segmented" role="group" aria-label="Appointment view">
             <button aria-pressed={view === 'diary'} data-view="diary" onClick={() => setView('diary')}><Rows3 size={13} /> Diary</button>
             <button aria-pressed={view === 'heatmap'} data-view="heatmap" onClick={() => setView('heatmap')}><Flame size={13} /> Heat map</button>
+            <button aria-pressed={view === 'grid'} data-view="grid" onClick={() => setView('grid')}><Table2 size={13} /> Grid view</button>
           </div>
           <div className="segmented" role="group" aria-label="Calendar range">
             <button aria-pressed={mode === 'day'} data-mode="day" onClick={() => setMode('day')}><List size={13} /> Day</button>
@@ -107,6 +108,8 @@ export default function Appointments() {
 
         {view === 'heatmap' ? (
           <HeatMap mode={mode} clinic={clinic} openAppt={openAppt} />
+        ) : view === 'grid' ? (
+          <GridView mode={mode} clinic={clinic} openAppt={openAppt} />
         ) : (
         <div className="cal-scroll" ref={scrollRef}>
           <div className="cal-grid" style={{ gridTemplateColumns: tpl }}>
@@ -267,6 +270,78 @@ function HeatMap({ mode, clinic, openAppt }) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+/* Every appointment as one sortable row, for scanning or exporting rather
+   than for placement in time. Reuses the same sortable-grid pattern (and its
+   CSS) as the Patients list, and the same row-click-opens-the-modal
+   behaviour as the diary and the heat map. */
+function GridView({ mode, clinic, openAppt }) {
+  const [sort, setSort] = useState({ k: 'start', dir: 1 });
+
+  const rows = (mode === 'week'
+    ? K.clinicians.flatMap(c => K.appts.filter(a => a.cl === c.id && (clinic === 'all' || a.clinic === clinic))
+        .map(a => ({ a, day: hashDay(a.id) })))
+    : K.appts.filter(a => clinic === 'all' || a.clinic === clinic).map(a => ({ a, day: null }))
+  ).map(({ a, day }) => ({ a, day, p: K.pt(a.pt), t: K.at(a.type), cl: K.st(a.cl) }));
+
+  const COLS = [
+    ...(mode === 'week' ? [{ k: 'day', label: 'Day', sort: true }] : []),
+    { k: 'start', label: 'Time', sort: true },
+    { k: 'patient', label: 'Patient', sort: true },
+    { k: 'nhi', label: 'NHI' },
+    { k: 'clinician', label: 'Clinician', sort: true },
+    { k: 'type', label: 'Type' },
+    { k: 'status', label: 'Status', sort: true },
+    { k: 'location', label: 'Location' },
+  ];
+  const CMP = {
+    day: (x, y) => x.day - y.day || x.a.start - y.a.start,
+    start: (x, y) => (x.day ?? 0) - (y.day ?? 0) || x.a.start - y.a.start,
+    patient: (x, y) => `${x.p.last} ${x.p.first}`.localeCompare(`${y.p.last} ${y.p.first}`),
+    clinician: (x, y) => x.cl.name.localeCompare(y.cl.name),
+    status: (x, y) => x.a.status.localeCompare(y.a.status),
+  };
+  const sorted = [...rows].sort((x, y) => (CMP[sort.k] || CMP.start)(x, y) * sort.dir);
+
+  if (!sorted.length) {
+    return <Empty icon={<Table2 size={22} />} title="Nothing booked"
+      body="No appointments match this location yet." />;
+  }
+
+  return (
+    <div className="ps-grid">
+      <table>
+        <thead><tr>
+          {COLS.map(c => {
+            const active = c.sort && sort.k === c.k;
+            return (
+              <th key={c.k} className={c.sort ? 'sortable' : ''} data-sort={c.sort ? c.k : undefined}
+                aria-sort={active ? (sort.dir === 1 ? 'ascending' : 'descending') : undefined}
+                onClick={c.sort ? () => setSort(s => s.k === c.k ? { k: c.k, dir: -s.dir } : { k: c.k, dir: 1 }) : undefined}>
+                {c.label}{c.sort && <span className="sort-ind">{active ? (sort.dir === 1 ? '↑' : '↓') : '↕'}</span>}
+              </th>
+            );
+          })}
+        </tr></thead>
+        <tbody>
+          {sorted.map(({ a, day, p, t, cl }) => (
+            <tr key={a.id} tabIndex={0} onClick={() => openAppt(a)}
+              onKeyDown={e => { if (e.key === 'Enter') openAppt(a); }}>
+              {mode === 'week' && <td className="t-xs">{DAYS[day]} <span className="subtle">{DATES[day]}</span></td>}
+              <td className="t-mono t-sm">{fmtTime(a.start)}</td>
+              <td><span className="row g-2"><Avatar id={p.id} size="xs" /><b className="t-sm">{p.first} {p.last}</b></span></td>
+              <td className="t-mono t-xs subtle">{p.nhi}</td>
+              <td className="t-xs">{cl.name}</td>
+              <td className="t-xs">{t.name}</td>
+              <td>{a.status === 'booked' ? <span className="t-xs subtle">Booked</span> : <Chip status={a.status} />}</td>
+              <td className="t-xs subtle">{K.cln(a.clinic).short}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

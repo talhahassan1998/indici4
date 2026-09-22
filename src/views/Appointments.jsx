@@ -26,6 +26,49 @@ const snap = m => Math.round(m / 5) * 5;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const DATES = ['14 Sep', '15 Sep', '16 Sep', '17 Sep', '18 Sep'];
 const hashDay = id => { let s = 0; for (const c of id) s += c.charCodeAt(0); return s % 5; };
+const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const startOfWeek = d => addDays(d, -((d.getDay() + 6) % 7)); // Monday
+
+/* The month picker from the reference, cut down to just that: no calendar
+   list, no "Add calendar" — one grid of days, this month's arrows, today
+   and the visible week picked out. Clicking a day moves the toolbar's own
+   date; the appointments themselves don't change with it, because this
+   demo's data models one week, not a real multi-week calendar backend. */
+function MiniCalendar({ cursor, viewDate, weekMode, onCursorShift, onPick }) {
+  const year = cursor.getFullYear(), month = cursor.getMonth();
+  const first = new Date(year, month, 1);
+  const startPad = (first.getDay() + 6) % 7; // Monday-first
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells = Array.from({ length: Math.ceil((startPad + daysInMonth) / 7) * 7 }, (_, i) => {
+    const day = i - startPad + 1;
+    return day >= 1 && day <= daysInMonth ? new Date(year, month, day) : null;
+  });
+  const weekStart = startOfWeek(viewDate), weekEnd = addDays(weekStart, 4);
+  const inVisibleWeek = d => weekMode && d >= weekStart && d <= weekEnd;
+  return (
+    <div className="mini-cal">
+      <div className="mini-cal-hd">
+        <b>{cursor.toLocaleDateString('en-NZ', { month: 'long', year: 'numeric' })}</b>
+        <span className="row g-1">
+          <button className="btn btn-ghost btn-icon btn-xs" onClick={() => onCursorShift(-1)} aria-label="Previous month"><ChevronLeft size={14} /></button>
+          <button className="btn btn-ghost btn-icon btn-xs" onClick={() => onCursorShift(1)} aria-label="Next month"><ChevronRight size={14} /></button>
+        </span>
+      </div>
+      <div className="mini-cal-dow">{['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i}>{d}</span>)}</div>
+      <div className="mini-cal-grid">
+        {cells.map((d, i) => (
+          <button key={i} className={`mini-cal-day ${!d ? 'is-out' : ''}
+              ${d && sameDay(d, K.TODAY) ? 'is-today' : ''}
+              ${d && sameDay(d, viewDate) ? 'is-selected' : ''}
+              ${d && inVisibleWeek(d) ? 'in-week' : ''}`}
+            disabled={!d} tabIndex={d ? 0 : -1}
+            onClick={() => d && onPick(d)}>{d ? d.getDate() : ''}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Appointments() {
   const { toast, open } = useUi();
@@ -36,11 +79,16 @@ export default function Appointments() {
   const [panel, setPanel] = useState(false);
   const [panelPt, setPanelPt] = useState(null);
   const [, force] = useState(0);
+  const [viewDate, setViewDate] = useState(K.TODAY);
+  const [calCursor, setCalCursor] = useState(K.TODAY);
   const dragId = useRef(null);
   const scrollRef = useRef(null);
   const textScale = useTextScale();
   const pxPerMin = PX_PER_MIN * textScale;
   const top = m => (m - START_H * 60) * pxPerMin;
+
+  const pickDate = d => { setViewDate(d); setCalCursor(d); };
+  const shiftView = n => pickDate(addDays(viewDate, mode === 'week' ? n * 7 : n));
 
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = Math.max(0, top(NOW) - 220); }, [mode]);
   useEffect(() => { if (sp.get('book')) { setPanel(true); sp.delete('book'); setSp(sp, { replace: true }); } }, [sp]);
@@ -61,21 +109,28 @@ export default function Appointments() {
   const openAppt = a => open(close => <ApptModal close={close} a={a} toast={toast} nav={nav} onDone={() => force(n => n + 1)} />);
 
   const tpl = `${68 * textScale}px repeat(${cols.length}, minmax(220px, 1fr))`;
+  const weekStart = startOfWeek(viewDate), weekEnd = addDays(weekStart, 4);
 
   return (
     <div className={`cal-shell ${panel ? 'with-panel' : ''}`}>
+      <aside className="cal-sidebar">
+        <MiniCalendar cursor={calCursor} viewDate={viewDate} weekMode={mode === 'week'}
+          onCursorShift={n => setCalCursor(d => new Date(d.getFullYear(), d.getMonth() + n, 1))}
+          onPick={pickDate} />
+      </aside>
       <div className="cal-main">
         <div className="cal-toolbar">
           <div className="row g-2">
-            <button className="btn btn-secondary btn-icon btn-sm" aria-label="Previous"><ChevronLeft size={15} /></button>
-            <button className="btn btn-secondary btn-sm">Today</button>
-            <button className="btn btn-secondary btn-icon btn-sm" aria-label="Next"><ChevronRight size={15} /></button>
+            <button className="btn btn-secondary btn-icon btn-sm" aria-label="Previous" onClick={() => shiftView(-1)}><ChevronLeft size={15} /></button>
+            <button className="btn btn-secondary btn-sm" onClick={() => pickDate(K.TODAY)}>Today</button>
+            <button className="btn btn-secondary btn-icon btn-sm" aria-label="Next" onClick={() => shiftView(1)}><ChevronRight size={15} /></button>
           </div>
           <div className="col" style={{ gap: 0 }}>
-            <b className="t-h4">{mode === 'day' ? fmtLongDate(K.TODAY) : '14 – 18 September 2026'}</b>
+            <b className="t-h4">{mode === 'day' ? fmtLongDate(viewDate)
+              : `${weekStart.getDate()} – ${weekEnd.getDate()} ${weekEnd.toLocaleDateString('en-NZ', { month: 'long', year: 'numeric' })}`}</b>
             <span className="t-xs subtle">{mode === 'day'
               ? `${K.appts.length} appointments across ${K.clinicians.length} clinicians`
-              : 'Week 38 · Dr Alice Fenwick'}</span>
+              : 'Dr Alice Fenwick'}</span>
           </div>
           <span className="spacer" />
           <div className="segmented" role="group" aria-label="Calendar view">

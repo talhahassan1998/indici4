@@ -990,7 +990,10 @@
 .ps-grid tbody tr { transition: background var(--dur-1) var(--ease); cursor: pointer; }
 .ps-grid tbody tr:hover { background: var(--surface-2); }
 .ps-grid tbody tr:focus-visible { background: var(--accent-soft); outline: 2px solid var(--focus); outline-offset: -2px; }
-.ps-grid td.wrap-cell { white-space: normal; min-width: 210px; max-width: 280px; }
+/* Wide enough that a real NZ street address — number, street, suburb, city,
+   postcode — reads on one line; it still wraps rather than clipping the rare
+   longer one. */
+.ps-grid td.wrap-cell { white-space: normal; min-width: 260px; max-width: 380px; }
 
 /* Name cell carries the enrolment colour on the text itself. */
 .pname { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }

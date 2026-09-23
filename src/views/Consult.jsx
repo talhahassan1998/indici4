@@ -733,8 +733,11 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
           </div>
         )}
         {tab === 'Family Hx' && (
-          <button className="btn btn-primary btn-sm" onClick={() => openFamDrawer(null)}>
-            <Plus size={14} /> Add</button>
+          <>
+            <span className="spacer" />
+            <button className="btn btn-primary btn-sm" onClick={() => openFamDrawer(null)}>
+              <Plus size={14} /> Add</button>
+          </>
         )}
       </div>
 

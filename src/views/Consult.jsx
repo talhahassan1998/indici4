@@ -4,7 +4,7 @@ import {
   Clock, FileText, SquareCheckBig, Activity, Pill, FlaskConical, TriangleAlert, HeartPulse,
   Shield, Bell, Copy, Eye, Share2, ShieldCheck, LayoutTemplate, Plus, X, Check, Mail,
   CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen, Search, History,
-  Users, Printer, UploadCloud, MessageSquare, ChevronLeft, ChevronRight, ChevronDown,
+  Users, Printer, UploadCloud, MessageSquare, ChevronLeft, ChevronRight, Ellipsis,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
@@ -509,16 +509,16 @@ function OverflowTabs({ items, active, onChange, label }) {
     <nav className="tabs otabs" role="tablist" aria-label={label} ref={outerRef}>
       <div className="otabs-measure" aria-hidden="true">
         {items.map((t, i) => <button key={t} ref={el => { itemRefs.current[i] = el; }} tabIndex={-1}>{t}</button>)}
-        <button ref={moreRef} tabIndex={-1}>More <ChevronDown size={13} /></button>
+        <button className="otabs-more" ref={moreRef} tabIndex={-1}><Ellipsis size={16} /></button>
       </div>
       {shown.map(t => (
         <button role="tab" key={t} aria-selected={active === t} onClick={() => onChange(t)}>{t}</button>
       ))}
       {hidden.length > 0 && (
-        <button role="tab" aria-selected={activeHidden}
+        <button className="otabs-more" role="tab" aria-selected={activeHidden} aria-label="More sections"
           onClick={e => setMenu({ anchor: e.currentTarget,
             items: hidden.map(t => ({ label: t, action: () => onChange(t) })) })}>
-          More <ChevronDown size={13} /></button>
+          <Ellipsis size={16} /></button>
       )}
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
     </nav>

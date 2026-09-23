@@ -645,6 +645,40 @@ const DX_SUGGESTIONS = ['Meniscal tear of knee', 'Knee pain', 'Osteoarthritis of
    Diagnosis has real data behind it; the other tabs are the same record
    structure with nothing recorded yet, same as an unused chart section
    anywhere else in the product. */
+/* Each diagnosis category is its own card, coloured so the three read as
+   distinct records rather than one long list split by a label — and each
+   holds its diagnoses in a grid of tiles, not stacked rows, so the category
+   still reads as a compact block once it has more than two or three items. */
+function DxCategory({ tone, icon, title, items }) {
+  return (
+    <div className={`dx-cat is-${tone}`}>
+      <div className="dx-cat-hd">
+        <span className="dx-cat-ic">{icon}</span>
+        <b className="grow">{title}</b>
+        <span className="dx-cat-count">{items.length}</span>
+      </div>
+      <div className="dx-cat-bd">
+        {items.length ? (
+          <div className="dx-grid">
+            {items.map(it => (
+              <div className="dx-tile" key={it.key}>
+                <button className="dx-tile-act tip" data-tip={it.actionLabel} aria-label={it.actionLabel}
+                  onClick={it.onAction}>{it.actionIcon}</button>
+                <span className="dx-tile-name">{it.name}</span>
+                <span className="dx-tile-meta">
+                  <span>{it.meta}</span>
+                  {it.acc && <span className="chip chip-warm">ACC</span>}
+                  {it.resolved && <span className="chip">Resolved</span>}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : <span className="dx-cat-empty"><Check size={14} /> No record found</span>}
+      </div>
+    </div>
+  );
+}
+
 function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
   const [tab, setTab] = useState('Diagnosis');
   const [q, setQ] = useState('');
@@ -675,60 +709,26 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
               placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
           </div>
 
-          <div className="col g-2">
-            <span className="t-eyebrow">Recent diagnosis</span>
-            {recent.length ? (
-              <div className="dx-list">
-                {recent.map(c => (
-                  <div className="dx-row" key={c}>
-                    <span className="t-xs subtle dx-date">Today</span>
-                    <span className="grow t-sm">{c}</span>
-                    <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${c}`}
-                      onClick={() => { setCodes(x => x.filter(y => y !== c)); bump(); }}><X size={14} /></button>
-                  </div>
-                ))}
-              </div>
-            ) : <span className="t-sm subtle">No record found.</span>}
-          </div>
+          <DxCategory tone="accent" icon={<Clock size={14} />} title="Recent diagnosis"
+            items={recent.map(c => ({
+              key: c, name: c, meta: 'Today',
+              onAction: () => { setCodes(x => x.filter(y => y !== c)); bump(); }, actionIcon: <X size={13} />,
+              actionLabel: `Remove ${c}`,
+            }))} />
 
-          <div className="col g-2">
-            <span className="t-eyebrow">Long term diagnosis</span>
-            {longTerm.length ? (
-              <div className="dx-list">
-                {longTerm.map(x => (
-                  <div className="dx-row" key={x.text}>
-                    <span className="t-xs t-mono subtle dx-date">{fmtDateDMY(x.onset)}</span>
-                    <span className="grow t-sm">{x.text}
-                      {x.acc && <span className="chip chip-warm" style={{ marginLeft: 6 }}>ACC</span>}
-                    </span>
-                    <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
-                      aria-label={`View ${x.text} in timeline`}
-                      onClick={() => toast('Timeline', x.text, 'info')}><History size={14} /></button>
-                  </div>
-                ))}
-              </div>
-            ) : <span className="t-sm subtle">No record found.</span>}
-          </div>
+          <DxCategory tone="info" icon={<HeartPulse size={14} />} title="Long term diagnosis"
+            items={longTerm.map(x => ({
+              key: x.text, name: x.text, meta: fmtDateDMY(x.onset), acc: x.acc,
+              onAction: () => toast('Timeline', x.text, 'info'), actionIcon: <History size={13} />,
+              actionLabel: `View ${x.text} in timeline`,
+            }))} />
 
-          <div className="col g-2">
-            <span className="t-eyebrow">Short term diagnosis</span>
-            {shortTerm.length ? (
-              <div className="dx-list">
-                {shortTerm.map(x => (
-                  <div className="dx-row" key={x.text}>
-                    <span className="t-xs t-mono subtle dx-date">{fmtDateDMY(x.onset)}</span>
-                    <span className="grow t-sm">{x.text}
-                      {x.acc && <span className="chip chip-warm" style={{ marginLeft: 6 }}>ACC</span>}
-                      <span className="chip" style={{ marginLeft: 6 }}>Resolved</span>
-                    </span>
-                    <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
-                      aria-label={`View ${x.text} in timeline`}
-                      onClick={() => toast('Timeline', x.text, 'info')}><History size={14} /></button>
-                  </div>
-                ))}
-              </div>
-            ) : <span className="t-sm subtle">No record found.</span>}
-          </div>
+          <DxCategory tone="warm" icon={<Activity size={14} />} title="Short term diagnosis"
+            items={shortTerm.map(x => ({
+              key: x.text, name: x.text, meta: fmtDateDMY(x.onset), acc: x.acc, resolved: true,
+              onAction: () => toast('Timeline', x.text, 'info'), actionIcon: <History size={13} />,
+              actionLabel: `View ${x.text} in timeline`,
+            }))} />
 
           <div className="row g-2 wrap">
             {suggestions.map(c => (

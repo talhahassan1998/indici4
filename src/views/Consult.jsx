@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Clock, FileText, SquareCheckBig, Activity, Pill, FlaskConical, TriangleAlert, HeartPulse,
   Shield, Bell, Copy, Eye, Share2, ShieldCheck, LayoutTemplate, Plus, X, Check, Mail,
-  CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen,
+  CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen, Search, History,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
@@ -229,28 +229,7 @@ export default function Consult() {
     </section>
   );
 
-  const CodingCard = (
-    <section className="sect">
-      <div className="sect-hd"><h2>Diagnosis and coding</h2><span className="spacer" />
-        <span className="sect-meta">SNOMED CT · drives recalls, reporting and ACC</span></div>
-      <div className="col g-3">
-        <div className="recip-chips">
-          {codes.length ? codes.map(c => (
-            <span className="chip chip-accent chip-lg chip-removable" key={c}>{c}
-              <button className="x" data-rmcode aria-label={`Remove ${c}`}
-                onClick={() => { setCodes(x => x.filter(y => y !== c)); bump(); }}><X size={11} /></button></span>
-          )) : <span className="t-sm subtle">Nothing coded yet.</span>}
-        </div>
-        <div className="row g-2 wrap">
-          {['Meniscal tear of knee', 'Knee pain', 'Osteoarthritis of knee', 'Work-related injury']
-            .filter(c => !codes.includes(c)).map(c => (
-            <button className="btn btn-secondary btn-sm" key={c} data-addcode
-              onClick={() => { setCodes(x => [...x, c]); bump(); }}><Plus size={12} /> {c}</button>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  const CodingCard = <DiagnosisCoding p={p} codes={codes} setCodes={setCodes} bump={bump} toast={toast} />;
 
   /* A fixed-height shell, like the inbox and the letter editor: the banner and
      the action bar stay put and each of the three columns scrolls on its own.
@@ -459,6 +438,105 @@ function InboxPanel({ p }) {
     <div key={i.id}>
       <b className="t-body">{i.subj}</b><div className="t-sm muted">{i.from}</div></div>
   ))}</div>;
+}
+
+const DX_TABS = ['Diagnosis', 'Procedure Hx', 'Family Hx', 'Social Hx', 'History', 'General comments'];
+const DX_SUGGESTIONS = ['Meniscal tear of knee', 'Knee pain', 'Osteoarthritis of knee', 'Work-related injury'];
+
+/* The diagnosis/coding tool as its own sub-tabbed record, the way the rest
+   of the chart (problems, allergies, immunisations) already reads: dated
+   rows grouped by whether they're the patient's standing history or
+   something just added this consult, not a flat run-on of chips. Only
+   Diagnosis has real data behind it; the other tabs are the same record
+   structure with nothing recorded yet, same as an unused chart section
+   anywhere else in the product. */
+function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
+  const [tab, setTab] = useState('Diagnosis');
+  const [q, setQ] = useState('');
+  const [status, setStatus] = useState('active');
+
+  const longTerm = K.problems.filter(x => x.pt === p.id
+    && (status === 'all' || x.status === status)
+    && (!q.trim() || x.text.toLowerCase().includes(q.trim().toLowerCase())));
+  const suggestions = DX_SUGGESTIONS.filter(c => !codes.includes(c)
+    && (!q.trim() || c.toLowerCase().includes(q.trim().toLowerCase())));
+
+  return (
+    <section className="sect">
+      <div className="sect-hd"><h2>Diagnosis and coding</h2><span className="spacer" />
+        <span className="sect-meta">SNOMED CT · drives recalls, reporting and ACC</span></div>
+
+      <nav className="tabs dx-tabs" role="tablist" aria-label="Patient record section">
+        {DX_TABS.map(t => (
+          <button role="tab" key={t} aria-selected={tab === t} onClick={() => setTab(t)}>{t}</button>
+        ))}
+      </nav>
+
+      {tab !== 'Diagnosis' ? (
+        <Empty icon={<FileText size={22} />} title="Nothing recorded"
+          body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
+      ) : (
+        <div className="col g-4">
+          <div className="row g-3 wrap">
+            <div className="input-group" style={{ maxWidth: 280, flex: '1 1 220px' }}>
+              <span className="ic-lead"><Search size={15} /></span>
+              <input className="input" value={q} onChange={e => setQ(e.target.value)}
+                placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
+            </div>
+            <select className="select" style={{ maxWidth: 160 }} value={status}
+              onChange={e => setStatus(e.target.value)} aria-label="Diagnosis status">
+              <option value="active">Active</option>
+              <option value="resolved">Resolved</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+
+          <div className="col g-2">
+            <span className="t-eyebrow">Long term diagnosis</span>
+            {longTerm.length ? (
+              <div className="dx-list">
+                {longTerm.map(x => (
+                  <div className="dx-row" key={x.text}>
+                    <span className="t-xs t-mono subtle dx-date">{fmtDateDMY(x.onset)}</span>
+                    <span className="grow t-sm">{x.text}
+                      {x.acc && <span className="chip chip-warm" style={{ marginLeft: 6 }}>ACC</span>}
+                      {x.status === 'resolved' && <span className="chip" style={{ marginLeft: 6 }}>Resolved</span>}
+                    </span>
+                    <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
+                      aria-label={`View ${x.text} in timeline`}
+                      onClick={() => toast('Timeline', x.text, 'info')}><History size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            ) : <span className="t-sm subtle">No record found.</span>}
+          </div>
+
+          <div className="col g-2">
+            <span className="t-eyebrow">Added this consult</span>
+            {codes.length ? (
+              <div className="dx-list">
+                {codes.map(c => (
+                  <div className="dx-row" key={c}>
+                    <span className="t-xs subtle dx-date">Today</span>
+                    <span className="grow t-sm">{c}</span>
+                    <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${c}`}
+                      onClick={() => { setCodes(x => x.filter(y => y !== c)); bump(); }}><X size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            ) : <span className="t-sm subtle">Nothing coded yet.</span>}
+          </div>
+
+          <div className="row g-2 wrap">
+            {suggestions.map(c => (
+              <button className="btn btn-secondary btn-sm" key={c} data-addcode
+                onClick={() => { setCodes(x => [...x, c]); bump(); }}><Plus size={12} /> {c}</button>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
 }
 
 function Transcribe({ toast }) {

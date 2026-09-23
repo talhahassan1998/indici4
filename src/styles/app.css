@@ -1026,6 +1026,19 @@ a.cb-contact-row:hover .ic { color: var(--accent-text); }
 
 .soap-field .textarea { min-height: 96px; }
 
+/* Diagnosis & coding — its own dated list, not .work-row's dashboard rhythm:
+   this sits in the wide consult column and reads best as a dense record of
+   rows, each with a date, a name and one action, not a stack of tiles. */
+.dx-tabs { margin-top: -4px; }
+.dx-list { display: flex; flex-direction: column; }
+.dx-row {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: 8px var(--s-2); border-bottom: 1px solid var(--line-faint);
+}
+.dx-row:last-child { border-bottom: 0; }
+.dx-row:hover { background: var(--surface-2); }
+.dx-date { flex: none; width: 78px; }
+
 .consult-foot {
   flex: none; z-index: 25;
   border-top: 1px solid var(--line); border-bottom: 0;

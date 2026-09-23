@@ -4,6 +4,7 @@ import {
   Clock, FileText, SquareCheckBig, Activity, Pill, FlaskConical, TriangleAlert, HeartPulse,
   Shield, Bell, Copy, Eye, Share2, ShieldCheck, LayoutTemplate, Plus, X, Check, Mail,
   CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen, Search, History,
+  Users, Printer, UploadCloud, MessageSquare,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
@@ -41,7 +42,7 @@ const FUNCTIONS = [
   ]},
 ];
 
-const PANELS = ['Prompts', 'Timeline', 'Problems', 'Inbox', 'Transcribe'];
+const PANELS = ['Prompts', 'Timeline', 'Problems', 'Inbox', 'Outbox', 'Transcribe'];
 
 const TEMPLATES = {
   'Orthopaedic assessment': { s: 'Right knee pain following a fall at work.',
@@ -80,6 +81,9 @@ export default function Consult() {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(true);
   const [menu, setMenu] = useState(null);
+  const [noteTab, setNoteTab] = useState('Notes');
+  const [dxQuick, setDxQuick] = useState('');
+  const [tlQuery, setTlQuery] = useState('');
   const [saveState, bump] = useAutosave();
   const timer = useRef(null);
 
@@ -157,46 +161,83 @@ export default function Consult() {
   const NoteCard = (
     <section className="sect sect-lead">
       <div className="sect-hd">
-        <h2>Notes</h2><span className="spacer" />
-        <select className="select" id="noteTpl" style={{ maxWidth: 210 }} aria-label="Notes template" defaultValue=""
-          onChange={e => { const t = TEMPLATES[e.target.value]; if (t) { setNote({ ...t }); bump(); toast('Template applied', 'Edit the wording before signing.', 'ok'); } }}>
-          <option value="">Select notes template…</option>
-          {Object.keys(TEMPLATES).map(t => <option key={t}>{t}</option>)}
-        </select>
-        <button className="btn btn-ghost btn-sm" onClick={() => {
-          const prev = (K.timeline[p.id] || []).find(e => e.kind === 'note');
-          if (!prev) return toast('No earlier consult', 'Nothing to copy forward.', 'warn');
-          setNote(n => ({ ...n, s: prev.body })); bump();
-          toast('Copied forward', 'Pasted into Subjective. Edit before signing.', 'ok');
-        }}><Copy size={14} /> Copy last consult</button>
+        <nav className="tabs" role="tablist" aria-label="Notes or history">
+          <button role="tab" aria-selected={noteTab === 'Notes'} onClick={() => setNoteTab('Notes')}>Notes</button>
+          <button role="tab" aria-selected={noteTab === 'History'} onClick={() => setNoteTab('History')}>History</button>
+        </nav>
+        <span className="spacer" />
+        <button className={`btn btn-sm ${confidential ? 'btn-soft' : 'btn-secondary'}`}
+          onClick={() => { setConfidential(c => !c); bump(); }}><Shield size={13} /> Confidential</button>
+        <button className="btn btn-secondary btn-sm" onClick={() => window.print()}><Printer size={13} /> Print</button>
       </div>
-      <div className="row g-5 wrap">
-        <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
-          <span className="check" role="checkbox" aria-checked={confidential} data-flag="confidential"
-            onClick={() => { setConfidential(c => !c); bump(); }}><Check size={11} /></span> Confidential</label>
-        <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
-          <span className="check" role="checkbox" aria-checked={hidePortal}
-            onClick={() => { setHidePortal(c => !c); bump(); }}><Check size={11} /></span> Hide from patient portal</label>
-        {confidential && <span className="chip chip-bad">Restricted to the care team</span>}
-      </div>
-      <div className="col g-5">
-        {SOAP.map(sx => (
-          <div className="field soap-field" key={sx.k}>
-            <div className="row between">
-              <label className="label" htmlFor={`soap-${sx.k}`}>{sx.label}</label>
-              <button className="btn btn-ghost btn-sm" data-dots={sx.k} onClick={e => setMenu({ anchor: e.currentTarget, items: [
-                { heading: 'Insert a dot phrase' },
-                { icon: <Plus size={15} />, label: '.normalknee · normal knee examination',
-                  action: () => { setSoap(sx.k, (note[sx.k] ? note[sx.k] + ' ' : '') + 'Full range of movement. No effusion. Ligaments stable. Neurovascularly intact.'); } },
-                { icon: <Plus size={15} />, label: '.noredflags · no red flags',
-                  action: () => { setSoap(sx.k, (note[sx.k] ? note[sx.k] + ' ' : '') + 'No night pain, no weight loss, no fevers.'); } },
-              ]})}><Plus size={12} /> Go to dots</button>
+
+      {noteTab === 'History' ? <TimelinePanel p={p} /> : (
+        <>
+          <div className="field">
+            <label className="label" htmlFor="dxQuick">Diagnosis</label>
+            <div className="input-group">
+              <span className="ic-lead"><Search size={15} /></span>
+              <input className="input" id="dxQuick" value={dxQuick} placeholder="Add a diagnosis or clinical code…"
+                onChange={e => setDxQuick(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key !== 'Enter' || !dxQuick.trim()) return;
+                  const c = dxQuick.trim();
+                  setCodes(x => x.includes(c) ? x : [...x, c]); setDxQuick(''); bump();
+                  toast('Diagnosis added', 'Also listed under Diagnosis / coding.', 'ok');
+                }} />
             </div>
-            <textarea className="textarea" id={`soap-${sx.k}`} rows={4} placeholder={sx.ph}
-              value={note[sx.k]} onChange={e => setSoap(sx.k, e.target.value)} />
+            {codes.length > 0 && (
+              <div className="recip-chips" style={{ marginTop: 8 }}>
+                {codes.map(c => (
+                  <span className="chip chip-accent chip-removable" key={c}>{c}
+                    <button className="x" aria-label={`Remove ${c}`}
+                      onClick={() => { setCodes(x => x.filter(y => y !== c)); bump(); }}><X size={11} /></button></span>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
+
+          <div className="row g-3 wrap">
+            <select className="select" id="noteTpl" style={{ maxWidth: 210 }} aria-label="Notes template" defaultValue=""
+              onChange={e => { const t = TEMPLATES[e.target.value]; if (t) { setNote({ ...t }); bump(); toast('Template applied', 'Edit the wording before signing.', 'ok'); } }}>
+              <option value="">Select notes template…</option>
+              {Object.keys(TEMPLATES).map(t => <option key={t}>{t}</option>)}
+            </select>
+            <button className="btn btn-ghost btn-sm" onClick={() => {
+              const prev = (K.timeline[p.id] || []).find(e => e.kind === 'note');
+              if (!prev) return toast('No earlier consult', 'Nothing to copy forward.', 'warn');
+              setNote(n => ({ ...n, s: prev.body })); bump();
+              toast('Copied forward', 'Pasted into Subjective. Edit before signing.', 'ok');
+            }}><Copy size={14} /> Copy last consult</button>
+          </div>
+
+          <div className="row g-5 wrap">
+            <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
+              <span className="check" role="checkbox" aria-checked={hidePortal}
+                onClick={() => { setHidePortal(c => !c); bump(); }}><Check size={11} /></span> Hide from patient portal</label>
+            {confidential && <span className="chip chip-bad">Restricted to the care team</span>}
+          </div>
+
+          <div className="col g-5">
+            {SOAP.map(sx => (
+              <div className="field soap-field" key={sx.k}>
+                <div className="row between">
+                  <label className="label" htmlFor={`soap-${sx.k}`}>{sx.label}</label>
+                  <button className="btn btn-ghost btn-sm" data-dots={sx.k} onClick={e => setMenu({ anchor: e.currentTarget, items: [
+                    { heading: 'Insert a dot phrase' },
+                    { icon: <Plus size={15} />, label: '.normalknee · normal knee examination',
+                      action: () => { setSoap(sx.k, (note[sx.k] ? note[sx.k] + ' ' : '') + 'Full range of movement. No effusion. Ligaments stable. Neurovascularly intact.'); } },
+                    { icon: <Plus size={15} />, label: '.noredflags · no red flags',
+                      action: () => { setSoap(sx.k, (note[sx.k] ? note[sx.k] + ' ' : '') + 'No night pain, no weight loss, no fevers.'); } },
+                  ]})}><Plus size={12} /> Go to dots</button>
+                </div>
+                <textarea className="textarea" id={`soap-${sx.k}`} rows={4} placeholder={sx.ph}
+                  value={note[sx.k]} onChange={e => setSoap(sx.k, e.target.value)} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 
@@ -240,35 +281,63 @@ export default function Consult() {
       <div className="consult-banner">
         <div className="cb-row">
           <Avatar id={p.id} size="lg" />
-          <div className="cb-id">
-            <Link className="cb-name" to={`/patient/${p.id}`}>{K.displayName(p)}</Link>
-            <div className="cb-sub">
-              <span>{age(p.dob)}yo</span><span className="dot-sep">·</span>
-              <span>{fmtDateDMY(p.dob)}</span><span className="dot-sep">·</span>
-              <span>{p.sex}</span><span className="dot-sep">·</span>
-              <span className="t-mono">{p.nhi}</span>
+          <div className="cb-id grow">
+            <div className="cb-name-line">
+              <Link className="cb-name" to={`/patient/${p.id}`}>{K.displayName(p)}</Link>
+              <span className="cb-sub">DOB {fmtDateDMY(p.dob)} · {age(p.dob)} Y · {p.sex === 'F' ? 'Female' : 'Male'}</span>
+            </div>
+            <div className="cb-pills">
+              <a className="cb-pill" href={`tel:${p.phone}`}><Phone size={12} className="ic" />{p.phone}</a>
+              <a className="cb-pill" href={`mailto:${p.email}`}><Mail size={12} className="ic" />{p.email}</a>
+              <span className="cb-pill"><MapPin size={12} className="ic" />{p.addr}</span>
             </div>
           </div>
-          <span className="cb-divider" aria-hidden="true" />
-          <div className="cb-contact">
-            <a className="cb-contact-row" href={`mailto:${p.email}`}><Mail size={13} className="ic" />{p.email}</a>
-            <a className="cb-contact-row" href={`tel:${p.phone}`}><Phone size={13} className="ic" />{p.phone}</a>
-            <span className="cb-contact-row"><MapPin size={13} className="ic" />{p.addr}</span>
-          </div>
-          <span className="cb-divider" aria-hidden="true" />
-          <div className="cb-quick">
-            <button className="btn btn-soft btn-icon tip" data-tip="Book appointment"
-              aria-label="Book appointment" onClick={() => nav('/appointments')}><CalendarDays size={16} /></button>
-            <button className="btn btn-soft btn-icon tip" data-tip="Edit patient details"
-              aria-label="Edit patient details" onClick={() => toast('Edit', 'Demographics form would open.', 'info')}><SquarePen size={16} /></button>
-          </div>
-          <span className="spacer" />
-          <div className="cb-alerts">
-            {p.alerts.map(a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>)}
-            {p.warn.map(a => <span className="alert-badge warn" key={a}>{a}</span>)}
-            {p.claim && <span className="chip chip-warm">{p.claim}</span>}
+          <div className="col g-2" style={{ alignItems: 'flex-end', flex: 'none' }}>
+            <div className="cb-badges">
+              <span className="chip chip-ok">NHI {p.nhi}</span>
+              {p.csc && <span className="chip chip-info">Community Services Card</span>}
+              <span className="chip">{p.ethnicity}</span>
+              {p.claim && <span className="chip chip-warm">{p.claim}</span>}
+            </div>
+            <div className="cb-actions">
+              <button className="btn btn-secondary btn-sm"
+                onClick={() => toast('Edit', 'Demographics form would open.', 'info')}><SquarePen size={13} /> Edit</button>
+              <button className="btn btn-secondary btn-sm"
+                onClick={() => nav(`/patient/${p.id}/timeline`)}><History size={13} /> History</button>
+              <button className="btn btn-secondary btn-sm"
+                onClick={() => toast('Care team', 'Care team panel would open.', 'info')}><Users size={13} /> Care Team</button>
+            </div>
           </div>
         </div>
+
+        <div className="qg-cards">
+          <QuickCard tone="ok" icon={<FileText size={14} />} title="Problem List"
+            items={K.problems.filter(x => x.pt === p.id && x.status === 'active')}
+            onAdd={() => setFn('coding')}
+            renderItem={x => <span className="t-sm" key={x.text}>{x.text}</span>} />
+          <QuickCard tone="info" icon={<Pill size={14} />} title="Long Term Medications"
+            items={K.prescriptions.filter(r => r.pt === p.id)}
+            onAdd={() => setFn('meds')}
+            renderItem={r => <span className="t-sm" key={r.id}>{K.med(r.med).name}</span>} />
+          <QuickCard tone="bad" icon={<TriangleAlert size={14} />} title="Allergies / Adverse Reactions"
+            items={p.alerts} onAdd={() => setFn('allergy')}
+            renderItem={a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>} />
+          <QuickCard tone="warm" icon={<Bell size={14} />} title="Alerts"
+            items={p.warn} onAdd={() => setFn('allergy')}
+            renderItem={a => <span className="alert-badge warn" key={a}>{a}</span>} />
+        </div>
+
+        <div className="qa-row">
+          <button className="qa-pill" onClick={() => setFn('notes')}><FileText size={14} /> New Note</button>
+          <button className="qa-pill" onClick={() => setFn('meds')}><Pill size={14} /> Prescribe</button>
+          <button className="qa-pill" onClick={() => setFn('invest')}><FlaskConical size={14} /> Order Labs</button>
+          <button className="qa-pill" onClick={() => setFn('referral')}><Share2 size={14} /> Referral</button>
+          <button className="qa-pill" onClick={() => setFn('docs')}><UploadCloud size={14} /> Upload Document</button>
+          <button className="qa-pill" onClick={() => { setPanel('Inbox'); toast('Message', 'Compose a secure message.', 'info'); }}>
+            <MessageSquare size={14} /> Send Message</button>
+          <button className="qa-pill" onClick={() => window.print()}><Printer size={14} /> Print Summary</button>
+        </div>
+
         <dl className="cb-facts-strip">
           <div><dt>Chart</dt><dd className="t-mono">{p.chart}</dd></div>
           <div><dt>Provider</dt><dd>{K.st(p.provider).name}</dd></div>
@@ -276,7 +345,6 @@ export default function Consult() {
           <div><dt>GMS</dt><dd>{p.gms} {p.fund === 'F' ? <span className="chip chip-ok">Funded</span> : <span className="chip chip-warn">Not funded</span>}</dd></div>
           <div><dt>Balance</dt><dd className={bal > 0 ? 'bad-t' : ''}><b>{money(bal)}</b></dd></div>
           <div><dt>Quintile</dt><dd>{p.quintile} <span className="subtle">· DHB {p.dhb}</span></dd></div>
-          <div><dt>Ethnicity</dt><dd>{p.ethnicity}</dd></div>
           <div><dt>Portal</dt><dd>{p.portal ? 'Registered' : <span className="subtle">Not registered</span>}</dd></div>
         </dl>
         <div className="cb-strip">
@@ -331,10 +399,19 @@ export default function Consult() {
               ))}
             </nav>
             <div className="card-bd">
+              {panel === 'Timeline' && (
+                <div className="input-group" style={{ marginBottom: 12 }}>
+                  <span className="ic-lead"><Search size={14} /></span>
+                  <input className="input" value={tlQuery} onChange={e => setTlQuery(e.target.value)}
+                    placeholder="Search timeline…" aria-label="Search timeline" />
+                </div>
+              )}
               {panel === 'Prompts' && <Prompts p={p} toast={toast} />}
-              {panel === 'Timeline' && <TimelinePanel p={p} />}
+              {panel === 'Timeline' && <TimelinePanel p={p} query={tlQuery} />}
               {panel === 'Problems' && <ProblemsPanel p={p} />}
               {panel === 'Inbox' && <InboxPanel p={p} />}
+              {panel === 'Outbox' && <Empty icon={<Mail size={22} />} title="Nothing sent"
+                body="Referrals and letters sent from this consult will appear here." />}
               {panel === 'Transcribe' && <Transcribe toast={toast} />}
             </div>
           </section>
@@ -350,6 +427,24 @@ export default function Consult() {
         <button className="btn btn-primary btn-sm" onClick={() => sign(true)}><Mail size={14} /> Sign and write letter</button>
       </div>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
+    </div>
+  );
+}
+
+/* One of the four quick-glance cards under the patient header — problems,
+   long-term medications, allergies, alerts. Same shape whichever list it
+   holds, so scanning across all four means learning the layout once. */
+function QuickCard({ tone, icon, title, items, onAdd, renderItem }) {
+  return (
+    <div className={`qg-card is-${tone}`}>
+      <div className="qg-hd">{icon}<b className="truncate">{title}</b><span className="spacer" />
+        <button className="btn btn-ghost btn-sm" onClick={onAdd}><Plus size={13} /> Add</button>
+      </div>
+      <div className="qg-bd">
+        {items.length
+          ? <div className="qg-list">{items.map(renderItem)}</div>
+          : <span className="qg-empty"><Check size={14} /> No records found</span>}
+      </div>
     </div>
   );
 }
@@ -387,19 +482,26 @@ function Prompts({ p, toast }) {
   );
 }
 
-function TimelinePanel({ p }) {
-  const ev = (K.timeline[p.id] || []).slice(0, 6);
+function TimelinePanel({ p, query = '' }) {
+  const q = query.trim().toLowerCase();
+  const ev = (K.timeline[p.id] || [])
+    .filter(e => !q || e.title.toLowerCase().includes(q) || (e.body || '').toLowerCase().includes(q))
+    .slice(0, 8);
   return (
     <div className="col g-3">
       <div className="t-eyebrow">{fmtLongDate(K.TODAY)}</div>
       {ev.length ? ev.map((e, i) => (
-        <div className="row g-3" style={{ padding: '9px 0', borderBottom: '1px solid var(--line-faint)' }} key={i}>
-          <span className={`feed-ic ${e.kind}`} style={{ width: 26, height: 26 }}><FileText size={13} /></span>
-          <span className="grow" style={{ minWidth: 0 }}>
-            <b className="t-xs" style={{ display: 'block' }}>{e.title}</b>
-            <span className="t-xs subtle">{fmtDateShort(e.at.slice(0, 10))} · {fmtClock(e.at)}</span></span>
+        <div className="tl-entry" key={i}>
+          <div className="row g-3">
+            <span className={`feed-ic ${e.kind}`} style={{ width: 26, height: 26 }}><FileText size={13} /></span>
+            <span className="grow" style={{ minWidth: 0 }}>
+              <b className="t-xs" style={{ display: 'block' }}>{e.title}</b>
+              <span className="t-xs subtle">{e.by ? `${K.st(e.by).name} · ` : ''}{fmtDateShort(e.at.slice(0, 10))} · {fmtClock(e.at)}</span>
+            </span>
+          </div>
+          {e.body && <p className="t-xs muted tl-entry-body">{e.body}</p>}
         </div>
-      )) : <span className="t-sm subtle">Nothing recorded yet.</span>}
+      )) : <span className="t-sm subtle">{q ? 'No matching entries.' : 'Nothing recorded yet.'}</span>}
     </div>
   );
 }

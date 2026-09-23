@@ -705,6 +705,12 @@
 .feed-card:hover { box-shadow: inset 0 0 0 1px var(--line-strong), var(--sh-1); }
 .feed-date { font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-subtle); padding: 0 0 var(--s-3) 46px; }
 
+/* Consult's own timeline entries — a fuller preview than the feed cards
+   above, since it doubles as the Notes screen's History tab. */
+.tl-entry { padding: 9px 0; border-bottom: 1px solid var(--line-faint); }
+.tl-entry:last-child { border-bottom: 0; }
+.tl-entry-body { margin: 6px 0 0; line-height: 1.45; }
+
 /* ------------------------------------------------------------- Letter editor */
 .ed-shell { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - var(--topbar-h)); overflow: hidden; }
 .ed-shell.with-ai { grid-template-columns: minmax(0,1fr) minmax(0,1fr) 340px; }
@@ -943,32 +949,64 @@
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
-.cb-row { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
-.cb-id { min-width: 170px; }
+.cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
+.cb-id { min-width: 240px; }
+.cb-name-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .cb-name {
   font-size: var(--fs-xl); font-weight: var(--fw-x); letter-spacing: -0.02em;
   color: var(--text); text-decoration: none; line-height: 1.2;
-  display: inline-flex; align-items: center; min-height: var(--h-md);
 }
 .cb-name:hover { color: var(--accent-text); }
-.cb-sub { display: flex; gap: 7px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
+.cb-sub { font-size: var(--fs-xs); color: var(--text-muted); }
 
-/* A hairline column rule, like the reference strap: it separates identity,
-   contact and quick actions without boxing each into its own card. */
-.cb-divider { align-self: stretch; width: 1px; background: var(--line); flex: none; }
-
-.cb-contact { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.cb-contact-row {
-  display: flex; align-items: center; gap: 6px; min-width: 0;
+/* Contact as pills, not a plain list: matches the reference strap and reads
+   as "on file", each one independently tappable (tel:/mailto:). */
+.cb-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.cb-pill {
+  display: inline-flex; align-items: center; gap: 6px; min-width: 0;
+  padding: 5px 12px; border-radius: var(--r-pill); background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line-faint);
   font-size: var(--fs-xs); color: var(--text-muted); text-decoration: none;
 }
-.cb-contact-row .ic { flex: none; color: var(--text-subtle); }
-a.cb-contact-row:hover { color: var(--accent-text); }
-a.cb-contact-row:hover .ic { color: var(--accent-text); }
+.cb-pill .ic { flex: none; color: var(--text-subtle); }
+a.cb-pill:hover { background: var(--accent-soft); color: var(--accent-text); }
+a.cb-pill:hover .ic { color: var(--accent-text); }
 
-.cb-quick { display: flex; gap: 6px; flex: none; }
+.cb-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.cb-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
-.cb-alerts { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: none; max-width: 260px; }
+/* Quick-glance cards — problems, long-term meds, allergies and alerts at a
+   glance, each with its own accent so the eye can jump straight to the
+   coloured edge that matters (green record, red safety, amber warning). */
+.qg-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--s-3); padding: 0 var(--s-6) var(--s-4);
+}
+.qg-card {
+  display: flex; flex-direction: column; min-width: 0;
+  border: 1px solid var(--line); border-top: 3px solid var(--line);
+  border-radius: var(--r-md); background: var(--surface); overflow: hidden;
+}
+.qg-card.is-ok   { border-top-color: var(--ok-fg); }
+.qg-card.is-info { border-top-color: var(--info-fg); }
+.qg-card.is-bad  { border-top-color: var(--bad-fg); }
+.qg-card.is-warm { border-top-color: var(--warm); }
+.qg-hd { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border-bottom: 1px solid var(--line-faint); }
+.qg-hd b { font-size: var(--fs-xs); font-weight: var(--fw-semi); flex: 1 1 auto; min-width: 0; }
+.qg-bd { padding: 10px 12px; min-height: 40px; display: flex; align-items: center; }
+.qg-list { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+.qg-empty { display: flex; align-items: center; gap: 6px; color: var(--text-subtle); font-size: var(--fs-sm); }
+
+/* Quick action pills — the consult's most common next steps, one tap away
+   regardless of which function-rail item is currently open. */
+.qa-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 var(--s-6) var(--s-4); }
+.qa-pill {
+  display: inline-flex; align-items: center; gap: 7px; border: 0; cursor: pointer;
+  padding: 8px 14px; border-radius: var(--r-pill); background: var(--accent-soft);
+  color: var(--accent-text); font-size: var(--fs-sm); font-weight: var(--fw-medium);
+  transition: background var(--dur-1) var(--ease);
+}
+.qa-pill:hover { background: var(--accent-soft-2); }
 
 /* Facts read as a table of labelled values, not a run-on sentence of chips.
    Demoted to a quieter second line under the strap: identity, contact and
@@ -1062,7 +1100,7 @@ a.cb-contact-row:hover .ic { color: var(--accent-text); }
   .consult-foot { position: sticky; bottom: 0; }
 }
 @media (max-width: 900px) {
-  .cb-alerts { align-items: flex-start; max-width: none; flex-direction: row; flex-wrap: wrap; }
+  .cb-badges, .cb-actions { justify-content: flex-start; }
 }
 
 /* ==========================================================================

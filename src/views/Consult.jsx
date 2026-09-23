@@ -316,9 +316,11 @@ export default function Consult() {
         </nav>
 
         <div className="consult-main col g-7">
-          {fn === 'meas' ? <>{MeasCard}{NoteCard}</>
-            : fn === 'coding' ? <>{CodingCard}{NoteCard}</>
-            : <>{NoteCard}{MeasCard}{CodingCard}</>}
+          {fn === 'meas' ? MeasCard
+            : fn === 'coding' ? CodingCard
+            : fn === 'notes' ? NoteCard
+            : <Empty icon={<FileText size={22} />} title="Not built in this prototype"
+                body="This section isn't wired up yet — try Notes, Measurements or Diagnosis / coding." />}
         </div>
 
         <div className="consult-side">

@@ -647,10 +647,10 @@ const DX_SUGGESTIONS = ['Meniscal tear of knee', 'Knee pain', 'Osteoarthritis of
    anywhere else in the product. */
 /* Each diagnosis category is its own card, coloured so the three read as
    distinct records rather than one long list split by a label — and each
-   holds its diagnoses in a real data grid (a header row naming the columns,
-   then one row per diagnosis), not a wrap of tiles, so it reads the way a
-   record grid does anywhere else in the product. */
-function DxCategory({ tone, icon, title, items, dateLabel = 'Date' }) {
+   uses the same .ps-grid table the Patients list and the Appointments grid
+   view already use, so a record grid looks like a record grid everywhere
+   in the product rather than growing its own one-off layout per screen. */
+function DxCategory({ tone, icon, title, items }) {
   return (
     <div className={`dx-cat is-${tone}`}>
       <div className="dx-cat-hd">
@@ -660,21 +660,29 @@ function DxCategory({ tone, icon, title, items, dateLabel = 'Date' }) {
       </div>
       <div className="dx-cat-bd">
         {items.length ? (
-          <div className="dx-table">
-            <div className="dx-table-row is-hd">
-              <span>{dateLabel}</span><span>Name</span><span>Actions</span>
-            </div>
-            {items.map(it => (
-              <div className="dx-table-row" key={it.key}>
-                <span className="t-xs t-mono subtle">{it.meta}</span>
-                <span className="dx-table-name">{it.name}
-                  {it.acc && <span className="chip chip-warm">ACC</span>}
-                  {it.resolved && <span className="chip">Resolved</span>}
-                </span>
-                <button className="btn btn-ghost btn-icon btn-sm tip" data-tip={it.actionLabel}
-                  aria-label={it.actionLabel} onClick={it.onAction}>{it.actionIcon}</button>
-              </div>
-            ))}
+          <div className="ps-grid is-embedded">
+            <table>
+              <thead><tr><th>Added</th><th>Onset</th><th>Name</th><th>Actions</th></tr></thead>
+              <tbody>
+                {items.map(it => (
+                  <tr key={it.key}>
+                    <td className="t-mono t-xs">{it.added}</td>
+                    <td className="t-mono t-xs">{it.onset}</td>
+                    <td>
+                      <span className="row g-2">
+                        <b className="t-sm">{it.name}</b>
+                        {it.acc && <span className="chip chip-warm">ACC</span>}
+                        {it.resolved && <span className="chip">Resolved</span>}
+                      </span>
+                    </td>
+                    <td>
+                      <button className="btn btn-ghost btn-icon btn-sm tip" data-tip={it.actionLabel}
+                        aria-label={it.actionLabel} onClick={it.onAction}>{it.actionIcon}</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : <span className="dx-cat-empty"><Check size={14} /> No record found</span>}
       </div>
@@ -707,25 +715,28 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
               placeholder="Find a procedure…" aria-label="Find a procedure" />
           </div>
           {procs.length ? (
-            <div className="dx-table">
-              <div className="dx-table-row is-hd dx-table-row-proc">
-                <span>Onset</span><span>Name</span><span>Provider</span><span>Actions</span>
-              </div>
-              {procs.map(x => (
-                <div className="dx-table-row dx-table-row-proc" key={x.name}>
-                  <span className="t-xs t-mono subtle">{fmtDateDMY(x.onset)}</span>
-                  <span className="dx-table-name">
-                    <span className="col" style={{ gap: 2 }}>
-                      <b>{x.name}</b>
-                      {x.note && <span className="t-xs subtle" style={{ fontStyle: 'italic', fontWeight: 'normal' }}>{x.note}</span>}
-                    </span>
-                  </span>
-                  <span className="t-xs subtle">{K.st(x.provider).name}</span>
-                  <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
-                    aria-label={`View ${x.name} in timeline`}
-                    onClick={() => toast('Timeline', x.name, 'info')}><History size={13} /></button>
-                </div>
-              ))}
+            <div className="ps-grid is-embedded">
+              <table>
+                <thead><tr><th>Added</th><th>Onset</th><th>Name</th><th>Provider</th><th>Actions</th></tr></thead>
+                <tbody>
+                  {procs.map(x => (
+                    <tr key={x.name}>
+                      <td className="t-mono t-xs">{fmtDateDMY(x.added)}</td>
+                      <td className="t-mono t-xs">{fmtDateDMY(x.onset)}</td>
+                      <td className="wrap-cell">
+                        <b className="t-sm">{x.name}</b>
+                        {x.note && <span className="t-xs subtle" style={{ display: 'block', fontStyle: 'italic' }}>{x.note}</span>}
+                      </td>
+                      <td className="t-xs subtle">{K.st(x.provider).name}</td>
+                      <td>
+                        <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
+                          aria-label={`View ${x.name} in timeline`}
+                          onClick={() => toast('Timeline', x.name, 'info')}><History size={13} /></button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : <span className="t-sm subtle">No record found.</span>}
         </div>
@@ -740,23 +751,23 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
               placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
           </div>
 
-          <DxCategory tone="accent" icon={<Clock size={14} />} title="Recent diagnosis" dateLabel="Added"
+          <DxCategory tone="accent" icon={<Clock size={14} />} title="Recent diagnosis"
             items={recent.map(c => ({
-              key: c, name: c, meta: 'Today',
+              key: c, name: c, added: 'Today', onset: 'Today',
               onAction: () => { setCodes(x => x.filter(y => y !== c)); bump(); }, actionIcon: <X size={13} />,
               actionLabel: `Remove ${c}`,
             }))} />
 
-          <DxCategory tone="info" icon={<HeartPulse size={14} />} title="Long term diagnosis" dateLabel="Onset"
+          <DxCategory tone="info" icon={<HeartPulse size={14} />} title="Long term diagnosis"
             items={longTerm.map(x => ({
-              key: x.text, name: x.text, meta: fmtDateDMY(x.onset), acc: x.acc,
+              key: x.text, name: x.text, added: fmtDateDMY(x.added), onset: fmtDateDMY(x.onset), acc: x.acc,
               onAction: () => toast('Timeline', x.text, 'info'), actionIcon: <History size={13} />,
               actionLabel: `View ${x.text} in timeline`,
             }))} />
 
-          <DxCategory tone="warm" icon={<Activity size={14} />} title="Short term diagnosis" dateLabel="Onset"
+          <DxCategory tone="warm" icon={<Activity size={14} />} title="Short term diagnosis"
             items={shortTerm.map(x => ({
-              key: x.text, name: x.text, meta: fmtDateDMY(x.onset), acc: x.acc, resolved: true,
+              key: x.text, name: x.text, added: fmtDateDMY(x.added), onset: fmtDateDMY(x.onset), acc: x.acc, resolved: true,
               onAction: () => toast('Timeline', x.text, 'info'), actionIcon: <History size={13} />,
               actionLabel: `View ${x.text} in timeline`,
             }))} />

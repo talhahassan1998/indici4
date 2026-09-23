@@ -112,17 +112,20 @@ const recalls = [
   { pt:'p12', kind:'Monitoring',       text:'Methotrexate bloods, 3 monthly', due:'2026-09-20', status:'due' },
 ];
 
+/* onset: when the problem actually began · added: when it was charted into
+   the record — often the same day, but not always (a long-standing
+   condition is frequently coded well after its real onset). */
 const problems = [
-  { pt:'p1',  text:'Medial meniscal tear, right knee', onset:'2026-07-28', status:'active',   acc:true  },
-  { pt:'p1',  text:'Osteoarthritis, medial compartment', onset:'2024-02-10', status:'active', acc:false },
-  { pt:'p1',  text:'Iron deficiency anaemia',          onset:'2021-06-04', status:'resolved', acc:false },
-  { pt:'p12', text:'Seropositive rheumatoid arthritis', onset:'2026-08-30', status:'active',  acc:false },
+  { pt:'p1',  text:'Medial meniscal tear, right knee', onset:'2026-07-28', added:'2026-07-29', status:'active',   acc:true  },
+  { pt:'p1',  text:'Osteoarthritis, medial compartment', onset:'2024-02-10', added:'2026-09-14', status:'active', acc:false },
+  { pt:'p1',  text:'Iron deficiency anaemia',          onset:'2021-06-04', added:'2021-06-10', status:'resolved', acc:false },
+  { pt:'p12', text:'Seropositive rheumatoid arthritis', onset:'2026-08-30', added:'2026-08-30', status:'active',  acc:false },
 ];
 
 const procedures = [
-  { pt:'p1',  name:'Diagnostic arthroscopy, right knee',   onset:'2026-08-04', provider:'u1', note:'Day surgery, uncomplicated' },
-  { pt:'p1',  name:'Corticosteroid injection, right knee', onset:'2026-07-30', provider:'u1' },
-  { pt:'p12', name:'Joint aspiration, right wrist',        onset:'2026-08-30', provider:'u3' },
+  { pt:'p1',  name:'Diagnostic arthroscopy, right knee',   onset:'2026-08-04', added:'2026-08-04', provider:'u1', note:'Day surgery, uncomplicated' },
+  { pt:'p1',  name:'Corticosteroid injection, right knee', onset:'2026-07-30', added:'2026-07-30', provider:'u1' },
+  { pt:'p12', name:'Joint aspiration, right wrist',        onset:'2026-08-30', added:'2026-08-30', provider:'u3' },
 ];
 
 const consultTypes = ['Note only', 'Face to face', 'Telehealth', 'Phone', 'Home visit', 'Nurse consult', 'ACC review'];

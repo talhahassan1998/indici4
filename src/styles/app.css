@@ -1134,23 +1134,12 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
 }
 .dx-cat-bd { padding: var(--s-4); }
 .dx-cat-empty { display: flex; align-items: center; gap: 6px; color: var(--text-subtle); font-size: var(--fs-sm); }
-/* A real data grid — a labelled header row, then one row per diagnosis on
-   the same columns, like any other record grid in the product. */
-.dx-table { border: 1px solid var(--line-faint); border-radius: var(--r-md); overflow: hidden; }
-.dx-table-row {
-  display: grid; grid-template-columns: 100px 1fr 40px; align-items: center; gap: var(--s-3);
-  padding: 8px var(--s-3); border-bottom: 1px solid var(--line-faint);
-  transition: background var(--dur-1) var(--ease);
-}
-.dx-table-row:last-child { border-bottom: 0; }
-.dx-table-row:not(.is-hd):hover { background: var(--surface-2); }
-.dx-table-row.is-hd {
-  background: var(--surface-2); font-size: var(--fs-2xs); font-weight: var(--fw-bold);
-  letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-subtle);
-}
-.dx-table-name { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: var(--fs-sm); font-weight: var(--fw-medium); }
-.dx-table-row .btn { justify-self: end; }
-.dx-table-row-proc { grid-template-columns: 100px 1fr 140px 40px; }
+/* Diagnosis and procedure records use the shared .ps-grid table styling
+   (see the Patients list and the Appointments grid view) rather than a
+   one-off layout, so a record grid looks the same everywhere. Elsewhere
+   .ps-grid gets its border from the .grid-panel it sits in; here there is
+   no such panel, so the border is added directly where it's embedded. */
+.ps-grid.is-embedded { border: 1px solid var(--line-faint); border-radius: var(--r-md); overflow: hidden; }
 
 .consult-foot {
   flex: none; z-index: 25;

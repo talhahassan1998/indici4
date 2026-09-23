@@ -128,6 +128,13 @@ const procedures = [
   { pt:'p12', name:'Joint aspiration, right wrist',        onset:'2026-08-30', added:'2026-08-30', provider:'u3' },
 ];
 
+const familyHistory = [
+  { id:'fh1', pt:'p1', date:'2026-09-10', name:'Hemi Ngata Sr', relation:'Father', relType:'Biological',
+    disease:'Type 2 diabetes', alive:true,  ageDiagnosed:'52', ageOfDeath:'', notes:'Diet-controlled.', confidential:false },
+  { id:'fh2', pt:'p1', date:'2026-09-10', name:'Mere Ngata',    relation:'Mother', relType:'Biological',
+    disease:'Breast cancer',   alive:false, ageDiagnosed:'61', ageOfDeath:'67',   notes:'',                confidential:false },
+];
+
 const consultTypes = ['Note only', 'Face to face', 'Telehealth', 'Phone', 'Home visit', 'Nurse consult', 'ACC review'];
 
 
@@ -558,7 +565,7 @@ const KORA = {
   TODAY, GST, clinics, staff, clinicians, gps, patients, apptTypes, appts, blocks,
   letters, letterTemplates, inbox, invoices, accQueue, accHistory, tasks, timeline, notes,
   billingCodes, XERO_SYNC, org, timetables, pharmacies, medicines, prescriptions, ENROL_STATUS,
-  recalls, problems, procedures, consultTypes,
+  recalls, problems, procedures, familyHistory, consultTypes,
   testProviders, testCatalogue, testRequests,
 
   /* ---- lookups ---- */

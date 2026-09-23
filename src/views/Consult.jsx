@@ -648,13 +648,12 @@ const DX_SUGGESTIONS = ['Meniscal tear of knee', 'Knee pain', 'Osteoarthritis of
 function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
   const [tab, setTab] = useState('Diagnosis');
   const [q, setQ] = useState('');
-  const [status, setStatus] = useState('active');
+  const matchesQ = text => !q.trim() || text.toLowerCase().includes(q.trim().toLowerCase());
 
-  const longTerm = K.problems.filter(x => x.pt === p.id
-    && (status === 'all' || x.status === status)
-    && (!q.trim() || x.text.toLowerCase().includes(q.trim().toLowerCase())));
-  const suggestions = DX_SUGGESTIONS.filter(c => !codes.includes(c)
-    && (!q.trim() || c.toLowerCase().includes(q.trim().toLowerCase())));
+  const recent = codes.filter(matchesQ);
+  const longTerm = K.problems.filter(x => x.pt === p.id && x.status === 'active' && matchesQ(x.text));
+  const shortTerm = K.problems.filter(x => x.pt === p.id && x.status === 'resolved' && matchesQ(x.text));
+  const suggestions = DX_SUGGESTIONS.filter(c => !codes.includes(c) && matchesQ(c));
 
   return (
     <section className="sect">
@@ -670,18 +669,26 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
       ) : (
         <div className="col g-4">
-          <div className="row g-3 wrap">
-            <div className="input-group" style={{ maxWidth: 280, flex: '1 1 220px' }}>
-              <span className="ic-lead"><Search size={15} /></span>
-              <input className="input" value={q} onChange={e => setQ(e.target.value)}
-                placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
-            </div>
-            <select className="select" style={{ maxWidth: 160 }} value={status}
-              onChange={e => setStatus(e.target.value)} aria-label="Diagnosis status">
-              <option value="active">Active</option>
-              <option value="resolved">Resolved</option>
-              <option value="all">All</option>
-            </select>
+          <div className="input-group" style={{ maxWidth: 320 }}>
+            <span className="ic-lead"><Search size={15} /></span>
+            <input className="input" value={q} onChange={e => setQ(e.target.value)}
+              placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
+          </div>
+
+          <div className="col g-2">
+            <span className="t-eyebrow">Recent diagnosis</span>
+            {recent.length ? (
+              <div className="dx-list">
+                {recent.map(c => (
+                  <div className="dx-row" key={c}>
+                    <span className="t-xs subtle dx-date">Today</span>
+                    <span className="grow t-sm">{c}</span>
+                    <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${c}`}
+                      onClick={() => { setCodes(x => x.filter(y => y !== c)); bump(); }}><X size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            ) : <span className="t-sm subtle">No record found.</span>}
           </div>
 
           <div className="col g-2">
@@ -693,7 +700,6 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
                     <span className="t-xs t-mono subtle dx-date">{fmtDateDMY(x.onset)}</span>
                     <span className="grow t-sm">{x.text}
                       {x.acc && <span className="chip chip-warm" style={{ marginLeft: 6 }}>ACC</span>}
-                      {x.status === 'resolved' && <span className="chip" style={{ marginLeft: 6 }}>Resolved</span>}
                     </span>
                     <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
                       aria-label={`View ${x.text} in timeline`}
@@ -705,19 +711,23 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
           </div>
 
           <div className="col g-2">
-            <span className="t-eyebrow">Added this consult</span>
-            {codes.length ? (
+            <span className="t-eyebrow">Short term diagnosis</span>
+            {shortTerm.length ? (
               <div className="dx-list">
-                {codes.map(c => (
-                  <div className="dx-row" key={c}>
-                    <span className="t-xs subtle dx-date">Today</span>
-                    <span className="grow t-sm">{c}</span>
-                    <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${c}`}
-                      onClick={() => { setCodes(x => x.filter(y => y !== c)); bump(); }}><X size={14} /></button>
+                {shortTerm.map(x => (
+                  <div className="dx-row" key={x.text}>
+                    <span className="t-xs t-mono subtle dx-date">{fmtDateDMY(x.onset)}</span>
+                    <span className="grow t-sm">{x.text}
+                      {x.acc && <span className="chip chip-warm" style={{ marginLeft: 6 }}>ACC</span>}
+                      <span className="chip" style={{ marginLeft: 6 }}>Resolved</span>
+                    </span>
+                    <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
+                      aria-label={`View ${x.text} in timeline`}
+                      onClick={() => toast('Timeline', x.text, 'info')}><History size={14} /></button>
                   </div>
                 ))}
               </div>
-            ) : <span className="t-sm subtle">Nothing coded yet.</span>}
+            ) : <span className="t-sm subtle">No record found.</span>}
           </div>
 
           <div className="row g-2 wrap">

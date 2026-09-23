@@ -716,16 +716,17 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
   return (
     <section className="sect">
       <div className="row" style={{ alignItems: 'center' }}>
-        <div className="grow"><OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" /></div>
+        <div style={{ flex: '0 1 auto', minWidth: 0 }}>
+          <OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" /></div>
         {tab === 'Diagnosis' && (
-          <div className="input-group" style={{ maxWidth: 140 }}>
+          <div className="input-group" style={{ flex: '1 1 160px', minWidth: 140, maxWidth: 320 }}>
             <span className="ic-lead"><Search size={14} /></span>
             <input className="input" value={q} onChange={e => setQ(e.target.value)}
               placeholder="Search…" aria-label="Find a diagnosis" />
           </div>
         )}
         {tab === 'Procedure Hx' && (
-          <div className="input-group" style={{ maxWidth: 140 }}>
+          <div className="input-group" style={{ flex: '1 1 160px', minWidth: 140, maxWidth: 320 }}>
             <span className="ic-lead"><Search size={14} /></span>
             <input className="input" value={pq} onChange={e => setPq(e.target.value)}
               placeholder="Search…" aria-label="Find a procedure" />

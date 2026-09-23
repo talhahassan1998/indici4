@@ -119,6 +119,12 @@ const problems = [
   { pt:'p12', text:'Seropositive rheumatoid arthritis', onset:'2026-08-30', status:'active',  acc:false },
 ];
 
+const procedures = [
+  { pt:'p1',  name:'Diagnostic arthroscopy, right knee',   onset:'2026-08-04', provider:'u1', note:'Day surgery, uncomplicated' },
+  { pt:'p1',  name:'Corticosteroid injection, right knee', onset:'2026-07-30', provider:'u1' },
+  { pt:'p12', name:'Joint aspiration, right wrist',        onset:'2026-08-30', provider:'u3' },
+];
+
 const consultTypes = ['Note only', 'Face to face', 'Telehealth', 'Phone', 'Home visit', 'Nurse consult', 'ACC review'];
 
 
@@ -549,7 +555,7 @@ const KORA = {
   TODAY, GST, clinics, staff, clinicians, gps, patients, apptTypes, appts, blocks,
   letters, letterTemplates, inbox, invoices, accQueue, accHistory, tasks, timeline, notes,
   billingCodes, XERO_SYNC, org, timetables, pharmacies, medicines, prescriptions, ENROL_STATUS,
-  recalls, problems, consultTypes,
+  recalls, problems, procedures, consultTypes,
   testProviders, testCatalogue, testRequests,
 
   /* ---- lookups ---- */

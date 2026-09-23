@@ -685,18 +685,51 @@ function DxCategory({ tone, icon, title, items, dateLabel = 'Date' }) {
 function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
   const [tab, setTab] = useState('Diagnosis');
   const [q, setQ] = useState('');
+  const [pq, setPq] = useState('');
   const matchesQ = text => !q.trim() || text.toLowerCase().includes(q.trim().toLowerCase());
 
   const recent = codes.filter(matchesQ);
   const longTerm = K.problems.filter(x => x.pt === p.id && x.status === 'active' && matchesQ(x.text));
   const shortTerm = K.problems.filter(x => x.pt === p.id && x.status === 'resolved' && matchesQ(x.text));
   const suggestions = DX_SUGGESTIONS.filter(c => !codes.includes(c) && matchesQ(c));
+  const procs = K.procedures.filter(x => x.pt === p.id
+    && (!pq.trim() || x.name.toLowerCase().includes(pq.trim().toLowerCase())));
 
   return (
     <section className="sect">
       <OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" />
 
-      {tab !== 'Diagnosis' ? (
+      {tab === 'Procedure Hx' ? (
+        <div className="col g-4">
+          <div className="input-group" style={{ maxWidth: 320 }}>
+            <span className="ic-lead"><Search size={15} /></span>
+            <input className="input" value={pq} onChange={e => setPq(e.target.value)}
+              placeholder="Find a procedure…" aria-label="Find a procedure" />
+          </div>
+          {procs.length ? (
+            <div className="dx-table">
+              <div className="dx-table-row is-hd dx-table-row-proc">
+                <span>Onset</span><span>Name</span><span>Provider</span><span>Actions</span>
+              </div>
+              {procs.map(x => (
+                <div className="dx-table-row dx-table-row-proc" key={x.name}>
+                  <span className="t-xs t-mono subtle">{fmtDateDMY(x.onset)}</span>
+                  <span className="dx-table-name">
+                    <span className="col" style={{ gap: 2 }}>
+                      <b>{x.name}</b>
+                      {x.note && <span className="t-xs subtle" style={{ fontStyle: 'italic', fontWeight: 'normal' }}>{x.note}</span>}
+                    </span>
+                  </span>
+                  <span className="t-xs subtle">{K.st(x.provider).name}</span>
+                  <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="View in timeline"
+                    aria-label={`View ${x.name} in timeline`}
+                    onClick={() => toast('Timeline', x.name, 'info')}><History size={13} /></button>
+                </div>
+              ))}
+            </div>
+          ) : <span className="t-sm subtle">No record found.</span>}
+        </div>
+      ) : tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
       ) : (

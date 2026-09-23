@@ -1150,6 +1150,7 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
 }
 .dx-table-name { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: var(--fs-sm); font-weight: var(--fw-medium); }
 .dx-table-row .btn { justify-self: end; }
+.dx-table-row-proc { grid-template-columns: 100px 1fr 140px 40px; }
 
 .consult-foot {
   flex: none; z-index: 25;

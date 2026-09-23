@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Clock, FileText, SquareCheckBig, Activity, Pill, FlaskConical, TriangleAlert, HeartPulse,
   Shield, Bell, Copy, Eye, Share2, ShieldCheck, LayoutTemplate, Plus, X, Check, Mail,
   CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen, Search, History,
-  Users, Printer, UploadCloud, MessageSquare, ChevronLeft, ChevronRight,
+  Users, Printer, UploadCloud, MessageSquare, ChevronLeft, ChevronRight, ChevronDown,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
@@ -425,11 +425,7 @@ export default function Consult() {
         {sideOpen ? (
           <aside className="consult-pane">
             <div className="panel-hd">
-              <nav className="tabs" role="tablist">
-                {PANELS.map(t => (
-                  <button role="tab" key={t} aria-selected={panel === t} data-panel={t} onClick={() => setPanel(t)}>{t}</button>
-                ))}
-              </nav>
+              <OverflowTabs items={PANELS} active={panel} onChange={setPanel} label="Consult side panel" />
               <span className="spacer" />
               <button className="btn btn-ghost btn-icon btn-sm" aria-label="Collapse side panel"
                 onClick={() => setSideOpen(false)}><ChevronRight size={15} /></button>
@@ -473,6 +469,62 @@ export default function Consult() {
 /* One of the four quick-glance cards under the patient header — problems,
    long-term medications, allergies, alerts. Same shape whichever list it
    holds, so scanning across all four means learning the layout once. */
+/* A tab strip that never wraps to a second row: whatever doesn't fit the
+   current width collapses behind a "More" tab, the way antd's own tabs
+   degrade — so shrinking the side panel costs a click, not the panel's own
+   height. Widths are measured off a hidden clone of every tab, so the count
+   that fits is exact rather than guessed from a breakpoint. */
+function OverflowTabs({ items, active, onChange, label }) {
+  const outerRef = useRef(null);
+  const itemRefs = useRef([]);
+  const moreRef = useRef(null);
+  const [visible, setVisible] = useState(items.length);
+  const [menu, setMenu] = useState(null);
+
+  useLayoutEffect(() => {
+    const recompute = () => {
+      const outer = outerRef.current;
+      if (!outer) return;
+      const avail = outer.clientWidth;
+      const widths = itemRefs.current.map(el => el ? el.getBoundingClientRect().width + 2 : 0);
+      const moreW = (moreRef.current ? moreRef.current.getBoundingClientRect().width : 0) + 2;
+      let total = 0, count = items.length;
+      for (let i = 0; i < widths.length; i++) {
+        total += widths[i];
+        if (total > avail || (total + moreW > avail && i < items.length - 1)) { count = i; break; }
+      }
+      setVisible(Math.max(1, count));
+    };
+    recompute();
+    const ro = new ResizeObserver(recompute);
+    if (outerRef.current) ro.observe(outerRef.current);
+    return () => ro.disconnect();
+  }, [items]);
+
+  const shown = items.slice(0, visible);
+  const hidden = items.slice(visible);
+  const activeHidden = hidden.includes(active);
+
+  return (
+    <nav className="tabs otabs" role="tablist" aria-label={label} ref={outerRef}>
+      <div className="otabs-measure" aria-hidden="true">
+        {items.map((t, i) => <button key={t} ref={el => { itemRefs.current[i] = el; }} tabIndex={-1}>{t}</button>)}
+        <button ref={moreRef} tabIndex={-1}>More <ChevronDown size={13} /></button>
+      </div>
+      {shown.map(t => (
+        <button role="tab" key={t} aria-selected={active === t} onClick={() => onChange(t)}>{t}</button>
+      ))}
+      {hidden.length > 0 && (
+        <button role="tab" aria-selected={activeHidden}
+          onClick={e => setMenu({ anchor: e.currentTarget,
+            items: hidden.map(t => ({ label: t, action: () => onChange(t) })) })}>
+          More <ChevronDown size={13} /></button>
+      )}
+      {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}
+    </nav>
+  );
+}
+
 function QuickCard({ tone, icon, title, items, onAdd, renderItem }) {
   return (
     <div className={`qg-card is-${tone}`}>
@@ -609,11 +661,9 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
       <div className="sect-hd"><h2>Diagnosis and coding</h2><span className="spacer" />
         <span className="sect-meta">SNOMED CT · drives recalls, reporting and ACC</span></div>
 
-      <nav className="tabs dx-tabs" role="tablist" aria-label="Patient record section">
-        {DX_TABS.map(t => (
-          <button role="tab" key={t} aria-selected={tab === t} onClick={() => setTab(t)}>{t}</button>
-        ))}
-      </nav>
+      <div className="dx-tabs">
+        <OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" />
+      </div>
 
       {tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"

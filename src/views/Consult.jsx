@@ -647,9 +647,10 @@ const DX_SUGGESTIONS = ['Meniscal tear of knee', 'Knee pain', 'Osteoarthritis of
    anywhere else in the product. */
 /* Each diagnosis category is its own card, coloured so the three read as
    distinct records rather than one long list split by a label — and each
-   holds its diagnoses in a grid of tiles, not stacked rows, so the category
-   still reads as a compact block once it has more than two or three items. */
-function DxCategory({ tone, icon, title, items }) {
+   holds its diagnoses in a real data grid (a header row naming the columns,
+   then one row per diagnosis), not a wrap of tiles, so it reads the way a
+   record grid does anywhere else in the product. */
+function DxCategory({ tone, icon, title, items, dateLabel = 'Date' }) {
   return (
     <div className={`dx-cat is-${tone}`}>
       <div className="dx-cat-hd">
@@ -659,17 +660,19 @@ function DxCategory({ tone, icon, title, items }) {
       </div>
       <div className="dx-cat-bd">
         {items.length ? (
-          <div className="dx-grid">
+          <div className="dx-table">
+            <div className="dx-table-row is-hd">
+              <span>{dateLabel}</span><span>Name</span><span>Actions</span>
+            </div>
             {items.map(it => (
-              <div className="dx-tile" key={it.key}>
-                <button className="dx-tile-act tip" data-tip={it.actionLabel} aria-label={it.actionLabel}
-                  onClick={it.onAction}>{it.actionIcon}</button>
-                <span className="dx-tile-name">{it.name}</span>
-                <span className="dx-tile-meta">
-                  <span>{it.meta}</span>
+              <div className="dx-table-row" key={it.key}>
+                <span className="t-xs t-mono subtle">{it.meta}</span>
+                <span className="dx-table-name">{it.name}
                   {it.acc && <span className="chip chip-warm">ACC</span>}
                   {it.resolved && <span className="chip">Resolved</span>}
                 </span>
+                <button className="btn btn-ghost btn-icon btn-sm tip" data-tip={it.actionLabel}
+                  aria-label={it.actionLabel} onClick={it.onAction}>{it.actionIcon}</button>
               </div>
             ))}
           </div>
@@ -691,12 +694,7 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
 
   return (
     <section className="sect">
-      <div className="sect-hd"><h2>Diagnosis and coding</h2><span className="spacer" />
-        <span className="sect-meta">SNOMED CT · drives recalls, reporting and ACC</span></div>
-
-      <div className="dx-tabs">
-        <OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" />
-      </div>
+      <OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" />
 
       {tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"
@@ -709,21 +707,21 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
               placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
           </div>
 
-          <DxCategory tone="accent" icon={<Clock size={14} />} title="Recent diagnosis"
+          <DxCategory tone="accent" icon={<Clock size={14} />} title="Recent diagnosis" dateLabel="Added"
             items={recent.map(c => ({
               key: c, name: c, meta: 'Today',
               onAction: () => { setCodes(x => x.filter(y => y !== c)); bump(); }, actionIcon: <X size={13} />,
               actionLabel: `Remove ${c}`,
             }))} />
 
-          <DxCategory tone="info" icon={<HeartPulse size={14} />} title="Long term diagnosis"
+          <DxCategory tone="info" icon={<HeartPulse size={14} />} title="Long term diagnosis" dateLabel="Onset"
             items={longTerm.map(x => ({
               key: x.text, name: x.text, meta: fmtDateDMY(x.onset), acc: x.acc,
               onAction: () => toast('Timeline', x.text, 'info'), actionIcon: <History size={13} />,
               actionLabel: `View ${x.text} in timeline`,
             }))} />
 
-          <DxCategory tone="warm" icon={<Activity size={14} />} title="Short term diagnosis"
+          <DxCategory tone="warm" icon={<Activity size={14} />} title="Short term diagnosis" dateLabel="Onset"
             items={shortTerm.map(x => ({
               key: x.text, name: x.text, meta: fmtDateDMY(x.onset), acc: x.acc, resolved: true,
               onAction: () => toast('Timeline', x.text, 'info'), actionIcon: <History size={13} />,

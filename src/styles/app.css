@@ -1141,16 +1141,14 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
    no such panel, so the border is added directly where it's embedded. */
 .ps-grid.is-embedded { border: 1px solid var(--line-faint); border-radius: var(--r-md); overflow: hidden; }
 
-/* Family Hx — the add form sits above the grid it feeds, two fields to a
-   row like the reference, with anything that needs the full width (Disease,
-   Notes, Confidential, the Save/Cancel pair) spanning both columns. */
-.fam-form {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-4);
-  padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface);
-}
-.fam-form .fam-span { grid-column: 1 / -1; }
-@media (max-width: 640px) {
-  .fam-form { grid-template-columns: 1fr; }
+/* Family Hx — the Add/Edit drawer's field rows pair up related fields
+   (e.g. Relationship + Relationship type) so the form reads compactly
+   inside the drawer's narrower width. */
+.fam-row { display: flex; gap: var(--s-4); align-items: flex-end; flex-wrap: wrap; }
+.fam-row > .field { flex: 1 1 160px; min-width: 0; }
+.fam-check { flex: none; padding-bottom: 10px; white-space: nowrap; }
+@media (max-width: 900px) {
+  .fam-row > .field { flex-basis: 100%; }
 }
 
 .consult-foot {

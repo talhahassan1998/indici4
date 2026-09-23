@@ -9,7 +9,7 @@ import {
 import K from '../data/sample.js';
 import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
 import { Chip, FunderChip, Avatar, Banner, Empty } from '../components/Primitives.jsx';
-import { useUi, Modal, Menu, useAutosave, SavedIndicator } from '../lib/ui.jsx';
+import { useUi, Modal, Drawer, Menu, useAutosave, SavedIndicator } from '../lib/ui.jsx';
 
 const SOAP = [
   { k: 's', label: 'Subjective', ph: 'What the patient reports, in their words.' },
@@ -302,7 +302,7 @@ export default function Consult() {
     </section>
   );
 
-  const CodingCard = <DiagnosisCoding p={p} codes={codes} setCodes={setCodes} bump={bump} toast={toast} />;
+  const CodingCard = <DiagnosisCoding p={p} codes={codes} setCodes={setCodes} bump={bump} toast={toast} open={open} />;
 
   /* A fixed-height shell, like the inbox and the letter editor: the header
      block and the action bar stay put; the three panes in between are each
@@ -690,7 +690,7 @@ function DxCategory({ tone, icon, title, items }) {
   );
 }
 
-function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
+function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
   const [tab, setTab] = useState('Diagnosis');
   const [q, setQ] = useState('');
   const [pq, setPq] = useState('');
@@ -741,7 +741,7 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast }) {
           ) : <span className="t-sm subtle">No record found.</span>}
         </div>
       ) : tab === 'Family Hx' ? (
-        <FamilyHxPanel p={p} toast={toast} />
+        <FamilyHxPanel p={p} toast={toast} open={open} />
       ) : tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
@@ -795,28 +795,19 @@ const blankFamilyForm = () => ({
   relation: '', relType: '', disease: '', name: '', ageDiagnosed: '', ageOfDeath: '', alive: true, notes: '', confidential: false,
 });
 
-/* Family Hx: a form above the grid it feeds, like the reference — Save
-   pushes straight into K.familyHistory (the same "mutate the shared sample
-   data, force a repaint" pattern K.appts.push already uses elsewhere) so
-   the new row shows up in the grid immediately without a parallel copy of
-   the list living in component state. */
-function FamilyHxPanel({ p, toast }) {
-  const [form, setForm] = useState(blankFamilyForm);
+/* Family Hx: a grid fed by an Add/Edit drawer rather than a permanently
+   inline form, so the grid stays on screen and one drawer form serves both
+   flows — Save pushes or, when editing, updates in place in K.familyHistory
+   (the same "mutate the shared sample data, force a repaint" pattern
+   K.appts.push already uses elsewhere) so the change shows up in the grid
+   immediately without a parallel copy of the list living in component state. */
+function FamilyHxPanel({ p, toast, open }) {
   const [, force] = useState(0);
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const list = K.familyHistory.filter(x => x.pt === p.id);
 
-  const cancel = () => setForm(blankFamilyForm());
-  const save = () => {
-    if (!form.relation || !form.name.trim()) {
-      toast('Missing details', 'Relationship and name are required.', 'warn');
-      return;
-    }
-    K.familyHistory.push({ id: 'fh' + Date.now(), pt: p.id, date: K.TODAY.toISOString().slice(0, 10), ...form });
-    cancel();
-    force(n => n + 1);
-    toast('Family history added', form.name, 'ok');
-  };
+  const openDrawer = editing => open(close => (
+    <FamilyHxDrawer close={close} p={p} editing={editing} toast={toast} force={force} />
+  ));
   const remove = id => {
     const i = K.familyHistory.findIndex(x => x.id === id);
     if (i > -1) K.familyHistory.splice(i, 1);
@@ -825,60 +816,9 @@ function FamilyHxPanel({ p, toast }) {
 
   return (
     <div className="col g-4">
-      <div className="fam-form">
-        <div className="field">
-          <label className="label" htmlFor="famRel">Relationship</label>
-          <select className="select" id="famRel" value={form.relation} onChange={e => set('relation', e.target.value)}>
-            <option value="">Select…</option>
-            {RELATIONS.map(r => <option key={r}>{r}</option>)}
-          </select>
-        </div>
-        <div className="field">
-          <label className="label" htmlFor="famRelType">Relationship type</label>
-          <select className="select" id="famRelType" value={form.relType} onChange={e => set('relType', e.target.value)}>
-            <option value="">Select…</option>
-            {REL_TYPES.map(r => <option key={r}>{r}</option>)}
-          </select>
-        </div>
-        <div className="field fam-span">
-          <label className="label" htmlFor="famDisease">Disease</label>
-          <select className="select" id="famDisease" value={form.disease} onChange={e => set('disease', e.target.value)}>
-            <option value="">Choose…</option>
-            {FAMILY_DISEASES.map(d => <option key={d}>{d}</option>)}
-          </select>
-        </div>
-        <div className="field">
-          <label className="label" htmlFor="famName">Name</label>
-          <input className="input" id="famName" value={form.name} onChange={e => set('name', e.target.value)}
-            placeholder="Family member's name" />
-        </div>
-        <div className="field">
-          <label className="label" htmlFor="famAgeDx">Age diagnosed</label>
-          <input className="input" id="famAgeDx" value={form.ageDiagnosed} inputMode="numeric"
-            onChange={e => set('ageDiagnosed', e.target.value)} />
-        </div>
-        <div className="row g-4" style={{ alignItems: 'flex-end' }}>
-          <div className="field grow">
-            <label className="label" htmlFor="famAgeDeath">Age of death</label>
-            <input className="input" id="famAgeDeath" value={form.ageOfDeath} inputMode="numeric" disabled={form.alive}
-              onChange={e => set('ageOfDeath', e.target.value)} />
-          </div>
-          <label className="row g-2 t-sm" style={{ cursor: 'pointer', paddingBottom: 10 }}>
-            <span className="check" role="checkbox" aria-checked={form.alive}
-              onClick={() => setForm(f => ({ ...f, alive: !f.alive, ageOfDeath: !f.alive ? '' : f.ageOfDeath }))}>
-              <Check size={11} /></span> Alive</label>
-        </div>
-        <div className="field fam-span">
-          <label className="label" htmlFor="famNotes">Notes</label>
-          <textarea className="textarea" id="famNotes" rows={3} value={form.notes} onChange={e => set('notes', e.target.value)} />
-        </div>
-        <label className="row g-2 t-sm fam-span" style={{ cursor: 'pointer' }}>
-          <span className="check" role="checkbox" aria-checked={form.confidential}
-            onClick={() => set('confidential', !form.confidential)}><Check size={11} /></span> Confidential</label>
-        <div className="row g-2 fam-span" style={{ justifyContent: 'flex-end' }}>
-          <button className="btn btn-ghost btn-sm" onClick={cancel}>Cancel</button>
-          <button className="btn btn-primary btn-sm" onClick={save}><Check size={14} /> Save</button>
-        </div>
+      <div className="row" style={{ justifyContent: 'flex-end' }}>
+        <button className="btn btn-primary btn-sm" onClick={() => openDrawer(null)}>
+          <Plus size={14} /> Add family history</button>
       </div>
 
       {list.length ? (
@@ -900,8 +840,12 @@ function FamilyHxPanel({ p, toast }) {
                   <td className="t-xs">{x.disease || <span className="subtle">—</span>}</td>
                   <td className="t-xs subtle wrap-cell">{x.notes || '—'}</td>
                   <td>
-                    <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${x.name}`}
-                      onClick={() => remove(x.id)}><X size={13} /></button>
+                    <span className="row g-1">
+                      <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Edit ${x.name}`}
+                        onClick={() => openDrawer(x)}><SquarePen size={13} /></button>
+                      <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${x.name}`}
+                        onClick={() => remove(x.id)}><X size={13} /></button>
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -910,6 +854,98 @@ function FamilyHxPanel({ p, toast }) {
         </div>
       ) : <span className="t-sm subtle">No record found.</span>}
     </div>
+  );
+}
+
+function FamilyHxDrawer({ close, p, editing, toast, force }) {
+  const [form, setForm] = useState(() => editing ? { ...editing } : blankFamilyForm());
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const save = () => {
+    if (!form.relation || !form.name.trim()) {
+      toast('Missing details', 'Relationship and name are required.', 'warn');
+      return;
+    }
+    if (editing) {
+      const i = K.familyHistory.findIndex(x => x.id === editing.id);
+      if (i > -1) K.familyHistory[i] = { ...K.familyHistory[i], ...form };
+    } else {
+      K.familyHistory.push({ id: 'fh' + Date.now(), pt: p.id, date: K.TODAY.toISOString().slice(0, 10), ...form });
+    }
+    force(n => n + 1);
+    close();
+    toast(editing ? 'Family history updated' : 'Family history added', form.name, 'ok');
+  };
+
+  return (
+    <Drawer title={editing ? 'Edit family history' : 'Add family history'}
+      sub={`${p.first} ${p.last} · ${p.nhi}`} onClose={close}
+      footer={<>
+        <button className="btn btn-ghost" onClick={close}>Cancel</button>
+        <button className="btn btn-primary" onClick={save}><Check size={14} /> Save</button>
+      </>}>
+      <div className="col g-4">
+        <div className="fam-row">
+          <div className="field">
+            <label className="label" htmlFor="famRel">Relationship</label>
+            <select className="select" id="famRel" value={form.relation} onChange={e => set('relation', e.target.value)}>
+              <option value="">Select…</option>
+              {RELATIONS.map(r => <option key={r}>{r}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label className="label" htmlFor="famRelType">Relationship type</label>
+            <select className="select" id="famRelType" value={form.relType} onChange={e => set('relType', e.target.value)}>
+              <option value="">Select…</option>
+              {REL_TYPES.map(r => <option key={r}>{r}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="fam-row">
+          <div className="field">
+            <label className="label" htmlFor="famDisease">Disease</label>
+            <select className="select" id="famDisease" value={form.disease} onChange={e => set('disease', e.target.value)}>
+              <option value="">Choose…</option>
+              {FAMILY_DISEASES.map(d => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label className="label" htmlFor="famName">Name</label>
+            <input className="input" id="famName" value={form.name} onChange={e => set('name', e.target.value)}
+              placeholder="Family member's name" />
+          </div>
+        </div>
+
+        <div className="fam-row">
+          <div className="field">
+            <label className="label" htmlFor="famAgeDx">Age diagnosed</label>
+            <input className="input" id="famAgeDx" value={form.ageDiagnosed} inputMode="numeric"
+              onChange={e => set('ageDiagnosed', e.target.value)} />
+          </div>
+          <div className="field">
+            <label className="label" htmlFor="famAgeDeath">Age of death</label>
+            <input className="input" id="famAgeDeath" value={form.ageOfDeath} inputMode="numeric" disabled={form.alive}
+              onChange={e => set('ageOfDeath', e.target.value)} />
+          </div>
+        </div>
+
+        <div className="fam-row">
+          <label className="row g-2 t-sm fam-check" style={{ cursor: 'pointer' }}>
+            <span className="check" role="checkbox" aria-checked={form.alive}
+              onClick={() => setForm(f => ({ ...f, alive: !f.alive, ageOfDeath: !f.alive ? '' : f.ageOfDeath }))}>
+              <Check size={11} /></span> Alive</label>
+          <label className="row g-2 t-sm fam-check" style={{ cursor: 'pointer' }}>
+            <span className="check" role="checkbox" aria-checked={form.confidential}
+              onClick={() => set('confidential', !form.confidential)}><Check size={11} /></span> Confidential</label>
+        </div>
+
+        <div className="field">
+          <label className="label" htmlFor="famNotes">Notes</label>
+          <textarea className="textarea" id="famNotes" rows={3} value={form.notes} onChange={e => set('notes', e.target.value)} />
+        </div>
+      </div>
+    </Drawer>
   );
 }
 

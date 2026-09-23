@@ -1135,13 +1135,22 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
 }
 .dx-cat-bd { padding: var(--s-4); }
 .dx-cat-empty { display: flex; align-items: center; gap: 6px; color: var(--text-subtle); font-size: var(--fs-sm); }
-.dx-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: var(--s-3); }
+/* A true grid — each tile draws its own right/bottom line, so lines only
+   ever run along real cells: an incomplete last row stays blank past the
+   final tile instead of a filled-in "ghost" cell (what the gap+background
+   trick for grid lines would leave behind). */
+.dx-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  border-top: 1px solid var(--line-faint); border-left: 1px solid var(--line-faint);
+  border-radius: var(--r-md); overflow: hidden;
+}
 .dx-tile {
   position: relative; display: flex; flex-direction: column; gap: 6px;
-  padding: 10px 34px 10px 12px; border: 1px solid var(--line-faint); border-radius: var(--r-md);
-  background: var(--surface-2); transition: box-shadow var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  padding: 10px 34px 10px 12px; background: var(--surface);
+  border-right: 1px solid var(--line-faint); border-bottom: 1px solid var(--line-faint);
+  transition: background var(--dur-1) var(--ease);
 }
-.dx-tile:hover { border-color: var(--line-strong); box-shadow: var(--sh-1); }
+.dx-tile:hover { background: var(--surface-2); }
 .dx-tile-name { font-size: var(--fs-sm); font-weight: var(--fw-medium); line-height: 1.3; }
 .dx-tile-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: var(--fs-2xs); color: var(--text-subtle); }
 .dx-tile-act {

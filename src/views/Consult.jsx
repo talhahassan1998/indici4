@@ -4,7 +4,7 @@ import {
   Clock, FileText, SquareCheckBig, Activity, Pill, FlaskConical, TriangleAlert, HeartPulse,
   Shield, Bell, Copy, Eye, Share2, ShieldCheck, LayoutTemplate, Plus, X, Check, Mail,
   CalendarDays, ReceiptText, Mic, LayoutDashboard, Phone, MapPin, SquarePen, Search, History,
-  Users, Printer, UploadCloud, MessageSquare,
+  Users, Printer, UploadCloud, MessageSquare, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtDate, fmtDateDMY, fmtDateShort, fmtClock, fmtLongDate, age, money } from '../lib/format.js';
@@ -86,6 +86,38 @@ export default function Consult() {
   const [tlQuery, setTlQuery] = useState('');
   const [saveState, bump] = useAutosave();
   const timer = useRef(null);
+
+  /* Rail and side panel are draggable-width and collapsible, like a code
+     editor's side panes: the notes column in the middle just fills
+     whatever's left. Widths live in state, not layout, because a drag needs
+     to repaint every frame without re-deriving anything else. */
+  const [railW, setRailW] = useState(224);
+  const [railOpen, setRailOpen] = useState(true);
+  const [sideW, setSideW] = useState(360);
+  const [sideOpen, setSideOpen] = useState(true);
+  const dragRef = useRef(null);
+
+  useEffect(() => {
+    const onMove = e => {
+      const d = dragRef.current; if (!d) return;
+      const delta = e.clientX - d.startX;
+      if (d.edge === 'rail') setRailW(Math.min(340, Math.max(180, d.startW + delta)));
+      else setSideW(Math.min(520, Math.max(260, d.startW - delta)));
+    };
+    const onUp = () => {
+      if (!dragRef.current) return;
+      dragRef.current = null;
+      document.body.style.cursor = ''; document.body.style.userSelect = '';
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  }, []);
+  const beginDrag = edge => e => {
+    e.preventDefault();
+    dragRef.current = { edge, startX: e.clientX, startW: edge === 'rail' ? railW : sideW };
+    document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none';
+  };
 
   useEffect(() => {
     if (!running) return;
@@ -272,13 +304,15 @@ export default function Consult() {
 
   const CodingCard = <DiagnosisCoding p={p} codes={codes} setCodes={setCodes} bump={bump} toast={toast} />;
 
-  /* A fixed-height shell, like the inbox and the letter editor: the banner and
-     the action bar stay put and each of the three columns scrolls on its own.
-     Before this the whole page scrolled, so the sticky footer sat on top of
-     the note and the function rail was cut in half by it. */
+  /* A fixed-height shell, like the inbox and the letter editor: the header
+     block and the action bar stay put; the three panes in between are each
+     their own card, independently resizable and collapsible, and each
+     scrolls on its own. Before this the whole page scrolled, so the sticky
+     footer sat on top of the note and the function rail was cut in half. */
   return (
     <div className="consult-shell">
-      <div className="consult-banner">
+      <div className="consult-top">
+      <div className="cb-strapline">
         <div className="cb-row">
           <Avatar id={p.id} size="lg" />
           <div className="cb-id grow">
@@ -310,34 +344,6 @@ export default function Consult() {
           </div>
         </div>
 
-        <div className="qg-cards">
-          <QuickCard tone="ok" icon={<FileText size={14} />} title="Problem List"
-            items={K.problems.filter(x => x.pt === p.id && x.status === 'active')}
-            onAdd={() => setFn('coding')}
-            renderItem={x => <span className="t-sm" key={x.text}>{x.text}</span>} />
-          <QuickCard tone="info" icon={<Pill size={14} />} title="Long Term Medications"
-            items={K.prescriptions.filter(r => r.pt === p.id)}
-            onAdd={() => setFn('meds')}
-            renderItem={r => <span className="t-sm" key={r.id}>{K.med(r.med).name}</span>} />
-          <QuickCard tone="bad" icon={<TriangleAlert size={14} />} title="Allergies / Adverse Reactions"
-            items={p.alerts} onAdd={() => setFn('allergy')}
-            renderItem={a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>} />
-          <QuickCard tone="warm" icon={<Bell size={14} />} title="Alerts"
-            items={p.warn} onAdd={() => setFn('allergy')}
-            renderItem={a => <span className="alert-badge warn" key={a}>{a}</span>} />
-        </div>
-
-        <div className="qa-row">
-          <button className="qa-pill" onClick={() => setFn('notes')}><FileText size={14} /> New Note</button>
-          <button className="qa-pill" onClick={() => setFn('meds')}><Pill size={14} /> Prescribe</button>
-          <button className="qa-pill" onClick={() => setFn('invest')}><FlaskConical size={14} /> Order Labs</button>
-          <button className="qa-pill" onClick={() => setFn('referral')}><Share2 size={14} /> Referral</button>
-          <button className="qa-pill" onClick={() => setFn('docs')}><UploadCloud size={14} /> Upload Document</button>
-          <button className="qa-pill" onClick={() => { setPanel('Inbox'); toast('Message', 'Compose a secure message.', 'info'); }}>
-            <MessageSquare size={14} /> Send Message</button>
-          <button className="qa-pill" onClick={() => window.print()}><Printer size={14} /> Print Summary</button>
-        </div>
-
         <dl className="cb-facts-strip">
           <div><dt>Chart</dt><dd className="t-mono">{p.chart}</dd></div>
           <div><dt>Provider</dt><dd>{K.st(p.provider).name}</dd></div>
@@ -347,58 +353,113 @@ export default function Consult() {
           <div><dt>Quintile</dt><dd>{p.quintile} <span className="subtle">· DHB {p.dhb}</span></dd></div>
           <div><dt>Portal</dt><dd>{p.portal ? 'Registered' : <span className="subtle">Not registered</span>}</dd></div>
         </dl>
-        <div className="cb-strip">
-          <label className="cb-ctl"><span className="label">Consult type</span>
-            <select className="select" value={type} onChange={e => { setType(e.target.value); bump(); }}>
-              {K.consultTypes.map(t => <option key={t}>{t}</option>)}
-            </select></label>
-          <label className="cb-ctl"><span className="label">Consult</span>
-            <select className="select" defaultValue="Consult 1"><option>Consult 1</option><option>Consult 2</option></select></label>
-          <span className={`chip ${running ? 'chip-ok' : ''}`}><i className="dot" />
-            <span className="t-mono" id="timerText">{mm}:{ss}</span></span>
-          <button className="btn btn-ghost btn-icon btn-sm tip" data-tip={running ? 'Pause timer' : 'Resume timer'}
-            aria-label="Toggle consult timer" onClick={() => setRunning(r => !r)}><Clock size={15} /></button>
-          <span className="spacer" />
-          <button className="btn btn-secondary btn-sm" data-act="services" onClick={openServices}>
-            <ReceiptText size={14} /> Services for invoicing
-            {services.length > 0 && <span className="badge-count warm">{services.length}</span>}</button>
-          <SavedIndicator state={saveState} />
-        </div>
       </div>
 
-      <div className="consult-body">
-        <nav className="fn-rail" aria-label="Patient note functions">
-          {FUNCTIONS.map(g => (
-            <div className="fn-group" key={g.group}>
-              <div className="nav-group-label">{g.group}</div>
-              {g.items.map(it => (
-                <button className={`fn-item ${it.tone || ''}`} key={it.id} data-fn={it.id}
-                  aria-current={fn === it.id} onClick={() => setFn(it.id)}>
-                  <it.Icon size={16} className="ic" /><span className="grow">{it.label}</span>
-                  {counts[it.id] ? <span className={`badge-count ${it.tone === 'bad' ? '' : 'quiet'}`}>{counts[it.id]}</span>
-                    : it.badge ? <span className="badge-count quiet">{it.badge}</span> : null}
-                </button>
+      <div className="qg-cards">
+        <QuickCard tone="ok" icon={<FileText size={14} />} title="Problem List"
+          items={K.problems.filter(x => x.pt === p.id && x.status === 'active')}
+          onAdd={() => setFn('coding')}
+          renderItem={x => <span className="t-sm" key={x.text}>{x.text}</span>} />
+        <QuickCard tone="info" icon={<Pill size={14} />} title="Long Term Medications"
+          items={K.prescriptions.filter(r => r.pt === p.id)}
+          onAdd={() => setFn('meds')}
+          renderItem={r => <span className="t-sm" key={r.id}>{K.med(r.med).name}</span>} />
+        <QuickCard tone="bad" icon={<TriangleAlert size={14} />} title="Allergies / Adverse Reactions"
+          items={p.alerts} onAdd={() => setFn('allergy')}
+          renderItem={a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>} />
+        <QuickCard tone="warm" icon={<Bell size={14} />} title="Alerts"
+          items={p.warn} onAdd={() => setFn('allergy')}
+          renderItem={a => <span className="alert-badge warn" key={a}>{a}</span>} />
+      </div>
+
+      <div className="qa-row">
+        <button className="qa-pill" onClick={() => setFn('notes')}><FileText size={14} /> New Note</button>
+        <button className="qa-pill" onClick={() => setFn('meds')}><Pill size={14} /> Prescribe</button>
+        <button className="qa-pill" onClick={() => setFn('invest')}><FlaskConical size={14} /> Order Labs</button>
+        <button className="qa-pill" onClick={() => setFn('referral')}><Share2 size={14} /> Referral</button>
+        <button className="qa-pill" onClick={() => setFn('docs')}><UploadCloud size={14} /> Upload Document</button>
+        <button className="qa-pill" onClick={() => { setPanel('Inbox'); toast('Message', 'Compose a secure message.', 'info'); }}>
+          <MessageSquare size={14} /> Send Message</button>
+        <button className="qa-pill" onClick={() => window.print()}><Printer size={14} /> Print Summary</button>
+      </div>
+
+      <div className="cb-strip">
+        <label className="cb-ctl"><span className="label">Consult type</span>
+          <select className="select" value={type} onChange={e => { setType(e.target.value); bump(); }}>
+            {K.consultTypes.map(t => <option key={t}>{t}</option>)}
+          </select></label>
+        <label className="cb-ctl"><span className="label">Consult</span>
+          <select className="select" defaultValue="Consult 1"><option>Consult 1</option><option>Consult 2</option></select></label>
+        <span className={`chip ${running ? 'chip-ok' : ''}`}><i className="dot" />
+          <span className="t-mono" id="timerText">{mm}:{ss}</span></span>
+        <button className="btn btn-ghost btn-icon btn-sm tip" data-tip={running ? 'Pause timer' : 'Resume timer'}
+          aria-label="Toggle consult timer" onClick={() => setRunning(r => !r)}><Clock size={15} /></button>
+        <span className="spacer" />
+        <button className="btn btn-secondary btn-sm" data-act="services" onClick={openServices}>
+          <ReceiptText size={14} /> Services for invoicing
+          {services.length > 0 && <span className="badge-count warm">{services.length}</span>}</button>
+        <SavedIndicator state={saveState} />
+      </div>
+      </div>
+
+      <div className="consult-body" style={{ gridTemplateColumns:
+        `${railOpen ? railW : 44}px 6px minmax(0, 1fr) 6px ${sideOpen ? sideW : 44}px` }}>
+
+        {railOpen ? (
+          <nav className="consult-pane" aria-label="Patient record functions">
+            <div className="panel-hd">
+              <b className="grow">Patient record</b>
+              <button className="btn btn-ghost btn-icon btn-sm" aria-label="Collapse patient record panel"
+                onClick={() => setRailOpen(false)}><ChevronLeft size={15} /></button>
+            </div>
+            <div className="panel-scroll fn-rail">
+              {FUNCTIONS.map(g => (
+                <div className="fn-group" key={g.group}>
+                  <div className="nav-group-label">{g.group}</div>
+                  {g.items.map(it => (
+                    <button className={`fn-item ${it.tone || ''}`} key={it.id} data-fn={it.id}
+                      aria-current={fn === it.id} onClick={() => setFn(it.id)}>
+                      <it.Icon size={16} className="ic" /><span className="grow">{it.label}</span>
+                      {counts[it.id] ? <span className={`badge-count ${it.tone === 'bad' ? '' : 'quiet'}`}>{counts[it.id]}</span>
+                        : it.badge ? <span className="badge-count quiet">{it.badge}</span> : null}
+                    </button>
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
-        </nav>
+          </nav>
+        ) : (
+          <button className="panel-collapsed" aria-label="Expand patient record panel"
+            onClick={() => setRailOpen(true)}><ChevronRight size={15} /></button>
+        )}
+        <div className={`resize-handle ${!railOpen ? 'is-idle' : ''}`} onMouseDown={railOpen ? beginDrag('rail') : undefined} />
 
-        <div className="consult-main col g-7">
-          {fn === 'meas' ? MeasCard
-            : fn === 'coding' ? CodingCard
-            : fn === 'notes' ? NoteCard
-            : <Empty icon={<FileText size={22} />} title="Not built in this prototype"
-                body="This section isn't wired up yet — try Notes, Measurements or Diagnosis / coding." />}
+        <div className="consult-pane">
+          <div className="panel-scroll">
+            <div className="consult-main col g-7">
+              {fn === 'meas' ? MeasCard
+                : fn === 'coding' ? CodingCard
+                : fn === 'notes' ? NoteCard
+                : <Empty icon={<FileText size={22} />} title="Not built in this prototype"
+                    body="This section isn't wired up yet — try Notes, Measurements or Diagnosis / coding." />}
+            </div>
+          </div>
         </div>
 
-        <div className="consult-side">
-          <section className="card">
-            <nav className="tabs" role="tablist">
-              {PANELS.map(t => (
-                <button role="tab" key={t} aria-selected={panel === t} data-panel={t} onClick={() => setPanel(t)}>{t}</button>
-              ))}
-            </nav>
-            <div className="card-bd">
+        <div className={`resize-handle ${!sideOpen ? 'is-idle' : ''}`} onMouseDown={sideOpen ? beginDrag('side') : undefined} />
+        {sideOpen ? (
+          <aside className="consult-pane">
+            <div className="panel-hd">
+              <nav className="tabs" role="tablist">
+                {PANELS.map(t => (
+                  <button role="tab" key={t} aria-selected={panel === t} data-panel={t} onClick={() => setPanel(t)}>{t}</button>
+                ))}
+              </nav>
+              <span className="spacer" />
+              <button className="btn btn-ghost btn-icon btn-sm" aria-label="Collapse side panel"
+                onClick={() => setSideOpen(false)}><ChevronRight size={15} /></button>
+            </div>
+            <div className="panel-scroll">
               {panel === 'Timeline' && (
                 <div className="input-group" style={{ marginBottom: 12 }}>
                   <span className="ic-lead"><Search size={14} /></span>
@@ -414,8 +475,11 @@ export default function Consult() {
                 body="Referrals and letters sent from this consult will appear here." />}
               {panel === 'Transcribe' && <Transcribe toast={toast} />}
             </div>
-          </section>
-        </div>
+          </aside>
+        ) : (
+          <button className="panel-collapsed" aria-label="Expand side panel"
+            onClick={() => setSideOpen(true)}><ChevronLeft size={15} /></button>
+        )}
       </div>
 
       <div className="ed-bar consult-foot">

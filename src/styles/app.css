@@ -944,12 +944,9 @@
 /* ==========================================================================
    Consult — dense banner, function rail, SOAP note, prompts panel
    ========================================================================== */
-.consult-banner {
-  position: sticky; top: var(--topbar-h); z-index: 30;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-.cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
+.consult-top { flex: none; display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-4) var(--s-6) 0; }
+.cb-strapline { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+.cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-5) var(--s-3); flex-wrap: wrap; }
 .cb-id { min-width: 240px; }
 .cb-name-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .cb-name {
@@ -979,8 +976,7 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
    glance, each with its own accent so the eye can jump straight to the
    coloured edge that matters (green record, red safety, amber warning). */
 .qg-cards {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--s-3); padding: 0 var(--s-6) var(--s-4);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3);
 }
 .qg-card {
   display: flex; flex-direction: column; min-width: 0;
@@ -999,7 +995,7 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
 
 /* Quick action pills — the consult's most common next steps, one tap away
    regardless of which function-rail item is currently open. */
-.qa-row { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 var(--s-6) var(--s-4); }
+.qa-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .qa-pill {
   display: inline-flex; align-items: center; gap: 7px; border: 0; cursor: pointer;
   padding: 8px 14px; border-radius: var(--r-pill); background: var(--accent-soft);
@@ -1014,7 +1010,7 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
    glance, this is the supporting clinical detail underneath. */
 .cb-facts-strip {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 6px var(--s-4); margin: 0; padding: 9px var(--s-6) var(--s-3);
+  gap: 6px var(--s-4); margin: 0; padding: 9px var(--s-5) var(--s-4);
   border-top: 1px solid var(--line-faint);
 }
 .cb-facts-strip > div { min-width: 0; }
@@ -1026,29 +1022,68 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
 
 .cb-strip {
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
-  padding: 9px var(--s-6); border-top: 1px solid var(--line-faint); background: var(--surface-2);
+  padding: var(--s-3) var(--s-5); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-lg);
 }
 .cb-ctl { display: flex; align-items: center; gap: var(--s-2); }
 .cb-ctl > .label { white-space: nowrap; color: var(--text-muted); }
 .cb-ctl .select { max-width: 168px; }
 
-/* Banner, body, action bar: the first and last stay put, the middle scrolls,
-   and each of its three columns scrolls on its own. */
+/* Header block, resizable body, action bar: the first and last stay put, the
+   middle is a row of panes — each its own white card floating on the
+   shell's own muted ground, so the eye reads them as separate surfaces
+   rather than one continuous page. */
 .consult-shell {
   display: flex; flex-direction: column;
   height: calc(100vh - var(--topbar-h)); min-height: 0;
+  background: var(--surface-2);
 }
 .consult-body {
   flex: 1 1 auto; min-height: 0;
-  display: grid; grid-template-columns: 224px minmax(0, 1fr) minmax(320px, 400px);
-  gap: var(--s-5); align-items: stretch;
-  padding: var(--s-4) var(--page-gutter);
+  display: grid; align-items: stretch;
+  padding: var(--s-4) var(--s-6);
 }
-.consult-main { min-width: 0; overflow-y: auto; padding-bottom: var(--s-6); }
-.consult-side { min-width: 0; overflow-y: auto; padding-bottom: var(--s-6); }
-.consult-side > .card { display: flex; flex-direction: column; }
 
-.fn-rail { overflow-y: auto; display: flex; flex-direction: column; gap: var(--s-4); padding-bottom: var(--s-6); }
+/* One shared "pane" look for the rail, the notes column and the side panel:
+   a bordered white card with its own header and its own scrolling body, so
+   collapsing or resizing one never disturbs how the others are drawn. */
+.consult-pane {
+  min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.panel-hd {
+  flex: none; display: flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--line-faint);
+}
+.panel-hd > b {
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--text-subtle); padding-left: 6px;
+}
+.panel-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: var(--s-4); }
+
+/* A slim drag bar between panes — 6px of hit target, a 2px line that lights
+   up with the accent so a resize is discoverable without a hint. */
+.resize-handle { width: 6px; flex: none; cursor: col-resize; position: relative; }
+.resize-handle::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 2px;
+  border-radius: 1px; background: var(--line); transition: background var(--dur-1) var(--ease);
+}
+.resize-handle:hover::after, .resize-handle:active::after { background: var(--accent); }
+.resize-handle.is-idle { cursor: default; }
+.resize-handle.is-idle::after { display: none; }
+
+/* A collapsed pane leaves a slim, always-visible strip so it can be
+   reopened — collapsing is never a dead end. */
+.panel-collapsed {
+  flex: none; width: 100%; height: 100%;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  display: flex; align-items: flex-start; justify-content: center; padding-top: var(--s-4);
+  color: var(--text-subtle); cursor: pointer; transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.panel-collapsed:hover { background: var(--surface-2); color: var(--accent-text); }
+
+.fn-rail { display: flex; flex-direction: column; gap: var(--s-4); }
 .fn-group { display: flex; flex-direction: column; gap: 1px; }
 .fn-item {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
@@ -1083,17 +1118,17 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
   background: var(--surface);
 }
 
-@media (max-width: 1360px) {
-  .consult-body { grid-template-columns: 200px minmax(0, 1fr) minmax(300px, 340px); gap: var(--s-4); }
-}
-/* Below this the three panes cannot all earn their width, so the shell stops
-   being a fixed-height frame and the page scrolls normally. Reflowing a
-   column into a second row inside a frame that does not grow only hides it. */
+/* Below this the panes can't all earn a usable width, so dragging and
+   collapsing stop being useful: the shell gives up being a fixed-height
+   frame with resizable columns and goes back to one stacked, page-scrolling
+   column. The !important overrides the inline width the resize state sets
+   at desktop size — this breakpoint always wins regardless of it. */
 @media (max-width: 1120px) {
-  .consult-shell { height: auto; }
-  .consult-body { grid-template-columns: 1fr; overflow: visible; }
-  .fn-rail, .consult-main, .consult-side { overflow: visible; }
-  .fn-rail { flex-direction: row; flex-wrap: wrap; overflow-x: auto; gap: var(--s-3); padding-bottom: var(--s-2); }
+  .consult-shell { height: auto; background: var(--surface); }
+  .consult-body { grid-template-columns: 1fr !important; padding: var(--s-4); gap: var(--s-4); }
+  .resize-handle, .panel-collapsed { display: none; }
+  .consult-pane { border-radius: var(--r-md); }
+  .fn-rail { flex-direction: row; flex-wrap: wrap; overflow-x: auto; gap: var(--s-3); }
   .fn-group { flex-direction: row; gap: 2px; }
   .fn-group .nav-group-label { display: none; }
   .fn-item { white-space: nowrap; }

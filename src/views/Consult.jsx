@@ -694,6 +694,7 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
   const [tab, setTab] = useState('Diagnosis');
   const [q, setQ] = useState('');
   const [pq, setPq] = useState('');
+  const [, forceFam] = useState(0);
   const matchesQ = text => !q.trim() || text.toLowerCase().includes(q.trim().toLowerCase());
 
   const recent = codes.filter(matchesQ);
@@ -702,10 +703,25 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
   const suggestions = DX_SUGGESTIONS.filter(c => !codes.includes(c) && matchesQ(c));
   const procs = K.procedures.filter(x => x.pt === p.id
     && (!pq.trim() || x.name.toLowerCase().includes(pq.trim().toLowerCase())));
+  const famList = K.familyHistory.filter(x => x.pt === p.id);
+  const openFamDrawer = editing => open(close => (
+    <FamilyHxDrawer close={close} p={p} editing={editing} toast={toast} force={forceFam} />
+  ));
+  const removeFam = id => {
+    const i = K.familyHistory.findIndex(x => x.id === id);
+    if (i > -1) K.familyHistory.splice(i, 1);
+    forceFam(n => n + 1);
+  };
 
   return (
     <section className="sect">
-      <OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" />
+      <div className="row" style={{ alignItems: 'center' }}>
+        <div className="grow"><OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" /></div>
+        {tab === 'Family Hx' && (
+          <button className="btn btn-primary btn-sm" onClick={() => openFamDrawer(null)}>
+            <Plus size={14} /> Add</button>
+        )}
+      </div>
 
       {tab === 'Procedure Hx' ? (
         <div className="col g-4">
@@ -741,7 +757,7 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
           ) : <span className="t-sm subtle">No record found.</span>}
         </div>
       ) : tab === 'Family Hx' ? (
-        <FamilyHxPanel p={p} toast={toast} open={open} />
+        <FamilyHxPanel list={famList} onEdit={openFamDrawer} onRemove={removeFam} />
       ) : tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
@@ -801,26 +817,9 @@ const blankFamilyForm = () => ({
    (the same "mutate the shared sample data, force a repaint" pattern
    K.appts.push already uses elsewhere) so the change shows up in the grid
    immediately without a parallel copy of the list living in component state. */
-function FamilyHxPanel({ p, toast, open }) {
-  const [, force] = useState(0);
-  const list = K.familyHistory.filter(x => x.pt === p.id);
-
-  const openDrawer = editing => open(close => (
-    <FamilyHxDrawer close={close} p={p} editing={editing} toast={toast} force={force} />
-  ));
-  const remove = id => {
-    const i = K.familyHistory.findIndex(x => x.id === id);
-    if (i > -1) K.familyHistory.splice(i, 1);
-    force(n => n + 1);
-  };
-
+function FamilyHxPanel({ list, onEdit, onRemove }) {
   return (
     <div className="col g-4">
-      <div className="row" style={{ justifyContent: 'flex-end' }}>
-        <button className="btn btn-primary btn-sm" onClick={() => openDrawer(null)}>
-          <Plus size={14} /> Add family history</button>
-      </div>
-
       {list.length ? (
         <div className="ps-grid is-embedded">
           <table>
@@ -842,9 +841,9 @@ function FamilyHxPanel({ p, toast, open }) {
                   <td>
                     <span className="row g-1">
                       <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Edit ${x.name}`}
-                        onClick={() => openDrawer(x)}><SquarePen size={13} /></button>
+                        onClick={() => onEdit(x)}><SquarePen size={13} /></button>
                       <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Remove ${x.name}`}
-                        onClick={() => remove(x.id)}><X size={13} /></button>
+                        onClick={() => onRemove(x.id)}><X size={13} /></button>
                     </span>
                   </td>
                 </tr>

@@ -355,33 +355,8 @@ export default function Consult() {
         </dl>
       </div>
 
-      <div className="qg-cards">
-        <QuickCard tone="ok" icon={<FileText size={14} />} title="Problem List"
-          items={K.problems.filter(x => x.pt === p.id && x.status === 'active')}
-          onAdd={() => setFn('coding')}
-          renderItem={x => <span className="t-sm" key={x.text}>{x.text}</span>} />
-        <QuickCard tone="info" icon={<Pill size={14} />} title="Long Term Medications"
-          items={K.prescriptions.filter(r => r.pt === p.id)}
-          onAdd={() => setFn('meds')}
-          renderItem={r => <span className="t-sm" key={r.id}>{K.med(r.med).name}</span>} />
-        <QuickCard tone="bad" icon={<TriangleAlert size={14} />} title="Allergies / Adverse Reactions"
-          items={p.alerts} onAdd={() => setFn('allergy')}
-          renderItem={a => <span className="alert-badge" key={a}><TriangleAlert size={12} />{a}</span>} />
-        <QuickCard tone="warm" icon={<Bell size={14} />} title="Alerts"
-          items={p.warn} onAdd={() => setFn('allergy')}
-          renderItem={a => <span className="alert-badge warn" key={a}>{a}</span>} />
-      </div>
-
-      <div className="qa-row">
-        <button className="qa-pill" onClick={() => setFn('notes')}><FileText size={14} /> New Note</button>
-        <button className="qa-pill" onClick={() => setFn('meds')}><Pill size={14} /> Prescribe</button>
-        <button className="qa-pill" onClick={() => setFn('invest')}><FlaskConical size={14} /> Order Labs</button>
-        <button className="qa-pill" onClick={() => setFn('referral')}><Share2 size={14} /> Referral</button>
-        <button className="qa-pill" onClick={() => setFn('docs')}><UploadCloud size={14} /> Upload Document</button>
-        <button className="qa-pill" onClick={() => { setPanel('Inbox'); toast('Message', 'Compose a secure message.', 'info'); }}>
-          <MessageSquare size={14} /> Send Message</button>
-        <button className="qa-pill" onClick={() => window.print()}><Printer size={14} /> Print Summary</button>
-      </div>
+      {/* Quick-glance cards and quick-action pills are hidden for now —
+          re-enable by restoring this block (see git history). */}
 
       <div className="cb-strip">
         <label className="cb-ctl"><span className="label">Consult type</span>

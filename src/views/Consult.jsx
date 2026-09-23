@@ -717,6 +717,20 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
     <section className="sect">
       <div className="row" style={{ alignItems: 'center' }}>
         <div className="grow"><OverflowTabs items={DX_TABS} active={tab} onChange={setTab} label="Patient record section" /></div>
+        {tab === 'Diagnosis' && (
+          <div className="input-group" style={{ maxWidth: 140 }}>
+            <span className="ic-lead"><Search size={14} /></span>
+            <input className="input" value={q} onChange={e => setQ(e.target.value)}
+              placeholder="Search…" aria-label="Find a diagnosis" />
+          </div>
+        )}
+        {tab === 'Procedure Hx' && (
+          <div className="input-group" style={{ maxWidth: 140 }}>
+            <span className="ic-lead"><Search size={14} /></span>
+            <input className="input" value={pq} onChange={e => setPq(e.target.value)}
+              placeholder="Search…" aria-label="Find a procedure" />
+          </div>
+        )}
         {tab === 'Family Hx' && (
           <button className="btn btn-primary btn-sm" onClick={() => openFamDrawer(null)}>
             <Plus size={14} /> Add</button>
@@ -725,11 +739,6 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
 
       {tab === 'Procedure Hx' ? (
         <div className="col g-4">
-          <div className="input-group" style={{ maxWidth: 320 }}>
-            <span className="ic-lead"><Search size={15} /></span>
-            <input className="input" value={pq} onChange={e => setPq(e.target.value)}
-              placeholder="Find a procedure…" aria-label="Find a procedure" />
-          </div>
           {procs.length ? (
             <div className="ps-grid is-embedded">
               <table>
@@ -763,12 +772,6 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
       ) : (
         <div className="col g-4">
-          <div className="input-group" style={{ maxWidth: 320 }}>
-            <span className="ic-lead"><Search size={15} /></span>
-            <input className="input" value={q} onChange={e => setQ(e.target.value)}
-              placeholder="Find a diagnosis…" aria-label="Find a diagnosis" />
-          </div>
-
           <DxCategory tone="accent" icon={<Clock size={14} />} title="Recent diagnosis"
             items={recent.map(c => ({
               key: c, name: c, added: 'Today', onset: 'Today',

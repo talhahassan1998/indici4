@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   ChevronRight, Clock, Stethoscope, FileText, Mail, TriangleAlert, Check,
   RefreshCw, ReceiptText, CalendarDays, ShieldCheck, EllipsisVertical, X,
-  Sparkles, Plus,
+  Sparkles, Plus, Users, ClipboardCheck,
 } from 'lucide-react';
 import K from '../data/sample.js';
 import { fmtLongDate, fmtTime, age, money0, money, invoiceTotals, daysOverdue } from '../lib/format.js';
@@ -33,38 +33,43 @@ const stats = () => {
 };
 
 function Masthead({ user, figures }) {
-  const hour = Math.floor(NOW / 60);
-  const part = hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
-  const short = user.name.split(' ').slice(0, 2).join(' ');
+  const parts = user.name.split(' ');
+  const greeting = parts[0] === 'Dr' ? `Dr. ${parts[parts.length - 1]}` : parts[0];
   return (
-    <div className="masthead">
-      <p className="mh-date">{fmtLongDate(K.TODAY)} · {fmtTime(NOW)}</p>
-      <h1>{part}, <em>{short}</em>.</h1>
-      <div className="stat-strip">
+    <>
+      <div className="dash-hero">
+        <div>
+          <h1>Hello, {greeting}</h1>
+          <p className="dash-hero-date">{fmtLongDate(K.TODAY)} · {fmtTime(NOW)}</p>
+        </div>
+        <Link className="btn btn-primary" to="/appointments"><Plus size={16} /> Book appointment</Link>
+      </div>
+      <div className="stat-cards">
         {figures.map(f => (
-          <div className={`ss ${f.flag ? 'is-flag' : ''}`} key={f.l}>
-            <b>{f.v}</b><span>{f.l}</span>
+          <div className="dstat-card" key={f.l}>
+            <span className={`dstat-ic is-${f.tone}`}><f.Icon size={20} /></span>
+            <div><b>{f.v}</b><span>{f.l}</span></div>
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
-function NextPatient({ appt, onArrive }) {
+function NextPatient({ appt }) {
   if (!appt) return (
-    <div className="next-patient col g-3">
-      <span className="t-eyebrow np-eyebrow">Next patient</span>
+    <div className="next-card">
+      <span className="t-eyebrow">Next up</span>
       <Empty icon={<Check size={22} />} title="Clinic list complete" body="Nothing more booked for you today." />
     </div>
   );
   const p = K.pt(appt.pt), t = K.at(appt.type);
   const arrived = appt.status === 'arrived';
   return (
-    <div className={`next-patient col g-4 ${arrived ? 'arrived' : ''}`}>
-      <div className="row between">
-        <span className="t-eyebrow np-eyebrow">{arrived ? 'Waiting for you now' : 'Next patient'}</span>
-        <Chip status={appt.status} />
+    <div className="next-card">
+      <div className="next-card-hd">
+        <span className="t-eyebrow">Next up</span>
+        <Chip status={appt.status} lg />
       </div>
       <div className="row g-4">
         <Avatar id={p.id} size="xl" />
@@ -73,71 +78,55 @@ function NextPatient({ appt, onArrive }) {
             {p.first} {p.last}
           </Link>
           <div className="t-sm muted">{age(p.dob)}y {p.sex} · <span className="t-mono">{p.nhi}</span></div>
-          <div className="row g-2 mt-2 wrap">
-            <FunderChip funder={p.funder} />
-            {p.alerts.map(a => <span className="alert-badge" key={a}><TriangleAlert size={13} />{a}</span>)}
-          </div>
         </div>
       </div>
-      <div className="row g-4 t-sm">
-        <span className="row g-2"><Clock size={14} /><b>{fmtTime(appt.start)}</b></span>
-        <span className="row g-2 muted"><Stethoscope size={14} />{t.name} · {t.mins}min</span>
+      <div className="next-card-tags">
+        <FunderChip funder={p.funder} />
+        {p.alerts.map(a => <span className="alert-badge" key={a}><TriangleAlert size={13} />{a}</span>)}
       </div>
-      {arrived && (
-        <Banner tone="ok" icon={<Check size={15} />}>
-          Arrived and waiting <b>{Math.max(1, NOW - appt.start)} minutes</b>. Room 2 is free.
-        </Banner>
-      )}
-      <p className="t-sm muted">{appt.note}</p>
+      <div className="next-card-meta">
+        <span className="row g-2"><Stethoscope size={15} />{appt.note || t.name}</span>
+        {arrived
+          ? <span className="row g-2"><Check size={15} />Arrived {Math.max(1, NOW - appt.start)} minutes ago</span>
+          : <span className="row g-2"><Clock size={15} />Booked for {fmtTime(appt.start)}</span>}
+      </div>
       <div className="row g-2">
         <Link className="btn btn-primary grow" to={`/consult/${p.id}`}><Stethoscope size={15} /> Start consultation</Link>
-        <Link className="btn btn-secondary" to={`/patient/${p.id}/notes`}><FileText size={15} /> Notes</Link>
+        <Link className="btn btn-secondary" to={`/patient/${p.id}/notes`}><FileText size={15} /> View notes</Link>
       </div>
     </div>
   );
 }
 
-function ClinicList({ list, showClinician, onArrive, onMenu }) {
+function ClinicList({ list, showClinician, onMenu }) {
   return (
-    <section className="sect sect-lead">
-      <div className="sect-hd">
+    <section className="sect">
+      <div className="sect-hd" style={{ border: 'none' }}>
         <h2>{showClinician ? 'All clinics today' : 'My clinic today'}</h2>
         <span className="sect-meta">{list.length} appointments</span>
         <span className="spacer" />
         <Link className="btn btn-ghost btn-sm" to="/appointments">Open calendar <ChevronRight size={14} /></Link>
       </div>
-      <div className="tl">
+      <div className="today-list">
         {list.length ? list.map(a => {
           const p = K.pt(a.pt), t = K.at(a.type);
-          const isNow = a.status === 'consult' || (a.start <= NOW && NOW < a.start + t.mins && a.status !== 'done');
           return (
-            <div className={`tl-row ${isNow ? 'is-now' : ''}`} data-status={a.status} key={a.id}>
-              <span className="tl-time">{fmtTime(a.start)}<small>{t.mins} min</small></span>
-              <span className="tl-spine"><i className="tl-node" /></span>
-              <span className="tl-patient grow truncate">
-                <b>{p.first} {p.last}</b>
-                <span>{p.nhi} · {a.note || t.name}{showClinician ? ` · ${K.st(a.cl).name}` : ''}</span>
-              </span>
-              {/* Four fixed cells, so the alert flags, the statuses and the
-                  Arrived buttons each read as a column down the list rather
-                  than shuffling left and right row by row. */}
-              <span className="tl-actions">
-                <span className="tl-flag">
-                  {p.alerts.length > 0 && (
-                    <span className="tip" data-tip={p.alerts.join(', ')} style={{ color: 'var(--bad-fg)', display: 'inline-flex' }}>
-                      <TriangleAlert size={16} />
-                    </span>
-                  )}
+            <div className="today-row" data-status={a.status} key={a.id}>
+              <span className="today-time">{fmtTime(a.start)}<small>{t.mins} min</small></span>
+              <span className="today-patient truncate">
+                <i className="today-dot" />
+                <span className="today-patient-text truncate">
+                  <b>{p.first} {p.last}</b>
+                  <span>{p.nhi} · {a.note || t.name}{showClinician ? ` · ${K.st(a.cl).name}` : ''}</span>
                 </span>
-                <Chip status={a.status} />
-                <span>
-                  {a.status === 'booked' && (
-                    <button className="btn btn-soft btn-sm" data-arrive={a.id} onClick={() => onArrive(a)}><Check size={14} /> Arrived</button>
-                  )}
-                </span>
-                <button className="btn btn-ghost btn-icon btn-sm" onClick={e => onMenu(e.currentTarget, a)}
-                  aria-label={`More actions for ${p.first} ${p.last}`}><EllipsisVertical size={16} /></button>
+                {p.alerts.length > 0 && (
+                  <span className="tip" data-tip={p.alerts.join(', ')} style={{ color: 'var(--bad-fg)', display: 'inline-flex' }}>
+                    <TriangleAlert size={15} /></span>
+                )}
               </span>
+              <Chip status={a.status} />
+              <button className="btn btn-ghost btn-icon btn-sm" onClick={e => onMenu(e.currentTarget, a)}
+                aria-label={`More actions for ${p.first} ${p.last}`}><EllipsisVertical size={16} /></button>
             </div>
           );
         }) : <Empty icon={<CalendarDays size={22} />} title="No appointments today"
@@ -147,24 +136,20 @@ function ClinicList({ list, showClinician, onArrive, onMenu }) {
   );
 }
 
-/* A queue of things waiting on you: count, what it is, and where it goes.
-   No box around it and no icon beside it — the numbers down the left are
-   what you read, and they only read as a column if nothing sits in front. */
+/* A queue of things waiting on you: count, what it is, and where it goes. */
 function WorkList({ title, sub, rows }) {
   return (
     <section className="sect">
-      <div className="sect-hd"><h2>{title}</h2>{sub && <span className="sect-meta">{sub}</span>}</div>
-      <ul className="work-list">
+      <div className="sect-hd" style={{ border: 'none' }}><h2>{title}</h2>{sub && <span className="sect-meta">{sub}</span>}</div>
+      <div className="attn-list">
         {rows.map(r => (
-          <li key={r.label}>
-            <Link className="work-row" to={r.to}>
-              <span className={`work-n ${r.urgent && r.n > 0 ? 'is-urgent' : ''}`}>{r.n}</span>
-              <span className="grow"><b>{r.label}</b><span>{r.sub}</span></span>
-              <ChevronRight size={18} className="subtle" />
-            </Link>
-          </li>
+          <div className={`attn-row ${r.urgent && r.n > 0 ? '' : 'is-quiet'}`} key={r.label}>
+            <span className="attn-count">{r.n}</span>
+            <span className="grow"><b>{r.label}</b><span>{r.sub}</span></span>
+            <Link className="attn-link" to={r.to}>Links <ChevronRight size={14} /></Link>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
@@ -232,32 +217,28 @@ export default function Dashboard({ role, userId }) {
     { icon: <ReceiptText size={15} />, label: 'Create invoice', action: () => nav('/billing?create=1') },
   ]});
 
-  const roleLabel = { clinician: 'Clinician', reception: 'Reception', typist: 'Typist', manager: 'Practice manager' }[role];
-
   const figures = role === 'reception'
-    ? [{ v: all.length, l: 'Appointments today' }, { v: s.arrived, l: 'In the waiting room' },
-       { v: s.dna, l: 'Did not attend', flag: s.dna > 0 }, { v: s.todayInv.length, l: 'Invoices raised' }]
+    ? [{ v: all.length, l: 'Appointments today', Icon: CalendarDays, tone: 'info' },
+       { v: s.arrived, l: 'In the waiting room', Icon: Users, tone: 'warm' },
+       { v: s.dna, l: 'Did not attend', Icon: TriangleAlert, tone: 'bad' },
+       { v: s.todayInv.length, l: 'Invoices raised', Icon: ReceiptText, tone: 'ok' }]
     : role === 'typist'
-    ? [{ v: s.drafts + s.pending, l: 'In your queue' }, { v: s.drafts, l: 'To type' },
-       { v: s.pending, l: 'Awaiting approval', flag: s.pending > 0 }, { v: '2h 10m', l: 'Dictation backlog' }]
+    ? [{ v: s.drafts + s.pending, l: 'In your queue', Icon: Mail, tone: 'info' },
+       { v: s.drafts, l: 'To type', Icon: FileText, tone: 'warm' },
+       { v: s.pending, l: 'Awaiting approval', Icon: TriangleAlert, tone: 'bad' },
+       { v: '2h 10m', l: 'Dictation backlog', Icon: Clock, tone: 'ok' }]
     : role === 'manager'
-    ? [{ v: money0(s.todayTotal), l: 'Invoiced today' }, { v: money0(s.unpaid), l: 'Outstanding' },
-       { v: s.accErr, l: 'ACC errors', flag: s.accErr > 0 }, { v: s.dna, l: 'DNAs today', flag: s.dna > 0 }]
-    : [{ v: mine.length, l: 'Patients booked' }, { v: mine.filter(a => a.status === 'done').length, l: 'Seen so far' },
-       { v: s.unsigned, l: 'Notes to sign', flag: s.unsigned > 0 }, { v: s.pending, l: 'Letters to approve', flag: s.pending > 0 }];
+    ? [{ v: money0(s.todayTotal), l: 'Invoiced today', Icon: ReceiptText, tone: 'ok' },
+       { v: money0(s.unpaid), l: 'Outstanding', Icon: TriangleAlert, tone: 'warm' },
+       { v: s.accErr, l: 'ACC errors', Icon: ShieldCheck, tone: 'bad' },
+       { v: s.dna, l: 'DNAs today', Icon: Users, tone: 'info' }]
+    : [{ v: mine.length, l: 'Patients booked', Icon: Users, tone: 'info' },
+       { v: mine.filter(a => a.status === 'done').length, l: 'Seen so far', Icon: ClipboardCheck, tone: 'ok' },
+       { v: s.unsigned, l: 'Unsigned notes', Icon: TriangleAlert, tone: 'bad' },
+       { v: s.pending, l: 'Letters to approve', Icon: Mail, tone: 'warm' }];
 
   return (
     <div className="page">
-      <div className="page-hd">
-        <div className="page-title">
-          <span className="t-eyebrow">{roleLabel} view</span>
-          <h1>Dashboard</h1>
-        </div>
-        <div className="page-actions">
-          <Link className="btn btn-primary btn-sm" to="/appointments"><Plus size={14} /> Book appointment</Link>
-        </div>
-      </div>
-
       <div className="dash-grid">
         <div className="col-12"><Masthead user={user} figures={figures} /></div>
 
@@ -293,10 +274,10 @@ export default function Dashboard({ role, userId }) {
           <>
             <div className="col-7">
               <ClinicList list={role === 'reception' || role === 'manager' ? all : mine}
-                showClinician={role === 'reception' || role === 'manager'} onArrive={arrive} onMenu={openMenu} />
+                showClinician={role === 'reception' || role === 'manager'} onMenu={openMenu} />
             </div>
             <div className="col-5 col g-6">
-              {role === 'clinician' && <NextPatient appt={next} onArrive={arrive} />}
+              {role === 'clinician' && <NextPatient appt={next} />}
               <WorkList title={role === 'manager' ? 'Exceptions' : 'Needs your attention'} sub={role === 'manager' ? 'Money and compliance first' : 'Sorted by urgency'}
                 rows={role === 'manager' ? [
                   { label: 'ACC submissions failing', sub: 'Will be rejected as-is', n: s.accErr, to: '/acc', urgent: true },

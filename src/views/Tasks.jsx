@@ -21,26 +21,12 @@ export default function Tasks() {
   const dragId = useRef(null);
 
   const list = K.tasks.filter(t => who === 'all' || t.who === who);
-  const overdue = list.filter(t => t.col !== 'done' && daysOverdue(t.due) > 0).length;
 
   const newTask = ptId => open(close => <NewTask close={close} ptId={ptId} toast={toast} onDone={() => force(n => n + 1)} />);
   useEffect(() => { if (sp.get('new')) { sp.delete('new'); setSp(sp, { replace: true }); newTask(); } }, [sp]);
 
   return (
     <div className="page">
-      <div className="page-hd">
-        <div className="page-title"><h1>Tasks</h1>
-          <span className="page-sub">{list.filter(t => t.col !== 'done').length} open
-            {overdue > 0 && <> · <span className="bad-t">{overdue} overdue</span></>}</span></div>
-        <div className="page-actions">
-          <div className="segmented" role="group" aria-label="View">
-            <button aria-pressed={mode === 'board'} onClick={() => setMode('board')}><SquareKanban size={13} /> Board</button>
-            <button aria-pressed={mode === 'list'} onClick={() => setMode('list')}><List size={13} /> List</button>
-          </div>
-          <button className="btn btn-primary btn-sm" onClick={() => newTask()}><Plus size={14} /> New task</button>
-        </div>
-      </div>
-
       <div className="toolbar">
         <span className="t-eyebrow">Assignee</span>
         <div className="pill-nav" role="group" aria-label="Filter by assignee">
@@ -51,6 +37,11 @@ export default function Tasks() {
         </div>
         <span className="spacer" />
         <span className="t-xs subtle">Drag cards between columns to change status</span>
+        <div className="segmented" role="group" aria-label="View">
+          <button aria-pressed={mode === 'board'} onClick={() => setMode('board')}><SquareKanban size={13} /> Board</button>
+          <button aria-pressed={mode === 'list'} onClick={() => setMode('list')}><List size={13} /> List</button>
+        </div>
+        <button className="btn btn-primary btn-sm" onClick={() => newTask()}><Plus size={14} /> New task</button>
       </div>
 
       {mode === 'board' ? (

@@ -58,17 +58,6 @@ export default function Billing() {
 
   return (
     <div className="page">
-      <div className="page-hd">
-        <div className="page-title"><h1>Billing</h1>
-          <span className="page-sub">All amounts in NZD and include 15% GST unless shown otherwise</span></div>
-        <div className="page-actions">
-          <span className="sync-pill tip" data-tip={`Last synced ${fmtClock(K.XERO_SYNC)}`}><RefreshCw size={13} /> Xero connected</span>
-          <button className="btn btn-secondary btn-sm" data-act="sync" onClick={doSync} disabled={syncing}>
-            {syncing ? <><span className="spinner" /> Syncing…</> : <><RefreshCw size={14} /> Sync items</>}</button>
-          <button className="btn btn-primary btn-sm" data-act="create" onClick={() => openCreate()}><Plus size={14} /> Create invoice</button>
-        </div>
-      </div>
-
       {/* The summary strip and the Xero note are gone. Every figure they
           carried is a filter away in the grid's own footer, which totals what
           you are actually looking at rather than a fixed four numbers, and
@@ -103,22 +92,26 @@ export default function Billing() {
           <button className="btn btn-ghost"
             onClick={() => setF({ q: '', status: 'all', payer: 'all', cl: 'all' })}>Clear</button>
         </div>
+        <span className="spacer" />
+        <div className="fb-actions">
+          <span className="sync-pill tip" data-tip={`Last synced ${fmtClock(K.XERO_SYNC)}`}><RefreshCw size={13} /> Xero connected</span>
+          <button className="btn btn-secondary btn-sm" data-act="sync" onClick={doSync} disabled={syncing}>
+            {syncing ? <><span className="spinner" /> Syncing…</> : <><RefreshCw size={14} /> Sync items</>}</button>
+          <button className="btn btn-primary btn-sm" data-act="create" onClick={() => openCreate()}><Plus size={14} /> Create invoice</button>
+        </div>
       </div>
 
       <section className="grid-panel is-page">
-        <div className="grid-bar">
-          <span className="gb-count"><b className="num">{list.length}</b> invoices</span>
-          {sel.size > 0 && (
-            <>
-              <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
-              <button className="btn btn-primary btn-sm" onClick={() => {
-                toast('Reminders queued', `${sel.size} invoice${sel.size === 1 ? '' : 's'} will be emailed tonight.`, 'ok');
-                setSel(new Set());
-              }}><Send size={16} /> Send reminder</button>
-              <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
-            </>
-          )}
-        </div>
+        {sel.size > 0 && (
+          <div className="grid-bar">
+            <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
+            <button className="btn btn-primary btn-sm" onClick={() => {
+              toast('Reminders queued', `${sel.size} invoice${sel.size === 1 ? '' : 's'} will be emailed tonight.`, 'ok');
+              setSel(new Set());
+            }}><Send size={16} /> Send reminder</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
+          </div>
+        )}
         {list.length ? <div className="table-wrap"><table className="tbl">
           <thead><tr>
             <th className="sel-cell">
@@ -131,7 +124,7 @@ export default function Billing() {
             {/* Excl GST left the row and stayed in the footer and the invoice
                 drawer: it is Total minus GST, and the column it took is worth
                 more to the three buttons at the end of the row. */}
-            <th>Invoice</th><th className="grow-cell">Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
+            <th>Invoice</th><th>Patient</th><th>Date</th><th>Payer</th><th>Clinician</th>
             <th className="num-cell">GST</th><th className="num-cell">Total</th>
             <th>Status</th><th className="act-col">Actions</th></tr></thead>
           <tbody>{list.map(i => {
@@ -150,7 +143,7 @@ export default function Billing() {
                     <Check size={13} /></span>
                 </td>
                 <td className="t-mono t-sm"><b>{i.id}</b></td>
-                <td className="grow-cell"><span className="row g-2"><Avatar id={p.id} size="xs" />
+                <td><span className="row g-2"><Avatar id={p.id} size="xs" />
                   <span className="t-sm">{p.first} {p.last}</span></span></td>
                 <td><span className="cell2"><span>{fmtDateShort(i.date)}</span>
                   {od > 0 && <span className="bad-t">{od} days late</span>}</span></td>
@@ -176,13 +169,15 @@ export default function Billing() {
                   <button className="act-icon tip" data-tip="Send invoice" aria-label={`Send ${i.id}`}
                     onClick={() => { if (i.status === 'draft') i.status = 'sent'; force(n => n + 1); toast('Invoice sent', i.id, 'ok'); }}>
                     <Send size={20} /></button>
+                  <button className="act-icon tip" data-tip="View invoice" aria-label={`View ${i.id}`}
+                    onClick={() => openInvoice(i)}><Eye size={20} /></button>
+                  <button className="act-icon tip" data-tip="Edit lines" aria-label={`Edit lines for ${i.id}`}
+                    onClick={() => openCreate()}><Pencil size={20} /></button>
+                  <button className="act-icon tip" data-tip="Print receipt" aria-label={`Print receipt for ${i.id}`}
+                    onClick={() => toast('Receipt', 'Sent to the printer.', 'ok')}><Printer size={20} /></button>
                   <button className="act-icon tip" data-tip="More actions" aria-label={`More actions for ${i.id}`}
                     onClick={e => setMenu({ anchor: e.currentTarget, items: [
                       { heading: i.id },
-                      { icon: <Eye size={15} />, label: 'View invoice', action: () => openInvoice(i) },
-                      { icon: <Pencil size={15} />, label: 'Edit lines', action: () => openCreate() },
-                      { icon: <Printer size={15} />, label: 'Print receipt', action: () => toast('Receipt', 'Sent to the printer.', 'ok') },
-                      '-',
                       { icon: <Trash2 size={15} />, label: 'Void invoice', danger: true, action: () => toast('Void', 'Voiding needs a reason and manager approval.', 'warn') },
                     ]})}><EllipsisVertical size={20} /></button>
                 </span></td>

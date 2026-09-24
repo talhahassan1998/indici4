@@ -11,6 +11,8 @@ const d = v => (v instanceof Date ? v : new Date(v));
 
 export const fmtDate = v => { const x = d(v); return `${x.getDate()} ${MONTHS[x.getMonth()]} ${x.getFullYear()}`; };
 export const fmtDateShort = v => { const x = d(v); return `${x.getDate()} ${MONTHS[x.getMonth()]}`; };
+export const fmtDateDMY = v => { const x = d(v);
+  return `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${x.getFullYear()}`; };
 export const fmtLongDate = v => { const x = d(v); return `${DAYS[x.getDay()]} ${x.getDate()} ${MONTHS[x.getMonth()]} ${x.getFullYear()}`; };
 
 export function fmtTime(mins) {
@@ -50,7 +52,7 @@ export function invoiceTotals(inv) {
 
 export const STATUS = {
   booked:    { label: 'Booked',      cls: '' },
-  arrived:   { label: 'Arrived',     cls: 'chip-ok' },
+  arrived:   { label: 'Arrived',     cls: 'chip-warm' },
   consult:   { label: 'In consult',  cls: 'chip-info' },
   done:      { label: 'Done',        cls: 'chip-ok' },
   dna:       { label: 'DNA',         cls: 'chip-bad' },

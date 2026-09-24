@@ -195,6 +195,10 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
 }
 .badge-count.quiet { background: var(--surface-3); color: var(--text-muted); box-shadow: inset 0 0 0 1px var(--line); }
 .badge-count.warm { background: var(--warm); color: #2B2823; }
+/* Sidebar nav badges: one colour regardless of what they're counting, fixed
+   rather than theme-linked so white always reads on it — the brighter
+   accent green dark mode uses elsewhere needs dark text to pass contrast. */
+.badge-count.nav-badge { background: #15803E; color: #FFFFFF; }
 
 /* Allergy / clinical alert badge */
 .alert-badge {
@@ -329,14 +333,18 @@ label:has(> .switch) { min-height: var(--h-md); display: flex; align-items: cent
    offer. The gap is the clearance — these are not buttons, so the space
    between them is the only thing separating one from the next. */
 .tbl .row-actions {
-  display: grid; grid-auto-flow: column; grid-auto-columns: var(--h-md);
-  gap: var(--s-2); align-items: center; justify-content: end;
+  display: grid; grid-auto-flow: column; grid-auto-columns: 28px;
+  gap: 4px; align-items: center; justify-content: end;
 }
 .tbl .row-actions > * { justify-self: center; }
+/* Same trade as .p-actions in the patient grid: draw the icon small so the
+   row reads dense, keep the 44px tap target underneath on an invisible
+   overlay so it is no harder to hit than before. */
+.tbl .row-actions .act-icon { position: relative; width: 28px; height: 28px; }
+.tbl .row-actions .act-icon::before { content: ''; position: absolute; inset: -8px; }
 /* The trailing action column takes a fixed width so the slack goes to a column
    that can use it, instead of pooling as dead space on the right. */
 .tbl th.act-col, .tbl td.act-col { width: 1%; white-space: nowrap; text-align: right; padding-right: var(--s-4); }
-.tbl th.grow-cell, .tbl td.grow-cell { width: 100%; }
 .tbl tr.row-err { background: color-mix(in srgb, var(--bad-bg) 45%, transparent); }
 .tbl tr.row-err:hover { background: color-mix(in srgb, var(--bad-bg) 70%, transparent); }
 .tbl-compact tbody td { padding: 7px var(--s-3); }

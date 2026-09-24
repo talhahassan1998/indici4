@@ -54,21 +54,6 @@ export default function Acc() {
 
   return (
     <div className="page">
-      <div className="page-hd">
-        <div className="page-title"><h1>ACC submissions</h1>
-          <span className="page-sub">Validated against ACC business rules before they leave Kora</span></div>
-        <div className="page-actions">
-          <span className={`sync-pill ${bad.length ? 'off' : ''}`}><ShieldCheck size={13} /> ACC gateway {bad.length ? 'blocked' : 'ready'}</span>
-          <button className="btn btn-secondary btn-sm" data-act="revalidate" disabled={checking}
-            onClick={() => { setChecking(true); setTimeout(() => { setChecking(false);
-              toast('Validation complete', `${K.accQueue.filter(a => !a.valid).length} rows still need attention.`,
-                K.accQueue.some(a => !a.valid) ? 'warn' : 'ok'); }, 800); }}>
-            {checking ? <><span className="spinner" /> Checking…</> : <><RefreshCw size={14} /> Re-validate all</>}</button>
-          <button className="btn btn-primary btn-sm" data-act="submit" disabled={!ok.length} onClick={submit}>
-            <Send size={14} /> Submit {sel.size || ok.length} invoices</button>
-        </div>
-      </div>
-
       {bad.length ? (
         <Banner tone="bad" icon={<TriangleAlert size={17} />}>
           <b>{bad.length} submissions will be rejected as they are</b><br />
@@ -82,11 +67,22 @@ export default function Acc() {
         </Banner>
       )}
 
-      <div className="tabs mt-4 mb-4" role="tablist">
-        <button role="tab" aria-selected={tab === 'queue'} onClick={() => setTab('queue')}>
-          <List size={15} /> Ready to submit <span className="badge-count quiet">{K.accQueue.length}</span></button>
-        <button role="tab" aria-selected={tab === 'history'} onClick={() => setTab('history')}>
-          <Clock size={15} /> Submission history</button>
+      <div className="toolbar mt-4">
+        <div className="tabs" role="tablist">
+          <button role="tab" aria-selected={tab === 'queue'} onClick={() => setTab('queue')}>
+            <List size={15} /> Ready to submit <span className="badge-count quiet">{K.accQueue.length}</span></button>
+          <button role="tab" aria-selected={tab === 'history'} onClick={() => setTab('history')}>
+            <Clock size={15} /> Submission history</button>
+        </div>
+        <span className="spacer" />
+        <span className={`sync-pill ${bad.length ? 'off' : ''}`}><ShieldCheck size={13} /> ACC gateway {bad.length ? 'blocked' : 'ready'}</span>
+        <button className="btn btn-secondary btn-sm" data-act="revalidate" disabled={checking}
+          onClick={() => { setChecking(true); setTimeout(() => { setChecking(false);
+            toast('Validation complete', `${K.accQueue.filter(a => !a.valid).length} rows still need attention.`,
+              K.accQueue.some(a => !a.valid) ? 'warn' : 'ok'); }, 800); }}>
+          {checking ? <><span className="spinner" /> Checking…</> : <><RefreshCw size={14} /> Re-validate all</>}</button>
+        <button className="btn btn-primary btn-sm" data-act="submit" disabled={!ok.length} onClick={submit}>
+          <Send size={14} /> Submit {sel.size || ok.length} invoices</button>
       </div>
 
       {tab === 'queue' ? (

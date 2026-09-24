@@ -425,6 +425,88 @@
 .work-row b { font-size: var(--fs-md); font-weight: var(--fw-semi); display: block; }
 .work-row span:not(.work-n) { font-size: var(--fs-sm); color: var(--text-muted); }
 
+/* ==========================================================================
+   Dashboard — card-based layout (clinician home). Scoped entirely under
+   dash- / today- / next- / attn- so none of it reaches .work-row, .tl-row
+   etc. used by other pages built on the flatter "sections, not cards" look
+   elsewhere in the product. The accent colour throughout is the product's
+   own --accent, not a separate hero colour.
+   ========================================================================== */
+.dash-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; }
+.dash-hero h1 { font-size: var(--fs-3xl); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.dash-hero-date { font-size: var(--fs-xs); font-weight: var(--fw-semi); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-subtle); margin-top: 4px; }
+
+.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--s-3); margin: var(--s-5) 0; }
+.dstat-card {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-4); border-radius: var(--r-md);
+  background: var(--surface); box-shadow: inset 0 0 0 1px var(--line);
+}
+.dstat-ic { flex: none; width: 44px; height: 44px; border-radius: var(--r-sm);
+  display: grid; place-items: center; }
+.dstat-ic.is-info { background: var(--info-bg); color: var(--info-fg); }
+.dstat-ic.is-ok   { background: var(--ok-bg);   color: var(--ok-fg); }
+.dstat-ic.is-bad  { background: var(--bad-bg);  color: var(--bad-fg); }
+.dstat-ic.is-warm { background: var(--warm-soft); color: var(--warm-text); }
+.dstat-card b { display: block; font-size: var(--fs-2xl); font-weight: 800; line-height: 1.1;
+  font-variant-numeric: tabular-nums; }
+.dstat-card span { font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Today's list: each appointment is its own card, not a row in a shared
+   spine — the Arrived one needs to visually lift off the page, and a tint
+   on one row in a borderless list has nothing to sit inside. */
+.today-list { display: flex; flex-direction: column; gap: var(--s-2); }
+.today-row {
+  display: grid; grid-template-columns: 68px 1fr auto auto; align-items: center;
+  gap: var(--s-3); padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md); background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: box-shadow var(--dur-1) var(--ease);
+}
+.today-row:hover { box-shadow: inset 0 0 0 1px var(--line-strong); }
+.today-row[data-status="arrived"] { background: var(--warm-soft); box-shadow: inset 0 0 0 1px var(--warm-text); }
+.today-time { font-size: var(--fs-md); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.today-time small { display: block; font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--text-subtle); }
+.today-patient { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.today-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--line-strong); }
+.today-row[data-status="arrived"] .today-dot { background: var(--warm-text); }
+.today-row[data-status="consult"] .today-dot { background: var(--info-fg); }
+.today-row[data-status="done"]    .today-dot { background: var(--ok-fg); }
+.today-row[data-status="dna"]     .today-dot { background: var(--bad-fg); }
+.today-patient-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.today-patient-text b { font-size: var(--fs-md); font-weight: var(--fw-semi); }
+.today-patient-text span { font-size: var(--fs-sm); color: var(--text-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Next up: the one card on the page that is allowed a full-strength border,
+   because it is the one thing the page is telling you to do right now. */
+.next-card {
+  border-radius: var(--r-md); padding: var(--s-5);
+  background: var(--surface); box-shadow: inset 0 0 0 2px var(--accent), var(--sh-1);
+  display: flex; flex-direction: column; gap: var(--s-4);
+}
+.next-card-hd { display: flex; align-items: center; justify-content: space-between; }
+.next-card-hd .t-eyebrow { color: var(--accent-text); }
+.next-card-tags { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.next-card-meta { display: flex; flex-direction: column; gap: 7px; }
+.next-card-meta .row { color: var(--text-muted); font-size: var(--fs-sm); }
+.next-card-meta .row svg { color: var(--ok-fg); flex: none; }
+
+.attn-list { display: flex; flex-direction: column; }
+.attn-list > * + * { border-top: 1px solid var(--line-faint); }
+.attn-row { display: flex; align-items: center; gap: var(--s-3); padding-block: var(--s-3); }
+.attn-count { flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: var(--fw-bold); font-size: var(--fs-sm);
+  background: var(--bad-bg); color: var(--bad-fg); }
+.attn-row.is-quiet .attn-count { background: var(--surface-3); color: var(--text-muted); }
+.attn-row b { display: block; font-size: var(--fs-md); font-weight: var(--fw-semi); }
+.attn-row span:not(.attn-count) { font-size: var(--fs-sm); color: var(--text-muted); }
+.attn-link { flex: none; display: inline-flex; align-items: center; gap: 3px;
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--accent-text);
+  text-decoration: none; }
+.attn-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 /* The same row inside a bordered list elsewhere in the product: it keeps the
    padding and the divider the surface around it needs, and the leading glyph
    it uses to distinguish one kind of item from another. */
@@ -448,56 +530,134 @@
   position: sticky; top: 0; z-index: 5; display: grid;
   background: var(--surface); border-bottom: 1px solid var(--line);
 }
-.cal-col-head { padding: 9px var(--s-3); border-left: 1px solid var(--line-faint); min-width: 0; }
+.cal-col-head {
+  padding: 12px var(--s-3); border-left: 1px solid var(--line-faint); min-width: 0;
+  display: flex; align-items: center; gap: 9px;
+}
 .cal-col-head:first-child { border-left: 0; }
-.cal-col-head b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-bold); }
-.cal-col-head span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
-.cal-gutter { position: sticky; left: 0; z-index: 6; background: var(--surface); border-right: 1px solid var(--line); width: 62px; }
+.cal-col-head-text { display: block; min-width: 0; }
+/* Round, not the product's usual rounded-square badge — a Teams calendar
+   column header reads a person by a circular photo/initials, not a chip. */
+.cal-col-head .avatar { border-radius: 50%; }
+/* Scoped to the text wrapper, not every span in the header — the avatar is
+   a span too, and "every span in here is a block" was overriding its own
+   display:grid centering, which is how the initials ended up hugging the
+   top-left of the circle instead of sitting in its middle. */
+.cal-col-head-text b { display: block; font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+.cal-col-head-text span { display: block; font-size: var(--fs-2xs); color: var(--text-subtle); }
+.cal-gutter { position: sticky; left: 0; z-index: 6; background: var(--surface); border-right: 1px solid var(--line); width: calc(68px * var(--text-scale)); }
 .cal-body { display: grid; position: relative; }
-.cal-hour-label { height: 60px; font-size: var(--fs-2xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 2px 8px 0 0; text-align: right; border-top: 1px solid transparent; }
+/* One hour at 72px (see PX_PER_MIN in Appointments.jsx) — the height here is
+   a constant that has to move in lockstep with that scale, not a value to
+   restyle on its own. */
+/* calc(...*var(--text-scale)) here, not a bare px, because Appointments.jsx
+   computes every appointment's own top/height in JS from the same scale
+   (see pxPerMin there) — these rows and that JS have to move together or
+   the gridlines drift away from what's actually booked at that hour. */
+.cal-hour-label { height: calc(96px * var(--text-scale)); font-size: var(--fs-xs); color: var(--text-subtle); font-variant-numeric: tabular-nums; padding: 3px 10px 0 0; text-align: right; border-top: 1px solid transparent; }
 .cal-col { position: relative; border-left: 1px solid var(--line-faint); min-width: 0; }
 .cal-col:first-child { border-left: 0; }
-.cal-slot { height: 30px; border-top: 1px dashed transparent; border-bottom: 1px solid var(--line-faint); }
-.cal-slot.half { border-bottom: 1px dashed var(--line-faint); }
+/* Four evenly-weighted dashed lines an hour, not two lines of different
+   strength — the reference calendar's grid reads as one continuous fine
+   mesh rather than hour boundaries competing with the bookings for
+   attention. */
+.cal-slot { height: calc(24px * var(--text-scale)); border-bottom: 1px dashed var(--line-faint); }
 .cal-slot.drop-target { background: var(--accent-soft); }
 .cal-now {
   position: absolute; left: 0; right: 0; height: 2px; background: var(--bad-fg); z-index: 4; pointer-events: none;
 }
 .cal-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--bad-fg); }
 
+/* Cards, not ruled-off cells: colour and a shadow carry the boundary, so the
+   1px-everywhere look a dense grid gets doesn't happen here. Padding and a
+   6px gap between back-to-back bookings (built into the height in JS) are
+   what actually fixed "congested" — a bigger font on top of a cramped box
+   would not have. */
 .appt {
-  position: absolute; left: 3px; right: 3px; z-index: 3;
-  border-radius: var(--r-sm); padding: 5px 8px; overflow: hidden;
+  position: absolute; left: 4px; right: 4px; z-index: 3;
+  border-radius: var(--r-md); padding: 5px 10px; overflow: hidden;
   background: var(--surface); cursor: grab;
-  border-left: 3px solid var(--appt-consult);
-  box-shadow: inset 0 0 0 1px var(--line), var(--sh-1);
-  font-size: var(--fs-xs); text-align: left;
+  border-left: 4px solid var(--appt-consult);
+  box-shadow: var(--sh-1);
+  font-size: var(--fs-sm); text-align: left;
   transition: box-shadow var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
 }
-.appt:hover { box-shadow: inset 0 0 0 1px var(--line-strong), var(--sh-3); z-index: 6; }
+.appt:hover { box-shadow: var(--sh-3); z-index: 6; transform: translateY(-1px); }
 .appt:active { cursor: grabbing; }
 .appt.dragging { opacity: .5; }
-.appt b { display: block; font-weight: var(--fw-bold); font-size: var(--fs-xs); }
-.appt .appt-meta { display: block; color: var(--text-muted); font-size: var(--fs-2xs); }
-.appt[data-type="consult"]   { border-left-color: var(--appt-consult);   background: color-mix(in srgb, var(--appt-consult) 8%, var(--surface)); }
-.appt[data-type="followup"]  { border-left-color: var(--appt-followup);  background: color-mix(in srgb, var(--appt-followup) 9%, var(--surface)); }
-.appt[data-type="procedure"] { border-left-color: var(--appt-procedure); background: color-mix(in srgb, var(--appt-procedure) 9%, var(--surface)); }
-.appt[data-type="acc"]       { border-left-color: var(--appt-acc);       background: color-mix(in srgb, var(--appt-acc) 10%, var(--surface)); }
-.appt[data-type="telehealth"]{ border-left-color: var(--appt-telehealth);background: color-mix(in srgb, var(--appt-telehealth) 9%, var(--surface)); }
-.appt .appt-flag { position: absolute; top: 5px; right: 6px; }
+/* Name and status chip share one flex row instead of the chip floating
+   absolutely over the text: at a narrow week-view column width the chip was
+   overlapping and slicing through the last few letters of the name rather
+   than the name truncating cleanly before it. Flex plus min-width:0 on the
+   name is what makes the ellipsis point respect the chip's real width at
+   any column width, not a fixed guess. */
+.appt-row { display: flex; align-items: center; gap: 6px; }
+.appt-row b { flex: 1 1 auto; min-width: 0; }
+.appt-row .chip { flex: none; }
+.appt b { display: block; font-weight: var(--fw-bold); font-size: var(--fs-sm); }
+.appt .appt-meta { display: block; color: var(--text-muted); font-size: var(--fs-xs); margin-top: 1px; }
+/* A 15-minute booking gets a box just tall enough for one line at the
+   product's text-size floor — nothing here goes smaller than --fs-2xs. */
+.appt.is-compact { padding: 2px 9px; border-radius: var(--r-sm); }
+.appt.is-compact b { font-size: var(--fs-2xs); line-height: 1.15; }
+.appt-row .chip { height: 17px; padding: 0 6px; }
+.appt[data-type="consult"]   { border-left-color: var(--appt-consult);   background: color-mix(in srgb, var(--appt-consult) 11%, var(--surface)); }
+.appt[data-type="followup"]  { border-left-color: var(--appt-followup);  background: color-mix(in srgb, var(--appt-followup) 12%, var(--surface)); }
+.appt[data-type="procedure"] { border-left-color: var(--appt-procedure); background: color-mix(in srgb, var(--appt-procedure) 12%, var(--surface)); }
+.appt[data-type="acc"]       { border-left-color: var(--appt-acc);       background: color-mix(in srgb, var(--appt-acc) 13%, var(--surface)); }
+.appt[data-type="telehealth"]{ border-left-color: var(--appt-telehealth);background: color-mix(in srgb, var(--appt-telehealth) 12%, var(--surface)); }
 
 .blocked {
-  position: absolute; left: 0; right: 0; z-index: 2; border-radius: 4px;
+  position: absolute; left: 4px; right: 4px; z-index: 2; border-radius: var(--r-md);
   /* Hatching is the established way to say "not available", so this
      gradient carries meaning rather than decoration. */
   background-image: repeating-linear-gradient(135deg,
     var(--line) 0 6px, transparent 6px 12px);
   background-color: var(--surface-2);
   box-shadow: inset 0 0 0 1px var(--line);
-  display: flex; align-items: flex-start; padding: 4px 8px;
-  font-size: var(--fs-2xs); font-weight: var(--fw-semi); color: var(--text-subtle);
+  display: flex; align-items: flex-start; padding: 7px 10px;
+  font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--text-subtle);
 }
 .cal-panel { border-left: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
+
+/* Heat map — one compressed row per clinician, coloured by appointment type
+   (same palette as the diary's own legend strip) so a whole day or week of
+   bookings reads at a glance without opening each clinician's column. */
+.heatmap-wrap { padding: var(--s-4) var(--s-5) var(--s-6); overflow-x: auto; }
+.heatmap-row { display: flex; align-items: center; gap: var(--s-4); padding: 7px 0; border-bottom: 1px solid var(--line-faint); }
+.heatmap-row:last-child { border-bottom: 0; }
+.heatmap-who { width: 190px; flex: none; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.heatmap-who .truncate { min-width: 0; }
+.heatmap-track {
+  position: relative; flex: 1 1 auto; height: 30px; min-width: 0;
+  background: var(--surface-2); border-radius: var(--r-sm);
+  box-shadow: inset 0 0 0 1px var(--line-faint);
+}
+.heatmap-block {
+  position: absolute; top: 3px; bottom: 3px; border-radius: 4px; border: 0; padding: 0;
+  cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
+  transition: filter var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+.heatmap-block:hover { filter: brightness(1.08); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18), var(--sh-1); z-index: 2; }
+.heatmap-block:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; z-index: 2; }
+.heatmap-now {
+  position: absolute; top: -4px; bottom: -4px; width: 2px;
+  background: var(--bad-fg); opacity: .55; pointer-events: none;
+}
+.heatmap-ruler { padding-bottom: 4px; }
+.heatmap-ruler-track { display: grid; height: auto; background: none; box-shadow: none; }
+.heatmap-tick {
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
+  color: var(--text-subtle); border-left: 1px solid var(--line-faint); padding-left: 5px;
+}
+.heatmap-tick:first-child { border-left: 0; padding-left: 0; }
+.heatmap-days { display: flex; gap: 8px; flex: 1 1 auto; min-width: 0; }
+.heatmap-track-day { flex: 1 1 0; min-width: 90px; height: 26px; }
+.heatmap-daylabel {
+  flex: 1 1 0; min-width: 90px; text-align: center; font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-subtle);
+}
+.heatmap-daylabel .subtle { text-transform: none; letter-spacing: 0; font-weight: var(--fw-medium); }
 
 /* ------------------------------------------------------------- Patient workspace */
 .pt-header {
@@ -544,6 +704,12 @@
 .feed-card { background: var(--surface); border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--line); padding: var(--s-4); }
 .feed-card:hover { box-shadow: inset 0 0 0 1px var(--line-strong), var(--sh-1); }
 .feed-date { font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-subtle); padding: 0 0 var(--s-3) 46px; }
+
+/* Consult's own timeline entries — a fuller preview than the feed cards
+   above, since it doubles as the Notes screen's History tab. */
+.tl-entry { padding: 9px 0; border-bottom: 1px solid var(--line-faint); }
+.tl-entry:last-child { border-bottom: 0; }
+.tl-entry-body { margin: 6px 0 0; line-height: 1.45; }
 
 /* ------------------------------------------------------------- Letter editor */
 .ed-shell { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - var(--topbar-h)); overflow: hidden; }
@@ -778,60 +944,146 @@
 /* ==========================================================================
    Consult — dense banner, function rail, SOAP note, prompts panel
    ========================================================================== */
-.consult-banner {
-  position: sticky; top: var(--topbar-h); z-index: 30;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-.cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-6) var(--s-3); flex-wrap: wrap; }
-.cb-id { min-width: 190px; }
+.consult-top { flex: none; display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-4) var(--s-6) 0; }
+.cb-strapline { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+.cb-row { display: flex; align-items: flex-start; gap: var(--s-4); padding: var(--s-4) var(--s-5) var(--s-3); flex-wrap: wrap; }
+.cb-id { min-width: 240px; }
+.cb-name-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .cb-name {
   font-size: var(--fs-xl); font-weight: var(--fw-x); letter-spacing: -0.02em;
   color: var(--text); text-decoration: none; line-height: 1.2;
-  display: inline-flex; align-items: center; min-height: var(--h-md);
 }
 .cb-name:hover { color: var(--accent-text); }
-.cb-sub { display: flex; gap: 7px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-muted); margin-top: 2px; }
+.cb-sub { font-size: var(--fs-xs); color: var(--text-muted); }
 
-/* Facts read as a table of labelled values, not a run-on sentence of chips. */
-.cb-facts {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-  gap: 6px var(--s-4); flex: 1 1 420px; min-width: 0; margin: 0;
+/* Contact as pills, not a plain list: matches the reference strap and reads
+   as "on file", each one independently tappable (tel:/mailto:). */
+.cb-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.cb-pill {
+  display: inline-flex; align-items: center; gap: 6px; min-width: 0;
+  padding: 5px 12px; border-radius: var(--r-pill); background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--line-faint);
+  font-size: var(--fs-xs); color: var(--text-muted); text-decoration: none;
 }
-.cb-facts > div { min-width: 0; }
-.cb-facts dt {
+.cb-pill .ic { flex: none; color: var(--text-subtle); }
+a.cb-pill:hover { background: var(--accent-soft); color: var(--accent-text); }
+a.cb-pill:hover .ic { color: var(--accent-text); }
+
+.cb-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.cb-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* Quick-glance cards — problems, long-term meds, allergies and alerts at a
+   glance, each with its own accent so the eye can jump straight to the
+   coloured edge that matters (green record, red safety, amber warning). */
+.qg-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3);
+}
+.qg-card {
+  display: flex; flex-direction: column; min-width: 0;
+  border: 1px solid var(--line); border-top: 3px solid var(--line);
+  border-radius: var(--r-md); background: var(--surface); overflow: hidden;
+}
+.qg-card.is-ok   { border-top-color: var(--ok-fg); }
+.qg-card.is-info { border-top-color: var(--info-fg); }
+.qg-card.is-bad  { border-top-color: var(--bad-fg); }
+.qg-card.is-warm { border-top-color: var(--warm); }
+.qg-hd { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border-bottom: 1px solid var(--line-faint); }
+.qg-hd b { font-size: var(--fs-xs); font-weight: var(--fw-semi); flex: 1 1 auto; min-width: 0; }
+.qg-bd { padding: 10px 12px; min-height: 40px; display: flex; align-items: center; }
+.qg-list { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+.qg-empty { display: flex; align-items: center; gap: 6px; color: var(--text-subtle); font-size: var(--fs-sm); }
+
+/* Quick action pills — the consult's most common next steps, one tap away
+   regardless of which function-rail item is currently open. */
+.qa-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.qa-pill {
+  display: inline-flex; align-items: center; gap: 7px; border: 0; cursor: pointer;
+  padding: 8px 14px; border-radius: var(--r-pill); background: var(--accent-soft);
+  color: var(--accent-text); font-size: var(--fs-sm); font-weight: var(--fw-medium);
+  transition: background var(--dur-1) var(--ease);
+}
+.qa-pill:hover { background: var(--accent-soft-2); }
+
+/* Facts read as a table of labelled values, not a run-on sentence of chips.
+   Demoted to a quieter second line under the strap: identity, contact and
+   quick actions are the part that should look like the reference at a
+   glance, this is the supporting clinical detail underneath. */
+.cb-facts-strip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px var(--s-4); margin: 0; padding: 9px var(--s-5) var(--s-4);
+  border-top: 1px solid var(--line-faint);
+}
+.cb-facts-strip > div { min-width: 0; }
+.cb-facts-strip dt {
   font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
   text-transform: uppercase; color: var(--text-subtle);
 }
-.cb-facts dd { font-size: var(--fs-sm); margin: 0; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-
-.cb-alerts { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex: none; max-width: 260px; }
+.cb-facts-strip dd { font-size: var(--fs-sm); margin: 0; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
 
 .cb-strip {
   display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap;
-  padding: 9px var(--s-6); border-top: 1px solid var(--line-faint); background: var(--surface-2);
+  padding: var(--s-3) var(--s-5); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-lg);
 }
 .cb-ctl { display: flex; align-items: center; gap: var(--s-2); }
 .cb-ctl > .label { white-space: nowrap; color: var(--text-muted); }
 .cb-ctl .select { max-width: 168px; }
 
-/* Banner, body, action bar: the first and last stay put, the middle scrolls,
-   and each of its three columns scrolls on its own. */
+/* Header block, resizable body, action bar: the first and last stay put, the
+   middle is a row of panes — each its own white card floating on the
+   shell's own muted ground, so the eye reads them as separate surfaces
+   rather than one continuous page. */
 .consult-shell {
   display: flex; flex-direction: column;
   height: calc(100vh - var(--topbar-h)); min-height: 0;
+  background: var(--surface-2);
 }
 .consult-body {
   flex: 1 1 auto; min-height: 0;
-  display: grid; grid-template-columns: 224px minmax(0, 1fr) minmax(320px, 400px);
-  gap: var(--s-5); align-items: stretch;
-  padding: var(--s-4) var(--page-gutter);
+  display: grid; align-items: stretch;
+  padding: var(--s-4) var(--s-6);
 }
-.consult-main { min-width: 0; overflow-y: auto; padding-bottom: var(--s-6); }
-.consult-side { min-width: 0; overflow-y: auto; padding-bottom: var(--s-6); }
-.consult-side > .card { display: flex; flex-direction: column; }
 
-.fn-rail { overflow-y: auto; display: flex; flex-direction: column; gap: var(--s-4); padding-bottom: var(--s-6); }
+/* One shared "pane" look for the rail, the notes column and the side panel:
+   a bordered white card with its own header and its own scrolling body, so
+   collapsing or resizing one never disturbs how the others are drawn. */
+.consult-pane {
+  min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.panel-hd {
+  flex: none; display: flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--line-faint);
+}
+.panel-hd > b {
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold); letter-spacing: var(--tracking-caps);
+  text-transform: uppercase; color: var(--text-subtle); padding-left: 6px;
+}
+.panel-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; padding: var(--s-4); }
+
+/* A slim drag bar between panes — 6px of hit target, a 2px line that lights
+   up with the accent so a resize is discoverable without a hint. */
+.resize-handle { width: 6px; flex: none; cursor: col-resize; position: relative; }
+.resize-handle::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 2px; width: 2px;
+  border-radius: 1px; background: var(--line); transition: background var(--dur-1) var(--ease);
+}
+.resize-handle:hover::after, .resize-handle:active::after { background: var(--accent); }
+.resize-handle.is-idle { cursor: default; }
+.resize-handle.is-idle::after { display: none; }
+
+/* A collapsed pane leaves a slim, always-visible strip so it can be
+   reopened — collapsing is never a dead end. */
+.panel-collapsed {
+  flex: none; width: 100%; height: 100%;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  display: flex; align-items: flex-start; justify-content: center; padding-top: var(--s-4);
+  color: var(--text-subtle); cursor: pointer; transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.panel-collapsed:hover { background: var(--surface-2); color: var(--accent-text); }
+
+.fn-rail { display: flex; flex-direction: column; gap: var(--s-4); }
 .fn-group { display: flex; flex-direction: column; gap: 1px; }
 .fn-item {
   display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
@@ -847,30 +1099,113 @@
 
 .soap-field .textarea { min-height: 96px; }
 
+/* Diagnosis & coding — its own dated list, not .work-row's dashboard rhythm:
+   this sits in the wide consult column and reads best as a dense record of
+   rows, each with a date, a name and one action, not a stack of tiles. */
+
+/* Overflow tabs — never wraps to a second row; whatever doesn't fit
+   collapses behind a "More" tab. min-width: 0 is what lets a flex child
+   actually shrink below its content size instead of pushing its siblings
+   out of the row; the hidden measuring row is absolutely positioned so it
+   never affects that layout. */
+.otabs { position: relative; flex-wrap: nowrap; min-width: 0; max-width: 100%; overflow: hidden; }
+.otabs-measure {
+  position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none;
+  display: flex; gap: 2px; white-space: nowrap;
+}
+/* An icon-only overflow trigger rather than a "More" label, so it costs the
+   row as little width as possible, leaving more room for real tabs before
+   any of them need to collapse into it. */
+.otabs-more { padding: 0; width: var(--h-sm); justify-content: center; }
+/* Diagnosis categories — one coloured card per category (recent, long term,
+   short term) so the eye sorts them before reading a single word, and a
+   grid of tiles inside each rather than stacked rows, so a category with
+   six diagnoses reads as a compact block, not a long scroll. */
+.dx-cat { border: 1px solid var(--line); border-top: 3px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+.dx-cat.is-accent { border-top-color: var(--accent); }
+.dx-cat.is-info   { border-top-color: var(--info-fg); }
+.dx-cat.is-warm   { border-top-color: var(--warm); }
+.dx-cat-hd { display: flex; align-items: center; gap: 8px; padding: 10px var(--s-4); border-bottom: 1px solid var(--line-faint); }
+.dx-cat-ic { display: grid; place-items: center; flex: none; color: var(--text-subtle); }
+.dx-cat.is-accent .dx-cat-ic { color: var(--accent-text); }
+.dx-cat.is-info   .dx-cat-ic { color: var(--info-fg); }
+.dx-cat.is-warm   .dx-cat-ic { color: var(--warm-text); }
+.dx-cat-hd b { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.dx-cat-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--r-pill);
+  background: var(--surface-3); color: var(--text-muted); font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+}
+.dx-cat-bd { padding: var(--s-4); }
+.dx-cat-empty { display: flex; align-items: center; gap: 6px; color: var(--text-subtle); font-size: var(--fs-sm); }
+/* Diagnosis and procedure records use the shared .ps-grid table styling
+   (see the Patients list and the Appointments grid view) rather than a
+   one-off layout, so a record grid looks the same everywhere. Elsewhere
+   .ps-grid gets its border from the .grid-panel it sits in; here there is
+   no such panel, so the border is added directly where it's embedded. */
+.ps-grid.is-embedded { border: 1px solid var(--line-faint); border-radius: var(--r-md); overflow: hidden; }
+
+/* Family Hx — the Add/Edit drawer's field rows pair up related fields
+   (e.g. Relationship + Relationship type) so the form reads compactly
+   inside the drawer's narrower width. */
+.fam-row { display: flex; gap: var(--s-4); align-items: flex-end; flex-wrap: wrap; }
+.fam-row > .field { flex: 1 1 160px; min-width: 0; }
+.fam-check { flex: none; padding-bottom: 10px; white-space: nowrap; }
+@media (max-width: 900px) {
+  .fam-row > .field { flex-basis: 100%; }
+}
+
+/* Screening questionnaires (Audit C / TICS / PHQ3) — a bordered, lightly
+   striped list of question rows (like the reference tool) built from our
+   own radio control rather than native <input type=radio>, so focus,
+   spacing and checked-state colour all follow the rest of the app. */
+.qhx-list { border: 1px solid var(--line-faint); border-radius: var(--r-md); overflow: hidden; }
+.qhx-row { padding: var(--s-4); }
+.qhx-row:not(:last-child) { border-bottom: 1px solid var(--line-faint); }
+.qhx-row:nth-child(even) { background: var(--surface-2); }
+.qhx-q { margin: 0 0 var(--s-3); }
+.radio-row { display: flex; flex-wrap: wrap; gap: var(--s-5) var(--s-6); align-items: center; }
+.radio-opt { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.radio {
+  width: 20px; height: 20px; flex: none; border-radius: 999px;
+  border: 2px solid var(--line-field); background: var(--surface);
+  display: inline-grid; place-items: center; cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+.radio[aria-checked="true"] { border-color: var(--accent); }
+.radio-dot {
+  width: 9px; height: 9px; border-radius: 999px; background: var(--accent);
+  opacity: 0; transform: scale(.4); transition: all var(--dur-1) var(--ease);
+}
+.radio[aria-checked="true"] .radio-dot { opacity: 1; transform: scale(1); }
+.qhx-prov {
+  padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface);
+}
+
 .consult-foot {
   flex: none; z-index: 25;
   border-top: 1px solid var(--line); border-bottom: 0;
   background: var(--surface);
 }
 
-@media (max-width: 1360px) {
-  .consult-body { grid-template-columns: 200px minmax(0, 1fr) minmax(300px, 340px); gap: var(--s-4); }
-}
-/* Below this the three panes cannot all earn their width, so the shell stops
-   being a fixed-height frame and the page scrolls normally. Reflowing a
-   column into a second row inside a frame that does not grow only hides it. */
+/* Below this the panes can't all earn a usable width, so dragging and
+   collapsing stop being useful: the shell gives up being a fixed-height
+   frame with resizable columns and goes back to one stacked, page-scrolling
+   column. The !important overrides the inline width the resize state sets
+   at desktop size — this breakpoint always wins regardless of it. */
 @media (max-width: 1120px) {
-  .consult-shell { height: auto; }
-  .consult-body { grid-template-columns: 1fr; overflow: visible; }
-  .fn-rail, .consult-main, .consult-side { overflow: visible; }
-  .fn-rail { flex-direction: row; flex-wrap: wrap; overflow-x: auto; gap: var(--s-3); padding-bottom: var(--s-2); }
+  .consult-shell { height: auto; background: var(--surface); }
+  .consult-body { grid-template-columns: 1fr !important; padding: var(--s-4); gap: var(--s-4); }
+  .resize-handle, .panel-collapsed { display: none; }
+  .consult-pane { border-radius: var(--r-md); }
+  .fn-rail { flex-direction: row; flex-wrap: wrap; overflow-x: auto; gap: var(--s-3); }
   .fn-group { flex-direction: row; gap: 2px; }
   .fn-group .nav-group-label { display: none; }
   .fn-item { white-space: nowrap; }
   .consult-foot { position: sticky; bottom: 0; }
 }
 @media (max-width: 900px) {
-  .cb-alerts { align-items: flex-start; max-width: none; flex-direction: row; flex-wrap: wrap; }
+  .cb-badges, .cb-actions { justify-content: flex-start; }
 }
 
 /* ==========================================================================
@@ -881,14 +1216,10 @@
   height: calc(100vh - var(--topbar-h));
   min-width: 0;
 }
-.ps-head {
-  display: flex; align-items: flex-end; gap: var(--s-4); flex-wrap: wrap;
-  padding: var(--s-4) var(--page-gutter) var(--s-4); flex: none;
-}
 .ps-filters {
   /* No bottom rule: the panel below has its own border, and two hairlines a
      few pixels apart is a seam, not a separator. */
-  flex: none; padding: 0 var(--page-gutter) var(--s-2);
+  flex: none; padding: var(--s-4) var(--page-gutter) var(--s-2);
 }
 .ps-filter-grid { gap: var(--s-3);
   /* Flex, not a fixed grid. A breakpoint is written against the window, but
@@ -899,6 +1230,9 @@
 }
 .ps-filter-grid > .field { flex: 1 1 190px; min-width: 0; }
 .ps-filter-grid > .row   { flex: 0 0 auto; }
+/* The export/register pair reads as a toolbar, not another filter, so it
+   rides the far end of the row rather than wrapping in with the fields. */
+.ps-filter-grid > .ps-actions { margin-left: auto; }
 /* The selection column: a fixed narrow cell, and a row that is selected says
    so with a tint rather than only a ticked box in the corner of the eye. */
 .tbl th.sel-cell, .tbl td.sel-cell { width: 46px; padding-right: 0; }
@@ -934,9 +1268,10 @@
   background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--r-md);
 }
-.grid-panel > .grid-bar { border-radius: var(--r-md) var(--r-md) 0 0; }
-.grid-panel > .ps-foot,
-.grid-panel > .grid-foot { border-radius: 0 0 var(--r-md) var(--r-md); }
+/* Whichever bar ends up first or last (the legend now leads, pagination now
+   trails) takes the panel's own corner radius, not a fixed element type. */
+.grid-panel > *:first-child { border-radius: var(--r-md) var(--r-md) 0 0; }
+.grid-panel > *:last-child  { border-radius: 0 0 var(--r-md) var(--r-md); }
 /* Inside an ordinary padded page the panel supplies its own edge and takes no
    margin: the page gutter is already there. */
 .grid-panel.is-page { margin: 0; flex: 0 1 auto; }
@@ -990,19 +1325,37 @@
 .ps-grid tbody tr { transition: background var(--dur-1) var(--ease); cursor: pointer; }
 .ps-grid tbody tr:hover { background: var(--surface-2); }
 .ps-grid tbody tr:focus-visible { background: var(--accent-soft); outline: 2px solid var(--focus); outline-offset: -2px; }
-.ps-grid td.wrap-cell { white-space: normal; min-width: 210px; max-width: 280px; }
+/* Wide enough that a real NZ street address — number, street, suburb, city,
+   postcode — reads on one line; it still wraps rather than clipping the rare
+   longer one. */
+.ps-grid td.wrap-cell { white-space: normal; min-width: 260px; max-width: 380px; }
 
-/* Name cell carries the enrolment colour, with a dot that repeats it as shape. */
+/* Name cell carries the enrolment colour on the text itself. */
 .pname { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
-.pname .p-dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
 .pname b { font-weight: var(--fw-semi); }
 .pname .p-pref { color: var(--text-subtle); font-weight: var(--fw-regular); }
+
+/* NHI as a small coloured card in the patient's own enrolment tone, set via
+   the --tone custom property rather than a fixed palette of classes. */
+.nhi-card {
+  display: inline-block; padding: 2px 8px; border-radius: var(--r-sm);
+  color: var(--tone); font-weight: var(--fw-semi);
+  background: color-mix(in srgb, var(--tone) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--tone) 40%, transparent);
+}
 
 /* Action row: same affordances as before, drawn as one consistent icon set. */
 /* Always visible, never revealed on hover: someone who cannot see them
    cannot find them. */
-.p-actions { display: flex; align-items: center; gap: 6px; }
+.p-actions { display: flex; align-items: center; gap: 4px; }
 .p-actions .btn { white-space: nowrap; padding: 0 10px; }
+/* The icons still need to look close together in a dense row, but the 44px
+   tap target underneath them is a deliberate choice (see .act-icon above),
+   not a default to shrink. Draw the visible box small and grow the real hit
+   area back out on an invisible pseudo-element, so the icons pack tight
+   without making them harder to hit. */
+.p-actions .act-icon { position: relative; width: 28px; height: 28px; }
+.p-actions .act-icon::before { content: ''; position: absolute; inset: -8px; }
 
 .ps-foot {
   display: flex; align-items: center; gap: var(--s-4); flex-wrap: wrap; flex: none;
@@ -1010,6 +1363,12 @@
 }
 .ps-foot .lg { display: inline-flex; align-items: center; gap: 7px; font-size: var(--fs-sm); color: var(--text-muted); }
 .ps-foot .lg i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+/* Legend leads the panel now, so its hairline runs along the bottom edge it
+   shares with the bar below, not the top edge it no longer has above it. */
+.ps-foot-top { border-top: none; border-bottom: 1px solid var(--line); }
+/* Pagination trails the panel: hairline on top, none below, same reasoning
+   in reverse. */
+.grid-bar-bottom { border-bottom: none; border-top: 1px solid var(--line); }
 .pager { display: inline-flex; align-items: center; gap: 2px; }
 .pager button {
   display: inline-flex; align-items: center; justify-content: center;

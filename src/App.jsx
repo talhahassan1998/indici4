@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Shell, { ROLES } from './components/Shell.jsx';
 import CommandPalette from './components/CommandPalette.jsx';
 import { UiProvider, useUi } from './lib/ui.jsx';
-import { useTheme, useLocalState } from './lib/theme.js';
+import { useTheme, useTextSize, useLocalState } from './lib/theme.js';
 import { Skeleton } from './components/Primitives.jsx';
 
 import Dashboard from './views/Dashboard.jsx';
@@ -32,6 +32,7 @@ function Inner() {
   const nav = useNavigate();
   const { toast } = useUi();
   const [theme, toggleTheme] = useTheme();
+  const [textSize, cycleTextSize] = useTextSize();
   const [role, setRole] = useLocalState('kora.role', 'clinician');
   const [rail, setRail] = useLocalState('kora.rail', false);
   const [palette, setPalette] = useState(false);
@@ -64,7 +65,8 @@ function Inner() {
   return (
     <>
       <Shell role={role} setRole={r => { setRole(r); toast(`Now viewing as ${ROLES[r].label}`, ROLES[r].desc, 'info'); }}
-        theme={theme} toggleTheme={toggleTheme} rail={rail} setRail={setRail}
+        theme={theme} toggleTheme={toggleTheme} textSize={textSize} cycleTextSize={cycleTextSize}
+        rail={rail} setRail={setRail}
         onPalette={() => setPalette(true)} onSignOut={signOut}>
         <Suspense fallback={<div className="page"><Skeleton rows={5} /></div>}>
           <Routes>

@@ -20,20 +20,25 @@ const LEG_D = '#262D29';
 const SHOE = '#FBFCFB';
 
 export default function StageScene() {
-  /* A generated clip if one is configured, the drawn figure if not. The clip
-     is the only remote asset on the screen, so it is treated as optional:
-     if it will not load, `onError` takes it out and the SVG takes over. */
-  const [clipOk, setClipOk] = useState(!!WALK_VIDEO);
+  const videoRef = useRef(null);
   const reduced = useRef(false);
+
   useEffect(() => {
     reduced.current = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   }, []);
 
-  if (WALK_VIDEO && clipOk) return (
+  const hasVideo = WALK_VIDEO && WALK_VIDEO.length > 0;
+
+  if (hasVideo) return (
     <div className="stage-scene stage-clip" aria-hidden="true">
-      <video className="stage-video" src={WALK_VIDEO} poster={WALK_POSTER || undefined}
-        autoPlay={!reduced.current} loop muted playsInline preload="metadata"
-        onError={() => setClipOk(false)} />
+      <video ref={videoRef} className="stage-video"
+        src={WALK_VIDEO}
+        poster={WALK_POSTER}
+        autoPlay={!reduced.current}
+        loop
+        muted
+        playsInline
+        preload="auto" />
     </div>
   );
 

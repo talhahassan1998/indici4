@@ -1,18 +1,17 @@
 import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, Filter, Plus, Link2, Download, Check, TriangleAlert, User, Pencil, FilePen,
+  Search, Filter, Plus, Download, Check, TriangleAlert, User, Pencil, FilePen,
   SquareCheckBig, DollarSign, CalendarDays, Bell, Syringe, House, UserPlus, UserCheck,
   Printer, IdCard, EllipsisVertical, ChevronLeft, ChevronRight, Mail, Pill, FlaskConical,
   ReceiptText, Copy,
 } from 'lucide-react';
 import K from '../data/sample.js';
-import { fmtDate, age, money } from '../lib/format.js';
+import { fmtDateDMY, age, money } from '../lib/format.js';
 import { Avatar, Switch, Empty, Nil } from '../components/Primitives.jsx';
 import { useUi, Menu } from '../lib/ui.jsx';
 
 const COLS = [
-  { k: null,       label: '', select: true },
   { k: 'last',     label: 'Name', sort: true },
   { k: 'dob',      label: 'DOB', sort: true },
   { k: 'age',      label: 'Age', sort: true, num: true },
@@ -68,6 +67,28 @@ const MORE = [
 
 const digits = v => String(v).replace(/\D/g, '');
 
+/* Mars/Venus glyphs rather than lucide (which ships neither): stroke-only,
+   24x24 viewBox, so they sit at the same weight as the rest of the icon set. */
+function GenderIcon({ sex }) {
+  const isF = sex === 'F';
+  return (
+    <span className="tip" data-tip={isF ? 'Female' : 'Male'} aria-label={isF ? 'Female' : 'Male'}
+      style={{ display: 'inline-flex', color: isF ? 'var(--gender-f)' : 'var(--gender-m)' }}>
+      {isF ? (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="9" r="6" /><path d="M12 15v7M8.5 19h7" />
+        </svg>
+      ) : (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="10" cy="14" r="6" /><path d="M14.5 9.5L21 3M21 3h-5.5M21 3v5.5" />
+        </svg>
+      )}
+    </span>
+  );
+}
+
 /* One pager, used above the grid and below it. Every target is --h-md, and
    the page you are on is stated rather than only tinted. */
 function Pager({ cur, pages, onGo }) {
@@ -100,7 +121,6 @@ export default function Patients() {
   const [per, setPer] = useState(100);
   const [vault, setVault] = useState(false);
   const [menu, setMenu] = useState(null);
-  const [sel, setSel] = useState(() => new Set());
   const gridRef = useRef(null);
 
   const set = (k, v) => { setF(p => ({ ...p, [k]: v })); setPage(1); };
@@ -136,14 +156,6 @@ export default function Patients() {
   const pages = Math.max(1, Math.ceil(list.length / per));
   const cur = Math.min(page, pages);
   const rows = list.slice((cur - 1) * per, cur * per);
-  const pageIds = rows.map(r => r.id);
-  const allOnPage = pageIds.length > 0 && pageIds.every(id => sel.has(id));
-  const toggleRow = id => setSel(s2 => { const n = new Set(s2); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  const togglePage = () => setSel(s2 => {
-    const n = new Set(s2);
-    allOnPage ? pageIds.forEach(id => n.delete(id)) : pageIds.forEach(id => n.add(id));
-    return n;
-  });
   const nhiState = f.nhi.trim() ? K.nhiCheck(f.nhi) : null;
 
   const act = (id, pid, anchor) => {
@@ -182,22 +194,6 @@ export default function Patients() {
 
   return (
     <div className="ps-shell">
-      <div className="ps-head">
-        <div className="page-title">
-          <h1 className="t-h2">Search Patient</h1>
-          <span className="page-sub">Kora Specialists, Newmarket</span>
-        </div>
-        <span className="spacer" />
-        <div className="row g-2">
-          <button className="btn btn-ghost btn-sm" onClick={() => toast('Export queued', `${list.length} rows will be emailed as CSV.`, 'ok')}>
-            <Download size={14} /> Export</button>
-          <button className="btn btn-secondary btn-sm" onClick={() => toast('Duplicate check', 'Candidates matched on name, date of birth and address.', 'info')}>
-            <Link2 size={14} /> Find duplicates</button>
-          <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
-            <Plus size={14} /> Register patient</button>
-        </div>
-      </div>
-
       <div className="ps-filters">
         <div className="ps-filter-grid">
           <div className="field"><label className="label" htmlFor="fName">Patient name</label>
@@ -213,58 +209,37 @@ export default function Patients() {
           <div className="field"><label className="label" htmlFor="fStreet">Street or suburb</label>
             <input className="input" id="fStreet" value={f.street} placeholder="Devon Street"
               autoComplete="off" onChange={e => set('street', e.target.value)} /></div>
-          <div className="row g-2">
+          <div className="row g-2 ps-actions">
             <button className="btn btn-primary" data-act="search"
               onClick={() => { setPage(1); if (gridRef.current) gridRef.current.scrollTop = 0; }}>
-              <Search size={15} /> Search</button>
+              Search <Search size={15} /></button>
+            <button className="btn btn-primary btn-sm" onClick={() => toast('Register patient', 'An NHI lookup runs first so you do not create a duplicate.', 'info')}>
+              Register patient <Plus size={14} /></button>
             <button className="btn btn-ghost btn-sm" onClick={() => { setF({ name: '', dob: '', nhi: '', street: '' }); setPage(1); }}>Clear</button>
             <button className="btn btn-ghost btn-icon btn-sm tip" data-tip="Advanced search" aria-label="Advanced search"
               onClick={() => toast('Advanced search', 'Provider, enrolment, payment group and ACC claim would filter here.', 'info')}>
               <Filter size={15} /></button>
+            <button className="btn btn-ghost btn-sm" onClick={() => toast('Export queued', `${list.length} rows will be emailed as CSV.`, 'ok')}>
+              Export <Download size={14} /></button>
           </div>
         </div>
-        <div className="row g-3 mt-2">
-          {!nhiState ? <span className="hint">Three letters, four digits</span>
-            : nhiState.state === 'ok' ? <span className="err ok-t"><Check size={12} /> Check digit valid</span>
-            : nhiState.state === 'partial' ? <span className="hint">{nhiState.why}</span>
-            : <span className="err"><TriangleAlert size={12} /> {nhiState.why}</span>}
-        </div>
+        {nhiState && (
+          <div className="row g-3 mt-2">
+            {nhiState.state === 'ok' ? <span className="err ok-t"><Check size={12} /> Check digit valid</span>
+              : nhiState.state === 'partial' ? <span className="hint">{nhiState.why}</span>
+              : <span className="err"><TriangleAlert size={12} /> {nhiState.why}</span>}
+          </div>
+        )}
       </div>
 
-      {/* One bar over the grid rather than a legend strip and a footer: what
-          you have, what you have selected and what you can do about it, with
-          the pages where you can reach them without scrolling to the bottom
-          of four hundred rows. */}
+      {/* Legend on top so the colour on every name is explained before you
+          hit the grid, pagination on the bottom where a footer belongs. */}
       <div className="grid-panel">
-      <div className="grid-bar">
-        <span className="gb-count">
-          <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
-          <span className="subtle"> · showing {list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</span>
-        </span>
-
-        {sel.size > 0 ? (
-          <>
-            <span className="gb-sel"><b className="num">{sel.size}</b> selected</span>
-            <button className="btn btn-primary btn-sm" onClick={() => {
-              toast(`Recall letter queued`, `${sel.size} patient${sel.size === 1 ? '' : 's'} added to the typing queue.`, 'ok');
-              setSel(new Set());
-            }}><Mail size={16} /> Send recall letter</button>
-            <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Clear selection</button>
-          </>
-        ) : (
-          <label className="row g-2">
-            <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
-            <span className="t-sm muted">Include deceased and archived</span>
-          </label>
-        )}
-
-        <span className="spacer" />
-        <label className="row g-2 t-sm muted">Rows
-          <select className="select gb-rows" value={per} aria-label="Rows per page"
-            onChange={e => { setPer(Number(e.target.value)); setPage(1); }}>
-            {[50, 100, 200].map(n => <option key={n}>{n}</option>)}
-          </select></label>
-        <Pager cur={cur} pages={pages} onGo={n => { setPage(n); if (gridRef.current) gridRef.current.scrollTop = 0; }} />
+      <div className="ps-foot ps-foot-top">
+        <span className="t-eyebrow">Enrolment</span>
+        {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
+          <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
+        ))}
       </div>
 
       <div className="ps-grid" ref={gridRef}>
@@ -272,15 +247,6 @@ export default function Patients() {
           <thead><tr>
             {COLS.map(c => {
               const sorted = c.k && sort.k === c.k;
-              if (c.select) return (
-                <th key="sel" className="sel-cell">
-                  <span className="check" role="checkbox" tabIndex={0} aria-checked={allOnPage}
-                    aria-label={allOnPage ? 'Clear selection on this page' : 'Select every patient on this page'}
-                    onClick={togglePage}
-                    onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); togglePage(); } }}>
-                    <Check size={13} /></span>
-                </th>
-              );
               return (
                 <th key={c.label}
                   className={`${c.sort ? 'sortable' : ''} ${c.tip ? 'tip' : ''} ${c.num ? 'num-cell' : ''}`}
@@ -298,18 +264,10 @@ export default function Patients() {
               const mobile = p.phone && p.phone.startsWith('+64 2') ? p.phone : '';
               const landline = p.phone && !p.phone.startsWith('+64 2') ? p.phone : '';
               return (
-                <tr key={p.id} tabIndex={0} data-selected={sel.has(p.id) || undefined}
-                  onClick={e => { if (!e.target.closest('.p-actions, .sel-cell')) nav(`/patient/${p.id}`); }}
+                <tr key={p.id} tabIndex={0}
+                  onClick={e => { if (!e.target.closest('.p-actions')) nav(`/patient/${p.id}`); }}
                   onKeyDown={e => { if (e.key === 'Enter') nav(`/patient/${p.id}`); }}>
-                  <td className="sel-cell">
-                    <span className="check" role="checkbox" tabIndex={0} aria-checked={sel.has(p.id)}
-                      aria-label={`Select ${K.displayName(p)}`}
-                      onClick={e => { e.stopPropagation(); toggleRow(p.id); }}
-                      onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); toggleRow(p.id); } }}>
-                      <Check size={13} /></span>
-                  </td>
                   <td><span className="pname">
-                    <i className="p-dot" style={{ background: st.tone }} title={st.label} />
                     <b style={{ color: st.tone }}>{p.last.toUpperCase()}, {p.first}</b>
                     {p.preferred && <span className="p-pref">({p.preferred})</span>}
                     {p.alerts.length > 0 && (
@@ -317,10 +275,10 @@ export default function Patients() {
                         <TriangleAlert size={13} /></span>
                     )}
                   </span></td>
-                  <td className="t-mono t-xs">{fmtDate(p.dob)}</td>
+                  <td className="t-mono t-xs">{fmtDateDMY(p.dob)}</td>
                   <td className="num-cell">{age(p.dob)}</td>
-                  <td>{p.sex === 'F' ? 'Female' : 'Male'}</td>
-                  <td className="t-mono t-xs">{p.nhi}</td>
+                  <td><GenderIcon sex={p.sex} /></td>
+                  <td><span className="nhi-card t-mono t-xs" style={{ '--tone': st.tone }}>{p.nhi}</span></td>
                   <td className="t-mono t-xs subtle">{p.chart}</td>
                   <td className="wrap-cell t-xs">{p.addr}</td>
                   <td className="t-xs">{landline || <Nil label="No landline" />}</td>
@@ -365,11 +323,22 @@ export default function Patients() {
         )}
       </div>
 
-      <div className="ps-foot">
-        <span className="t-eyebrow">Enrolment</span>
-        {Object.entries(K.ENROL_STATUS).map(([k, v]) => (
-          <span className="lg" key={k}><i style={{ background: v.tone }} />{v.label}</span>
-        ))}
+      <div className="grid-bar grid-bar-bottom">
+        <span className="gb-count">
+          <b className="num">{list.length.toLocaleString('en-NZ')}</b> patients
+          <span className="subtle"> · showing {list.length ? (cur - 1) * per + 1 : 0}–{Math.min(cur * per, list.length)}</span>
+        </span>
+        <label className="row g-2">
+          <Switch checked={vault} onChange={v => { setVault(v); setPage(1); }} id="fVault" label="Include deceased and archived" />
+          <span className="t-sm muted">Include deceased and archived</span>
+        </label>
+        <span className="spacer" />
+        <label className="row g-2 t-sm muted">Rows
+          <select className="select gb-rows" value={per} aria-label="Rows per page"
+            onChange={e => { setPer(Number(e.target.value)); setPage(1); }}>
+            {[50, 100, 200].map(n => <option key={n}>{n}</option>)}
+          </select></label>
+        <Pager cur={cur} pages={pages} onGo={n => { setPage(n); if (gridRef.current) gridRef.current.scrollTop = 0; }} />
       </div>
       </div>
       {menu && <Menu anchor={menu.anchor} items={menu.items} onClose={() => setMenu(null)} />}

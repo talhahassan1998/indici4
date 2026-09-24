@@ -993,10 +993,10 @@ const AUDIT_C_BANDS = [
 ];
 
 const TICS_QUESTIONS = [
-  { key: 'more', text: 'In the last year, have you ever drunk or used drugs more than you meant to?',
-    options: [['No', 0], ['Yes', 1]] },
-  { key: 'cutdown', text: 'Have you felt you wanted to cut down on your drinking or drug use in the last year?',
-    options: [['No', 0], ['Yes', 1]] },
+  { key: 'more', text: 'In the last year, have you ever used drugs more than you meant to?',
+    options: [['Yes', 1], ['No', 0]] },
+  { key: 'cutdown', text: 'Have you felt you wanted or needed to cut down on drug use in the last year?',
+    options: [['Yes', 1], ['No', 0]] },
 ];
 const TICS_BANDS = [
   { max: 0, label: 'Negative screen', tone: 'chip-ok' },
@@ -1042,7 +1042,8 @@ function RadioRow({ name, options, value, onChange }) {
    three near-identical forms. The provisional-diagnosis fields push
    straight into the same codes list the Diagnosis tab shows, the same
    way the quick-add field on the Notes tab already does. */
-function Questionnaire({ id, blurb, questions, bands, form, setForm, codes, setCodes, bump, toast }) {
+function Questionnaire({ id, blurb, questions, bands, form, setForm, codes, setCodes, bump, toast,
+  showProvisional = true, showScore = true }) {
   const total = questions.reduce((sum, q) => {
     const opt = q.options.find(([label]) => label === form[q.key]);
     return sum + (opt ? opt[1] : 0);
@@ -1081,44 +1082,50 @@ function Questionnaire({ id, blurb, questions, bands, form, setForm, codes, setC
         ))}
       </div>
 
-      <div className="col g-3 qhx-prov">
-        <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
-          <span className="check" role="checkbox" aria-checked={prov.addToDiagnosis}
-            onClick={() => setProv({ addToDiagnosis: !prov.addToDiagnosis })}><Check size={11} /></span>
-          <b className="t-eyebrow">Provisional diagnosis</b>
-        </label>
-        {prov.addToDiagnosis && (
-          <>
-            <div className="row g-4" style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
-              <div className="field" style={{ flex: '1 1 200px' }}>
-                <label className="label" htmlFor={`${id}Code`}>Code</label>
-                <input className="input" id={`${id}Code`} value={prov.code}
-                  onChange={e => setProv({ code: e.target.value })} placeholder="e.g. F10.1" />
+      {showProvisional && (
+        <div className="col g-3 qhx-prov">
+          <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
+            <span className="check" role="checkbox" aria-checked={prov.addToDiagnosis}
+              onClick={() => setProv({ addToDiagnosis: !prov.addToDiagnosis })}><Check size={11} /></span>
+            <b className="t-eyebrow">Provisional diagnosis</b>
+          </label>
+          {prov.addToDiagnosis && (
+            <>
+              <div className="row g-4" style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div className="field" style={{ flex: '1 1 200px' }}>
+                  <label className="label" htmlFor={`${id}Code`}>Code</label>
+                  <input className="input" id={`${id}Code`} value={prov.code}
+                    onChange={e => setProv({ code: e.target.value })} placeholder="e.g. F10.1" />
+                </div>
+                <label className="row g-2 t-sm" style={{ cursor: 'pointer', paddingBottom: 10 }}>
+                  <span className="check" role="checkbox" aria-checked={prov.overwrite}
+                    onClick={() => setProv({ overwrite: !prov.overwrite })}><Check size={11} /></span> Overwrite</label>
               </div>
-              <label className="row g-2 t-sm" style={{ cursor: 'pointer', paddingBottom: 10 }}>
-                <span className="check" role="checkbox" aria-checked={prov.overwrite}
-                  onClick={() => setProv({ overwrite: !prov.overwrite })}><Check size={11} /></span> Overwrite</label>
-            </div>
-            <div className="row g-4" style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
-              <div className="field grow">
-                <label className="label" htmlFor={`${id}Comments`}>Comments</label>
-                <textarea className="textarea" id={`${id}Comments`} rows={2} value={prov.comments}
-                  onChange={e => setProv({ comments: e.target.value })} />
+              <div className="row g-4" style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                <div className="field grow">
+                  <label className="label" htmlFor={`${id}Comments`}>Comments</label>
+                  <textarea className="textarea" id={`${id}Comments`} rows={2} value={prov.comments}
+                    onChange={e => setProv({ comments: e.target.value })} />
+                </div>
+                <button className="btn btn-secondary btn-sm" onClick={addDiagnosis}><Plus size={13} /> Add diagnosis</button>
               </div>
-              <button className="btn btn-secondary btn-sm" onClick={addDiagnosis}><Plus size={13} /> Add diagnosis</button>
-            </div>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="row g-4" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
         <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
           <span className="check" role="checkbox" aria-checked={confidential}
             onClick={() => setForm(f => ({ ...f, _confidential: !confidential }))}><Check size={11} /></span> Confidential</label>
-        <span className="spacer" />
-        <span className="t-sm"><b>Score:</b> {answered ? total : <span className="subtle">—</span>}</span>
-        {answered === questions.length && <span className={`chip ${band.tone}`}>{band.label}</span>}
-        {answered > 0 && answered < questions.length && <span className="t-xs subtle">{answered} of {questions.length} answered</span>}
+        {showScore && (
+          <>
+            <span className="spacer" />
+            <span className="t-sm"><b>Score:</b> {answered ? total : <span className="subtle">—</span>}</span>
+            {answered === questions.length && <span className={`chip ${band.tone}`}>{band.label}</span>}
+            {answered > 0 && answered < questions.length && <span className="t-xs subtle">{answered} of {questions.length} answered</span>}
+          </>
+        )}
       </div>
     </div>
   );
@@ -1185,9 +1192,10 @@ function SocialHxPanel({ toast, codes, setCodes, bump }) {
           questions={AUDIT_C_QUESTIONS} bands={AUDIT_C_BANDS} form={auditC} setForm={setAuditC}
           codes={codes} setCodes={setCodes} bump={bump} toast={toast} />
       ) : subTab === 'TICS' ? (
-        <Questionnaire id="tics" blurb="Two-Item Conjoint Screen for alcohol and drug use."
+        <Questionnaire id="tics" blurb="Two-Item Conjoint Screen for drug use."
           questions={TICS_QUESTIONS} bands={TICS_BANDS} form={tics} setForm={setTics}
-          codes={codes} setCodes={setCodes} bump={bump} toast={toast} />
+          codes={codes} setCodes={setCodes} bump={bump} toast={toast}
+          showProvisional={false} showScore={false} />
       ) : (
         <Questionnaire id="phq3" blurb="3-item patient health questionnaire (mood screen)."
           questions={PHQ3_QUESTIONS} bands={PHQ3_BANDS} form={phq3} setForm={setPhq3}

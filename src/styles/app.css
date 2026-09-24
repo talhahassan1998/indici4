@@ -1155,6 +1155,33 @@ a.cb-pill:hover .ic { color: var(--accent-text); }
   .fam-row > .field { flex-basis: 100%; }
 }
 
+/* Screening questionnaires (Audit C / TICS / PHQ3) — a bordered, lightly
+   striped list of question rows (like the reference tool) built from our
+   own radio control rather than native <input type=radio>, so focus,
+   spacing and checked-state colour all follow the rest of the app. */
+.qhx-list { border: 1px solid var(--line-faint); border-radius: var(--r-md); overflow: hidden; }
+.qhx-row { padding: var(--s-4); }
+.qhx-row:not(:last-child) { border-bottom: 1px solid var(--line-faint); }
+.qhx-row:nth-child(even) { background: var(--surface-2); }
+.qhx-q { margin: 0 0 var(--s-3); }
+.radio-row { display: flex; flex-wrap: wrap; gap: var(--s-5) var(--s-6); align-items: center; }
+.radio-opt { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.radio {
+  width: 20px; height: 20px; flex: none; border-radius: 999px;
+  border: 2px solid var(--line-field); background: var(--surface);
+  display: inline-grid; place-items: center; cursor: pointer;
+  transition: all var(--dur-1) var(--ease);
+}
+.radio[aria-checked="true"] { border-color: var(--accent); }
+.radio-dot {
+  width: 9px; height: 9px; border-radius: 999px; background: var(--accent);
+  opacity: 0; transform: scale(.4); transition: all var(--dur-1) var(--ease);
+}
+.radio[aria-checked="true"] .radio-dot { opacity: 1; transform: scale(1); }
+.qhx-prov {
+  padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface);
+}
+
 .consult-foot {
   flex: none; z-index: 25;
   border-top: 1px solid var(--line); border-bottom: 0;

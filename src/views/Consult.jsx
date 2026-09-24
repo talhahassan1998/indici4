@@ -772,7 +772,7 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
       ) : tab === 'Family Hx' ? (
         <FamilyHxPanel list={famList} onEdit={openFamDrawer} onRemove={removeFam} />
       ) : tab === 'Social Hx' ? (
-        <SocialHxPanel toast={toast} />
+        <SocialHxPanel toast={toast} codes={codes} setCodes={setCodes} bump={bump} />
       ) : tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
@@ -1021,40 +1021,102 @@ function scoreBand(score, bands) {
   return bands.find(b => score <= b.max) || bands[bands.length - 1];
 }
 
+function RadioRow({ name, options, value, onChange }) {
+  return (
+    <div className="radio-row" role="radiogroup" aria-label={name}>
+      {options.map(([label]) => (
+        <label className="radio-opt" key={label}>
+          <span className="radio" role="radio" aria-checked={value === label} onClick={() => onChange(label)}>
+            <span className="radio-dot" />
+          </span>
+          <span className="t-sm">{label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
 /* Audit C / TICS / PHQ3 are all the same shape — a short list of scored
-   questions — so one component renders all three from data rather than
-   three near-identical forms. */
-function Questionnaire({ blurb, questions, bands, form, setForm }) {
+   questions, a provisional-diagnosis add-on, and a confidential + score
+   footer — so one component renders all three from data rather than
+   three near-identical forms. The provisional-diagnosis fields push
+   straight into the same codes list the Diagnosis tab shows, the same
+   way the quick-add field on the Notes tab already does. */
+function Questionnaire({ id, blurb, questions, bands, form, setForm, codes, setCodes, bump, toast }) {
   const total = questions.reduce((sum, q) => {
     const opt = q.options.find(([label]) => label === form[q.key]);
     return sum + (opt ? opt[1] : 0);
   }, 0);
   const answered = questions.filter(q => form[q.key]).length;
   const band = scoreBand(total, bands);
+  const confidential = !!form._confidential;
+  const prov = form._provisional || { addToDiagnosis: false, code: '', overwrite: false, comments: '' };
+  const setProv = patch => setForm(f => ({ ...f, _provisional: { ...prov, ...patch } }));
+
+  const addDiagnosis = () => {
+    const code = prov.code.trim();
+    if (!code) { toast('Missing code', 'Enter a diagnosis code first.', 'warn'); return; }
+    const text = prov.comments.trim() ? `${code} — ${prov.comments.trim()}` : code;
+    setCodes(x => {
+      if (prov.overwrite) {
+        const i = x.findIndex(c => c.startsWith(code));
+        if (i > -1) { const copy = [...x]; copy[i] = text; return copy; }
+      }
+      return x.includes(text) ? x : [...x, text];
+    });
+    bump();
+    toast('Diagnosis added', `${text} · also listed under Diagnosis`, 'ok');
+  };
+
   return (
     <div className="col g-4">
       {blurb && <p className="t-sm subtle">{blurb}</p>}
-      <div className="ps-grid is-embedded">
-        <table>
-          <thead><tr><th>Question</th><th>Response</th></tr></thead>
-          <tbody>
-            {questions.map(q => (
-              <tr key={q.key}>
-                <td className="t-sm wrap-cell">{q.text}</td>
-                <td style={{ minWidth: 200 }}>
-                  <select className="select" value={form[q.key] || ''}
-                    onChange={e => setForm(f => ({ ...f, [q.key]: e.target.value }))}>
-                    <option value="">Select…</option>
-                    {q.options.map(([label]) => <option key={label}>{label}</option>)}
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="qhx-list">
+        {questions.map((q, i) => (
+          <div className="qhx-row" key={q.key}>
+            <p className="t-sm qhx-q"><b>{i + 1}.</b> {q.text}</p>
+            <RadioRow name={q.text} options={q.options} value={form[q.key]}
+              onChange={v => setForm(f => ({ ...f, [q.key]: v }))} />
+          </div>
+        ))}
       </div>
-      <div className="row g-3" style={{ alignItems: 'center' }}>
-        <span className="t-sm"><b>Total score:</b> {answered ? total : <span className="subtle">—</span>}</span>
+
+      <div className="col g-3 qhx-prov">
+        <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
+          <span className="check" role="checkbox" aria-checked={prov.addToDiagnosis}
+            onClick={() => setProv({ addToDiagnosis: !prov.addToDiagnosis })}><Check size={11} /></span>
+          <b className="t-eyebrow">Provisional diagnosis</b>
+        </label>
+        {prov.addToDiagnosis && (
+          <>
+            <div className="row g-4" style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div className="field" style={{ flex: '1 1 200px' }}>
+                <label className="label" htmlFor={`${id}Code`}>Code</label>
+                <input className="input" id={`${id}Code`} value={prov.code}
+                  onChange={e => setProv({ code: e.target.value })} placeholder="e.g. F10.1" />
+              </div>
+              <label className="row g-2 t-sm" style={{ cursor: 'pointer', paddingBottom: 10 }}>
+                <span className="check" role="checkbox" aria-checked={prov.overwrite}
+                  onClick={() => setProv({ overwrite: !prov.overwrite })}><Check size={11} /></span> Overwrite</label>
+            </div>
+            <div className="row g-4" style={{ alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div className="field grow">
+                <label className="label" htmlFor={`${id}Comments`}>Comments</label>
+                <textarea className="textarea" id={`${id}Comments`} rows={2} value={prov.comments}
+                  onChange={e => setProv({ comments: e.target.value })} />
+              </div>
+              <button className="btn btn-secondary btn-sm" onClick={addDiagnosis}><Plus size={13} /> Add diagnosis</button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="row g-4" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+        <label className="row g-2 t-sm" style={{ cursor: 'pointer' }}>
+          <span className="check" role="checkbox" aria-checked={confidential}
+            onClick={() => setForm(f => ({ ...f, _confidential: !confidential }))}><Check size={11} /></span> Confidential</label>
+        <span className="spacer" />
+        <span className="t-sm"><b>Score:</b> {answered ? total : <span className="subtle">—</span>}</span>
         {answered === questions.length && <span className={`chip ${band.tone}`}>{band.label}</span>}
         {answered > 0 && answered < questions.length && <span className="t-xs subtle">{answered} of {questions.length} answered</span>}
       </div>
@@ -1066,7 +1128,7 @@ function Questionnaire({ blurb, questions, bands, form, setForm }) {
    PHQ3) with a Save alongside it, like the reference — each sub-tab is a
    simple form kept in local state, since (unlike Family Hx) there's one
    record per patient rather than a list feeding a grid below. */
-function SocialHxPanel({ toast }) {
+function SocialHxPanel({ toast, codes, setCodes, bump }) {
   const [subTab, setSubTab] = useState('Social History');
   const [social, setSocial] = useState(blankSocialForm);
   const [auditC, setAuditC] = useState({});
@@ -1119,14 +1181,17 @@ function SocialHxPanel({ toast }) {
           </table>
         </div>
       ) : subTab === 'Audit C' ? (
-        <Questionnaire blurb="Alcohol Use Disorders Identification Test — Consumption (AUDIT-C)."
-          questions={AUDIT_C_QUESTIONS} bands={AUDIT_C_BANDS} form={auditC} setForm={setAuditC} />
+        <Questionnaire id="auditC" blurb="Alcohol Use Disorders Identification Test — Consumption (AUDIT-C)."
+          questions={AUDIT_C_QUESTIONS} bands={AUDIT_C_BANDS} form={auditC} setForm={setAuditC}
+          codes={codes} setCodes={setCodes} bump={bump} toast={toast} />
       ) : subTab === 'TICS' ? (
-        <Questionnaire blurb="Two-Item Conjoint Screen for alcohol and drug use."
-          questions={TICS_QUESTIONS} bands={TICS_BANDS} form={tics} setForm={setTics} />
+        <Questionnaire id="tics" blurb="Two-Item Conjoint Screen for alcohol and drug use."
+          questions={TICS_QUESTIONS} bands={TICS_BANDS} form={tics} setForm={setTics}
+          codes={codes} setCodes={setCodes} bump={bump} toast={toast} />
       ) : (
-        <Questionnaire blurb="3-item patient health questionnaire (mood screen)."
-          questions={PHQ3_QUESTIONS} bands={PHQ3_BANDS} form={phq3} setForm={setPhq3} />
+        <Questionnaire id="phq3" blurb="3-item patient health questionnaire (mood screen)."
+          questions={PHQ3_QUESTIONS} bands={PHQ3_BANDS} form={phq3} setForm={setPhq3}
+          codes={codes} setCodes={setCodes} bump={bump} toast={toast} />
       )}
     </div>
   );

@@ -771,6 +771,8 @@ function DiagnosisCoding({ p, codes, setCodes, bump, toast, open }) {
         </div>
       ) : tab === 'Family Hx' ? (
         <FamilyHxPanel list={famList} onEdit={openFamDrawer} onRemove={removeFam} />
+      ) : tab === 'Social Hx' ? (
+        <SocialHxPanel toast={toast} />
       ) : tab !== 'Diagnosis' ? (
         <Empty icon={<FileText size={22} />} title="Nothing recorded"
           body={`No ${tab.toLowerCase()} recorded for this patient yet.`} />
@@ -952,6 +954,181 @@ function FamilyHxDrawer({ close, p, editing, toast, force }) {
         </div>
       </div>
     </Drawer>
+  );
+}
+
+const SOCIAL_HX_TABS = ['Social History', 'Audit C', 'TICS', 'PHQ3'];
+
+const SOCIAL_FIELDS = [
+  { key: 'smoking', label: 'Smoking', options: ['Never smoked', 'Ex-smoker', 'Current smoker', 'Vapes only'] },
+  { key: 'alcohol', label: 'Alcohol intake', options: ['None', 'Occasional', 'Moderate', 'Heavy'] },
+  { key: 'exercise', label: 'Exercise', options: ['Sedentary', 'Light', 'Moderate', 'Active'] },
+  { key: 'travel', label: 'Overseas travel', options: ['None recent', 'Within 6 months', 'Within 1 month'] },
+  { key: 'drugUse', label: 'Drug use', options: ['None', 'Occasional', 'Regular'] },
+  { key: 'religion', label: 'Religion', options: ['Not stated', 'Christian', 'Muslim', 'Hindu', 'Buddhist', 'Other', 'None'] },
+  { key: 'impairment', label: 'Impairment', options: ['None', 'Hearing', 'Vision', 'Mobility', 'Cognitive'] },
+  { key: 'living', label: 'Social / Living', options: ['Lives alone', 'Lives with family', 'Lives with partner', 'Residential care'] },
+  { key: 'stress', label: 'Stress, Coping and Mood', options: ['Coping well', 'Some difficulty', 'Struggling', 'Crisis'] },
+  { key: 'urine', label: 'Urine Status', options: ['Not tested', 'Normal', 'Abnormal'] },
+  { key: 'blood', label: 'Blood Status', options: ['Not tested', 'Normal', 'Abnormal'] },
+  { key: 'smokingAdvice', label: 'Smoking Advice Status', options: ['Not offered', 'Offered — declined', 'Offered — accepted', 'Not applicable'] },
+  { key: 'triage', label: 'Triage Score', options: ['1 — Immediate', '2 — Urgent', '3 — Semi-urgent', '4 — Standard', '5 — Non-urgent'] },
+];
+const blankSocialForm = () => Object.fromEntries(
+  SOCIAL_FIELDS.map(f => [f.key, { value: '', confidential: false, comment: '' }])
+);
+
+const AUDIT_C_QUESTIONS = [
+  { key: 'freq', text: 'How often do you have a drink containing alcohol?',
+    options: [['Never', 0], ['Monthly or less', 1], ['2–4 times a month', 2], ['2–3 times a week', 3], ['4+ times a week', 4]] },
+  { key: 'qty', text: 'How many drinks containing alcohol do you have on a typical day when drinking?',
+    options: [['1–2', 0], ['3–4', 1], ['5–6', 2], ['7–9', 3], ['10 or more', 4]] },
+  { key: 'binge', text: 'How often do you have six or more drinks on one occasion?',
+    options: [['Never', 0], ['Less than monthly', 1], ['Monthly', 2], ['Weekly', 3], ['Daily or almost daily', 4]] },
+];
+const AUDIT_C_BANDS = [
+  { max: 3, label: 'Low risk', tone: 'chip-ok' },
+  { max: 7, label: 'Increasing risk', tone: 'chip-warn' },
+  { max: 12, label: 'High risk', tone: 'chip-bad' },
+];
+
+const TICS_QUESTIONS = [
+  { key: 'more', text: 'In the last year, have you ever drunk or used drugs more than you meant to?',
+    options: [['No', 0], ['Yes', 1]] },
+  { key: 'cutdown', text: 'Have you felt you wanted to cut down on your drinking or drug use in the last year?',
+    options: [['No', 0], ['Yes', 1]] },
+];
+const TICS_BANDS = [
+  { max: 0, label: 'Negative screen', tone: 'chip-ok' },
+  { max: 2, label: 'Positive screen', tone: 'chip-bad' },
+];
+
+const PHQ3_QUESTIONS = [
+  { key: 'interest', text: 'Little interest or pleasure in doing things',
+    options: [['Not at all', 0], ['Several days', 1], ['More than half the days', 2], ['Nearly every day', 3]] },
+  { key: 'down', text: 'Feeling down, depressed, or hopeless',
+    options: [['Not at all', 0], ['Several days', 1], ['More than half the days', 2], ['Nearly every day', 3]] },
+  { key: 'selfHarm', text: 'Thoughts that you would be better off dead, or of hurting yourself',
+    options: [['Not at all', 0], ['Several days', 1], ['More than half the days', 2], ['Nearly every day', 3]] },
+];
+const PHQ3_BANDS = [
+  { max: 2, label: 'Minimal', tone: 'chip-ok' },
+  { max: 5, label: 'Mild', tone: 'chip-warn' },
+  { max: 9, label: 'Needs review', tone: 'chip-bad' },
+];
+
+function scoreBand(score, bands) {
+  return bands.find(b => score <= b.max) || bands[bands.length - 1];
+}
+
+/* Audit C / TICS / PHQ3 are all the same shape — a short list of scored
+   questions — so one component renders all three from data rather than
+   three near-identical forms. */
+function Questionnaire({ blurb, questions, bands, form, setForm }) {
+  const total = questions.reduce((sum, q) => {
+    const opt = q.options.find(([label]) => label === form[q.key]);
+    return sum + (opt ? opt[1] : 0);
+  }, 0);
+  const answered = questions.filter(q => form[q.key]).length;
+  const band = scoreBand(total, bands);
+  return (
+    <div className="col g-4">
+      {blurb && <p className="t-sm subtle">{blurb}</p>}
+      <div className="ps-grid is-embedded">
+        <table>
+          <thead><tr><th>Question</th><th>Response</th></tr></thead>
+          <tbody>
+            {questions.map(q => (
+              <tr key={q.key}>
+                <td className="t-sm wrap-cell">{q.text}</td>
+                <td style={{ minWidth: 200 }}>
+                  <select className="select" value={form[q.key] || ''}
+                    onChange={e => setForm(f => ({ ...f, [q.key]: e.target.value }))}>
+                    <option value="">Select…</option>
+                    {q.options.map(([label]) => <option key={label}>{label}</option>)}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="row g-3" style={{ alignItems: 'center' }}>
+        <span className="t-sm"><b>Total score:</b> {answered ? total : <span className="subtle">—</span>}</span>
+        {answered === questions.length && <span className={`chip ${band.tone}`}>{band.label}</span>}
+        {answered > 0 && answered < questions.length && <span className="t-xs subtle">{answered} of {questions.length} answered</span>}
+      </div>
+    </div>
+  );
+}
+
+/* Social Hx: its own inner tab strip (Social History / Audit C / TICS /
+   PHQ3) with a Save alongside it, like the reference — each sub-tab is a
+   simple form kept in local state, since (unlike Family Hx) there's one
+   record per patient rather than a list feeding a grid below. */
+function SocialHxPanel({ toast }) {
+  const [subTab, setSubTab] = useState('Social History');
+  const [social, setSocial] = useState(blankSocialForm);
+  const [auditC, setAuditC] = useState({});
+  const [tics, setTics] = useState({});
+  const [phq3, setPhq3] = useState({});
+  const setField = (key, patch) => setSocial(f => ({ ...f, [key]: { ...f[key], ...patch } }));
+
+  const save = () => toast('Social history saved', subTab, 'ok');
+
+  return (
+    <div className="col g-4">
+      <div className="row" style={{ alignItems: 'center' }}>
+        <nav className="tabs" role="tablist" aria-label="Social history section">
+          {SOCIAL_HX_TABS.map(t => (
+            <button role="tab" key={t} aria-selected={subTab === t} onClick={() => setSubTab(t)}>{t}</button>
+          ))}
+        </nav>
+        <span className="spacer" />
+        <button className="btn btn-primary btn-sm" onClick={save}><Check size={14} /> Save</button>
+      </div>
+
+      {subTab === 'Social History' ? (
+        <div className="ps-grid is-embedded">
+          <table>
+            <thead><tr><th>Field</th><th>Response</th><th>Confidential</th><th>Comment</th></tr></thead>
+            <tbody>
+              {SOCIAL_FIELDS.map(f => (
+                <tr key={f.key}>
+                  <td className="t-sm"><b>{f.label}</b></td>
+                  <td style={{ minWidth: 180 }}>
+                    <select className="select" value={social[f.key].value}
+                      onChange={e => setField(f.key, { value: e.target.value })}>
+                      <option value="">--Select--</option>
+                      {f.options.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                  </td>
+                  <td>
+                    <span className="check" role="checkbox" aria-checked={social[f.key].confidential}
+                      aria-label={`${f.label} confidential`}
+                      onClick={() => setField(f.key, { confidential: !social[f.key].confidential })}>
+                      <Check size={11} /></span>
+                  </td>
+                  <td style={{ minWidth: 220 }}>
+                    <textarea className="textarea" rows={1} value={social[f.key].comment}
+                      onChange={e => setField(f.key, { comment: e.target.value })} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : subTab === 'Audit C' ? (
+        <Questionnaire blurb="Alcohol Use Disorders Identification Test — Consumption (AUDIT-C)."
+          questions={AUDIT_C_QUESTIONS} bands={AUDIT_C_BANDS} form={auditC} setForm={setAuditC} />
+      ) : subTab === 'TICS' ? (
+        <Questionnaire blurb="Two-Item Conjoint Screen for alcohol and drug use."
+          questions={TICS_QUESTIONS} bands={TICS_BANDS} form={tics} setForm={setTics} />
+      ) : (
+        <Questionnaire blurb="3-item patient health questionnaire (mood screen)."
+          questions={PHQ3_QUESTIONS} bands={PHQ3_BANDS} form={phq3} setForm={setPhq3} />
+      )}
+    </div>
   );
 }
 

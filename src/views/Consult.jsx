@@ -1004,17 +1004,16 @@ const TICS_BANDS = [
 ];
 
 const PHQ3_QUESTIONS = [
-  { key: 'interest', text: 'Little interest or pleasure in doing things',
-    options: [['Not at all', 0], ['Several days', 1], ['More than half the days', 2], ['Nearly every day', 3]] },
-  { key: 'down', text: 'Feeling down, depressed, or hopeless',
-    options: [['Not at all', 0], ['Several days', 1], ['More than half the days', 2], ['Nearly every day', 3]] },
-  { key: 'selfHarm', text: 'Thoughts that you would be better off dead, or of hurting yourself',
-    options: [['Not at all', 0], ['Several days', 1], ['More than half the days', 2], ['Nearly every day', 3]] },
+  { key: 'coping', text: 'Are you having problems coping (now or longer term)?',
+    options: [['Yes', 1], ['No', 0]] },
+  { key: 'down', text: 'During the past month have you often been bothered by feeling down, depressed or hopeless?',
+    options: [['Yes', 1], ['No', 0]] },
+  { key: 'interest', text: 'During the past month have you often been bothered by little interest or pleasure in doing things?',
+    options: [['Yes', 1], ['No', 0]] },
 ];
 const PHQ3_BANDS = [
-  { max: 2, label: 'Minimal', tone: 'chip-ok' },
-  { max: 5, label: 'Mild', tone: 'chip-warn' },
-  { max: 9, label: 'Needs review', tone: 'chip-bad' },
+  { max: 0, label: 'Negative screen', tone: 'chip-ok' },
+  { max: 3, label: 'Positive screen', tone: 'chip-bad' },
 ];
 
 function scoreBand(score, bands) {
@@ -1199,7 +1198,8 @@ function SocialHxPanel({ toast, codes, setCodes, bump }) {
       ) : (
         <Questionnaire id="phq3" blurb="3-item patient health questionnaire (mood screen)."
           questions={PHQ3_QUESTIONS} bands={PHQ3_BANDS} form={phq3} setForm={setPhq3}
-          codes={codes} setCodes={setCodes} bump={bump} toast={toast} />
+          codes={codes} setCodes={setCodes} bump={bump} toast={toast}
+          showProvisional={false} showScore={false} />
       )}
     </div>
   );
